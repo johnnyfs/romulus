@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, String
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import UUIDMixin
@@ -11,6 +11,9 @@ from database import Base
 
 class Scene(UUIDMixin, Base):
     __tablename__ = "scenes"
+    __table_args__ = (
+        UniqueConstraint("game_id", "name", name="uq_scene_game_name"),
+    )
 
     game_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("games.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)

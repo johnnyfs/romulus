@@ -1,22 +1,21 @@
-
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
+from core.schemas import NESRef
 
 
-class PreambleCodeBlock(CodeBlock):
+class LoadSceneSubroutine(CodeBlock):
     """
-    The built-in preamble code block that runs at the start of the ROM.
+    The built-in load scene subroutine code block.
 
-    - initializes the stack pointer
-    - loads the first scene
+    - loads a scene into memory
     """
 
     @property
     def type(self) -> CodeBlockType:
-        return CodeBlockType.PREAMBLE
+        return CodeBlockType.SUBROUTINE
 
     @property
     def name(self) -> str:
-        return "preamble"
+        return "load_scene"
 
     @property
     def size(self) -> int:
@@ -24,8 +23,8 @@ class PreambleCodeBlock(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        return ["scene_data__main", "load_scene"]
+        return ["zp__src"]
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = b""
-        return RenderedCodeBlock(code=code, exported_names={})
+        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
