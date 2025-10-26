@@ -25,15 +25,20 @@ export class GamesService {
     /**
      * Create Game
      * @param requestBody
+     * @param _default
      * @returns GameCreateResponse Successful Response
      * @throws ApiError
      */
     public static createGameApiV1GamesPost(
         requestBody: GameCreateRequest,
+        _default: boolean = false,
     ): CancelablePromise<GameCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/games',
+            query: {
+                'default': _default,
+            },
             body: requestBody,
             mediaType: 'application/json',
             errors: {

@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NESScene_Input } from './NESScene_Input';
+import type { NESScene } from './NESScene';
 export type SceneCreateRequest = {
     game_id: string;
     name: string;
-    scene_data: NESScene_Input;
+    scene_data: NESScene;
 };
 

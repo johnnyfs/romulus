@@ -3,9 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NESColor } from './NESColor';
-export type NESScene_Input = {
+import type { NESRef } from './NESRef';
+export type NESScene = {
     background_color: NESColor;
-    background_palettes: any[];
-    sprite_palettes: any[];
+    background_palettes?: (NESRef | null);
+    sprite_palettes?: (NESRef | null);
 };
 

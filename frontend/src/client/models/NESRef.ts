@@ -2,7 +2,4 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type NESPalette = {
-    colors: any[];
-};
-
+export type NESRef = string;

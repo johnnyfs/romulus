@@ -14,9 +14,10 @@ function CreateGame() {
     setError(null);
 
     try {
-      const response = await GamesService.createGameApiV1GamesPost({
-        name: name
-      });
+      const response = await GamesService.createGameApiV1GamesPost(
+        { name: name },
+        true  // default_ = true to create with default scene
+      );
 
       // Redirect to the game detail page
       navigate(`/games/${response.id}`);

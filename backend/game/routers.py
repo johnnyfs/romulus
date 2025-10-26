@@ -35,7 +35,7 @@ async def create_game(
 
     if default_:
         # Default game has a single scene called main, dark blue background, no palettes.
-        scene_data = NESScene(background_color=NESColor(index=1))
+        scene_data = NESScene(background_color=NESColor(index=0x02))
         scene = Scene(name="main", game_id=game.id, scene_data=scene_data)
         game.scenes.append(scene)
 
