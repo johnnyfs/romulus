@@ -29,10 +29,18 @@ class ZeroPageWord(ZeroPageVariable):
     def size(self) -> int:
         return 2
 
-class ZeroPageSource(ZeroPageWord):
+class ZeroPageSource1(ZeroPageWord):
     """
     A generic source vector for indirect loading via the zero page.
     """
     @property
     def name(self) -> str:
-        return "zp__src"
+        return "zp__src1"
+    
+class ZeroPageSource2(ZeroPageWord):
+    """
+    A generic source vector for indirect loading via the zero page.
+    """
+    @property
+    def name(self) -> str:
+        return "zp__src2"

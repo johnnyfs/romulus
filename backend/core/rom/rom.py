@@ -19,3 +19,6 @@ class Rom(BaseModel):
 
     def add(self, code_block: CodeBlock) -> None:
         self.code_blocks[code_block.type][code_block.name] = code_block
+
+    def render(self) -> bytes:
+        return b""  # TODO: implement ROM rendering logic
