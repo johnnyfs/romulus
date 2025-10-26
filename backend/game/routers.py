@@ -1,12 +1,15 @@
 import uuid
-from fastapi import APIRouter, Depends
-from game.models import Game
-from sqlalchemy.ext.asyncio import AsyncSession
-
+from core.schemas import NESColor, NESScene
 from dependencies import get_db
-from game.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
-
+from fastapi import APIRouter, Depends, HTTPException, Query
+from game.models import Game
+from game.scene.models import Scene
 from game.scene.routers import router as scene_router
+from game.scene.schemas import SceneCreateResponse
+from game.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 router = APIRouter()
 router.include_router(scene_router, prefix="/{game_id}/scenes", tags=["scenes"])
@@ -15,8 +18,6 @@ router.include_router(scene_router, prefix="/{game_id}/scenes", tags=["scenes"])
 async def list_games(
     db: AsyncSession = Depends(get_db),
 ):
-    from sqlalchemy import select
-
     # Query all games
     stmt = select(Game)
     result = await db.execute(stmt)
@@ -27,9 +28,17 @@ async def list_games(
 @router.post("", response_model=GameCreateResponse)
 async def create_game(
     request: GameCreateRequest,
+    default_: bool = Query(False, alias="default"),
     db: AsyncSession = Depends(get_db),
 ):
     game = Game(name=request.name)
+
+    if default_:
+        # Default game has a single scene called main, dark blue background, no palettes.
+        scene_data = NESScene(background_color=NESColor(index=1))
+        scene = Scene(name="main", game_id=game.id, scene_data=scene_data)
+        game.scenes.append(scene)
+
     db.add(game)
     await db.flush()  # Flush to generate the UUID
     return GameCreateResponse(id=game.id, name=game.name)
@@ -39,11 +48,6 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    from fastapi import HTTPException
-    from sqlalchemy import select
-    from sqlalchemy.orm import selectinload
-    from game.scene.schemas import SceneCreateResponse
-
     # Query game with scenes eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(selectinload(Game.scenes))
     result = await db.execute(stmt)
@@ -70,8 +74,6 @@ async def delete_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    from fastapi import HTTPException
-
     game = await db.get(Game, game_id)
     if game is None:
         raise HTTPException(status_code=404, detail="Game not found")

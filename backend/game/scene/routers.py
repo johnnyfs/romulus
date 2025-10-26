@@ -1,6 +1,6 @@
 import uuid
 from dependencies import get_db
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from game.scene.models import Scene
 from game.scene.schemas import SceneCreateRequest, SceneCreateResponse, SceneDeleteResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,8 +24,6 @@ async def delete_scene(
     scene_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    from fastapi import HTTPException
-
     scene = await db.get(Scene, scene_id)
     if scene is None or scene.game_id != game_id:
         raise HTTPException(status_code=404, detail="Scene not found")

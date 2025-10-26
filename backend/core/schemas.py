@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 
 
+type NESRef = str # name referencing address in NES data
+
 class NESColor(BaseModel):
     index: int
 
@@ -12,5 +14,5 @@ class NESPalette(BaseModel):
 
 class NESScene(BaseModel):
     background_color: NESColor
-    background_palettes: tuple[NESPalette, NESPalette, NESPalette, NESPalette]
-    sprite_palettes: tuple[NESPalette, NESPalette, NESPalette, NESPalette]
+    background_palettes: NESRef | None = None
+    sprite_palettes: NESRef | None = None
