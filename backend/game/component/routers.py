@@ -16,7 +16,12 @@ async def create_component(
     request: ComponentCreateRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    component = Component(name=request.name, type=request.type, game_id=game_id)
+    component = Component(
+        name=request.name,
+        type=request.type,
+        component_data=request.component_data,
+        game_id=game_id,
+    )
     db.add(component)
     await db.flush()  # Flush to generate the UUID
     return ComponentCreateResponse(
@@ -24,6 +29,7 @@ async def create_component(
         game_id=component.game_id,
         name=component.name,
         type=component.type,
+        component_data=component.component_data,
     )
 
 

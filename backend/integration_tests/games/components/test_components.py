@@ -25,6 +25,13 @@ async def test_create_and_delete_component(base_url: str):
         component_data = {
             "name": "test_palette",
             "type": "palette",
+            "component_data": {
+                "type": "palette",
+                "palettes": [
+                    {"colors": [{"index": 1}, {"index": 2}, {"index": 3}]},
+                    {"colors": [{"index": 4}, {"index": 5}, {"index": 6}]},
+                ],
+            },
         }
 
         create_component_response = await client.post(
@@ -74,6 +81,10 @@ async def test_component_unique_constraint(base_url: str):
         component_data = {
             "name": "duplicate_palette",
             "type": "palette",
+            "component_data": {
+                "type": "palette",
+                "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
+            },
         }
 
         create_response1 = await client.post(
@@ -130,7 +141,14 @@ async def test_delete_component_from_wrong_game_returns_404(base_url: str):
         # Create a component for game 1
         component_response = await client.post(
             f"/api/v1/games/{game1_id}/components",
-            json={"name": "palette", "type": "palette"},
+            json={
+                "name": "palette",
+                "type": "palette",
+                "component_data": {
+                    "type": "palette",
+                    "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
+                },
+            },
         )
         component_id = component_response.json()["id"]
 
