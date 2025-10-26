@@ -22,3 +22,6 @@ class Rom(BaseModel):
 
     def render(self) -> bytes:
         return b""  # TODO: implement ROM rendering logic
+    
+def get_empty_rom() -> Rom:
+    return Rom()

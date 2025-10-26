@@ -199,6 +199,10 @@ pytest tests/
 2. Add route in `routers.py` with proper imports at top
 3. Use async/await for database operations
 4. Return Pydantic response models
+5. **CRITICAL: Write integration tests for all routes** in `integration_tests/`
+   - Test the happy path (successful create, read, update, delete)
+   - Test error cases (404s, validation errors, constraint violations)
+   - Follow the existing pattern in `integration_tests/games/`
 
 ### Add a new model
 1. Create model in `models.py` inheriting from UUIDMixin

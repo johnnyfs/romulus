@@ -1,7 +1,14 @@
+from enum import Enum
+
 from pydantic import BaseModel
 
 
 type NESRef = str # name referencing address in NES data
+
+
+class ComponentType(str, Enum):
+    """Types of components that can be attached to a game."""
+    PALETTE = "palette"
 
 class NESColor(BaseModel):
     index: int

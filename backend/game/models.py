@@ -10,5 +10,6 @@ class Game(UUIDMixin, Base):
 
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # Relationship to Scenes
+    # Relationships
     scenes: Mapped[list["Scene"]] = relationship("Scene", back_populates="game", cascade="all, delete-orphan", lazy="raise")
+    components: Mapped[list["Component"]] = relationship("Component", back_populates="game", cascade="all, delete-orphan", lazy="raise")

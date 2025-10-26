@@ -3,7 +3,7 @@ import uuid
 from core.rom.code_block import CodeBlock
 from core.rom.data import SceneData
 from core.rom.preamble import PreambleCodeBlock
-from core.rom.rom import Rom
+from core.rom.rom import Rom, get_empty_rom
 from core.rom.subroutines import LoadSceneSubroutine
 from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
 from dependencies import get_db
@@ -16,6 +16,7 @@ from sqlalchemy.orm import selectinload
 @dataclass
 class RomBuilder:
     db: AsyncSession
+    rom: Rom
     registry = {
         # Zero page
         "zp__src1": ZeroPageSource1(),
@@ -38,7 +39,7 @@ class RomBuilder:
         saw_main = False
         for scene in game.scenes:
             saw_main = saw_main or (scene.name == initial_scene_name)
-            scene_block = SceneData(_scene=scene)
+            scene_block = SceneData(_name=scene.name, _scene=scene.scene_data)
             self._add(rom, scene_block)
 
         preamble = PreambleCodeBlock(_main_scene_name=initial_scene_name)
@@ -62,6 +63,5 @@ class RomBuilder:
         rom.add(code_block)
         self.registry[code_block.name] = code_block
 
-def get_rom_builder(db: AsyncSession = Depends(get_db)) -> RomBuilder:
-    return RomBuilder(db=db)
-    
+def get_rom_builder(db: AsyncSession = Depends(get_db), rom: Rom = Depends(get_empty_rom)) -> RomBuilder:
+    return RomBuilder(db=db, rom=rom)

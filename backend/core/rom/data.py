@@ -1,5 +1,5 @@
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESScene
+from core.schemas import NESPalette, NESScene
 from game.scene.models import Scene
 
 class AddressData(CodeBlock):
@@ -34,6 +34,36 @@ class AddressData(CodeBlock):
         code = value.to_bytes(2, "little")
         return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
 
+class PaletteData(CodeBlock):
+    """
+    A palette data code block.
+
+    - contains NES palette data
+    """
+    _name: str
+    _palette: NESPalette
+
+    @property
+    def type(self) -> CodeBlockType:
+        return CodeBlockType.DATA
+
+    @property
+    def name(self) -> str:
+        return f"palette_data__{self._name}"
+
+    @property
+    def dependencies(self) -> list[str]:
+        return []
+
+    @property
+    def size(self) -> int:
+        return 12 # NES palettes are 12 bytes (4 colors x 3 bytes each)
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        code = bytearray()
+        for color in self._palette.colors:
+            code.append(color.index)
+        return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
 
 class SceneData(CodeBlock):
     """
@@ -42,7 +72,8 @@ class SceneData(CodeBlock):
     - contains the data for a scene
     """
     # Ignored by pydantic
-    _scene: Scene
+    _name: str
+    _scene: NESScene
 
     @property
     def type(self) -> CodeBlockType:
@@ -50,14 +81,14 @@ class SceneData(CodeBlock):
 
     @property
     def name(self) -> str:
-        return f"scene_data__{self._scene.name}"
+        return f"scene_data__{self._name}"
 
     @property
     def dependencies(self) -> list[str]:
         dependencies = ["data__initial_scene"]
-        if (bp := self._scene.scene_data.background_palettes) is not None:
+        if (bp := self._scene.background_palettes) is not None:
             dependencies.append(bp)
-        if (sp := self._scene.scene_data.sprite_palettes) is not None:
+        if (sp := self._scene.sprite_palettes) is not None:
             dependencies.append(sp)
         return dependencies
     
@@ -67,7 +98,7 @@ class SceneData(CodeBlock):
         return 1 + 2 + 2
     
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        scene_data = self._scene.scene_data
+        scene_data = self._scene
         code = bytearray()
 
         # Background color

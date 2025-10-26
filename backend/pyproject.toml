@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-packages = ["game", "game.scene", "core"]
+packages = ["game", "game.scene", "game.component", "core"]
 
 [project.optional-dependencies]
 dev = [
