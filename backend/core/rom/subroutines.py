@@ -99,8 +99,10 @@ class LoadSceneSubroutine(CodeBlock):
                 asm.iny()
 
         # Calculate skip offset for BEQ
+        # BEQ offset is relative to the PC of the instruction AFTER the BEQ
+        # beq_fixup_pos points to the offset byte, so PC after BEQ = beq_fixup_pos + 1
         bg_palette_end = len(asm)
-        skip_bg_bytes = bg_palette_end - bg_palette_start
+        skip_bg_bytes = bg_palette_end - beq_fixup_pos - 1
         # Fix up the BEQ instruction
         asm._code[beq_fixup_pos] = skip_bg_bytes & 0xFF
 
@@ -129,8 +131,9 @@ class LoadSceneSubroutine(CodeBlock):
                 asm.iny()
 
         # Fix up sprite palette BEQ
+        # Same calculation as BG palette above
         sprite_palette_end = len(asm)
-        skip_sprite_bytes = sprite_palette_end - sprite_palette_start
+        skip_sprite_bytes = sprite_palette_end - beq_sprite_fixup_pos - 1
         asm._code[beq_sprite_fixup_pos] = skip_sprite_bytes & 0xFF
 
         # === Enable PPU and NMI ===

@@ -292,6 +292,15 @@ wheels = [
 ]
 
 [[package]]
+name = "py65"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/15/de/8ceb654608a24ae247ac44443b369f70183d9a39d94e682ddb3c9767b330/py65-1.2.tar.gz", hash = "sha256:e1cb213823fc6ea8aecb219939943144b09439e5c14b3406cb5ca825d5875b93", size = 83481, upload-time = "2024-04-12T20:10:19.351Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/3d/7171f8401bb3cf058d233af314d3e314a348488bd22b2143b3591566a172/py65-1.2.0-py2.py3-none-any.whl", hash = "sha256:8e51f149647f2c2b44e5eb54350057771ccaef97f5f3d593fa3737e44c1ce4b7", size = 60518, upload-time = "2024-04-12T20:10:15.198Z" },
+]
+
+[[package]]
 name = "pydantic"
 version = "2.12.3"
 source = { registry = "https://pypi.org/simple" }
@@ -468,6 +477,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "httpx" },
+    { name = "py65" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
@@ -478,6 +488,7 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.29.0" },
     { name = "fastapi", specifier = ">=0.115.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
+    { name = "py65", marker = "extra == 'dev'", specifier = ">=1.1.0" },
     { name = "pydantic-settings", specifier = ">=2.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.23.0" },

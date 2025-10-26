@@ -164,10 +164,32 @@ alembic upgrade head
 
 ## Testing
 
+### Test Organization
+
+**CRITICAL: Test paths MUST mirror the code directory structure**
+
+- Unit tests go in `tests/` directory
+- Test file paths should match the code being tested
+- Refactors to code MUST be reflected in test file locations
+
+Examples:
+```
+core/rom/preamble.py        → tests/rom/test_preamble.py
+core/rom/subroutines.py     → tests/rom/test_subroutines.py
+game/routers.py             → tests/game/test_routers.py
+game/scene/models.py        → tests/game/scene/test_models.py
+```
+
 Integration tests are in `integration_tests/`:
 ```bash
 cd backend
 pytest integration_tests/
+```
+
+Unit tests:
+```bash
+cd backend
+pytest tests/
 ```
 
 ## Common Tasks
