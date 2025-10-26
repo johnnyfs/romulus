@@ -16,9 +16,12 @@ async def create_component(
     request: ComponentCreateRequest,
     db: AsyncSession = Depends(get_db),
 ):
+    # Extract type from component_data to keep SQL column in sync
+    component_type = request.component_data.type
+
     component = Component(
         name=request.name,
-        type=request.type,
+        type=component_type,
         component_data=request.component_data,
         game_id=game_id,
     )
@@ -28,7 +31,6 @@ async def create_component(
         id=component.id,
         game_id=component.game_id,
         name=component.name,
-        type=component.type,
         component_data=component.component_data,
     )
 

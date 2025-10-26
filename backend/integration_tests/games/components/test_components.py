@@ -24,7 +24,6 @@ async def test_create_and_delete_component(base_url: str):
         # Create a component for the game
         component_data = {
             "name": "test_palette",
-            "type": "palette",
             "component_data": {
                 "type": "palette",
                 "palettes": [
@@ -43,7 +42,7 @@ async def test_create_and_delete_component(base_url: str):
         created_component = create_component_response.json()
         assert "id" in created_component
         assert created_component["name"] == "test_palette"
-        assert created_component["type"] == "palette"
+        assert created_component["component_data"]["type"] == "palette"
         assert created_component["game_id"] == game_id
 
         component_id = created_component["id"]
@@ -80,7 +79,6 @@ async def test_component_unique_constraint(base_url: str):
         # Create a component
         component_data = {
             "name": "duplicate_palette",
-            "type": "palette",
             "component_data": {
                 "type": "palette",
                 "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
@@ -143,7 +141,6 @@ async def test_delete_component_from_wrong_game_returns_404(base_url: str):
             f"/api/v1/games/{game1_id}/components",
             json={
                 "name": "palette",
-                "type": "palette",
                 "component_data": {
                     "type": "palette",
                     "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
