@@ -13,8 +13,9 @@ dependencies = [
     "alembic>=1.13.0",
 ]
 
-[tool.setuptools]
-packages = ["game", "game.scene", "game.component", "core"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["api*", "core*"]
 
 [project.optional-dependencies]
 dev = [

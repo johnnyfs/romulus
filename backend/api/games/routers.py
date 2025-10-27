@@ -11,14 +11,12 @@ from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom
 from core.schemas import NESColor, NESScene
 from dependencies import get_db
-from game.models import Game
-from game.scene.models import Scene
-from game.scene.routers import router as scene_router
-from game.scene.schemas import SceneCreateResponse
-from game.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
+from api.games.models import Game
+from api.games.scenes.models import Scene
+from api.games.scenes.schemas import SceneCreateResponse
+from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
 
 router = APIRouter()
-router.include_router(scene_router, prefix="/{game_id}/scenes", tags=["scenes"])
 
 
 @router.get("", response_model=list[GameListItem])
@@ -88,7 +86,16 @@ async def delete_game(
     return GameDeleteResponse(id=game.id)
 
 
-@router.post("/{game_id}/render")
+@router.post(
+    "/{game_id}/render",
+    response_class=Response,
+    responses={
+        200: {
+            "content": {"application/octet-stream": {}},
+            "description": "NES ROM binary data",
+        }
+    },
+)
 async def render_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),

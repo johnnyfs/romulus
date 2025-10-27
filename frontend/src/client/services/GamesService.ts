@@ -16,10 +16,10 @@ export class GamesService {
      * @returns GameListItem Successful Response
      * @throws ApiError
      */
-    public static listGamesApiV1GamesGet(): CancelablePromise<Array<GameListItem>> {
+    public static listGamesGamesGet(): CancelablePromise<Array<GameListItem>> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/games',
+            url: '/games',
         });
     }
     /**
@@ -29,13 +29,13 @@ export class GamesService {
      * @returns GameCreateResponse Successful Response
      * @throws ApiError
      */
-    public static createGameApiV1GamesPost(
+    public static createGameGamesPost(
         requestBody: GameCreateRequest,
         _default: boolean = false,
     ): CancelablePromise<GameCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/games',
+            url: '/games',
             query: {
                 'default': _default,
             },
@@ -52,12 +52,12 @@ export class GamesService {
      * @returns GameGetResponse Successful Response
      * @throws ApiError
      */
-    public static getGameApiV1GamesGameIdGet(
+    public static getGameGamesGameIdGet(
         gameId: string,
     ): CancelablePromise<GameGetResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/games/{game_id}',
+            url: '/games/{game_id}',
             path: {
                 'game_id': gameId,
             },
@@ -72,12 +72,12 @@ export class GamesService {
      * @returns GameDeleteResponse Successful Response
      * @throws ApiError
      */
-    public static deleteGameApiV1GamesGameIdDelete(
+    public static deleteGameGamesGameIdDelete(
         gameId: string,
     ): CancelablePromise<GameDeleteResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/v1/games/{game_id}',
+            url: '/games/{game_id}',
             path: {
                 'game_id': gameId,
             },
@@ -93,15 +93,15 @@ export class GamesService {
      * Returns the ROM data as application/octet-stream which can be
      * loaded directly into a NES emulator.
      * @param gameId
-     * @returns any Successful Response
+     * @returns any NES ROM binary data
      * @throws ApiError
      */
-    public static renderGameApiV1GamesGameIdRenderPost(
+    public static renderGameGamesGameIdRenderPost(
         gameId: string,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/games/{game_id}/render',
+            url: '/games/{game_id}/render',
             path: {
                 'game_id': gameId,
             },

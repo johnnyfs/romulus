@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import './App.css';
-import CreateGame from './pages/CreateGame';
-import GameDetail from './pages/GameDetail';
-import RawAssetsList from './pages/admin/RawAssetsList';
-import RawAssetDetail from './pages/admin/RawAssetDetail';
-import GroupedAssetsList from './pages/admin/GroupedAssetsList';
-import GroupedAssetDetail from './pages/admin/GroupedAssetDetail';
-import { GamesService } from './client/services/GamesService';
-import type { GameListItem } from './client/models/GameListItem';
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import "./App.css";
+import CreateGame from "./pages/CreateGame";
+import GameDetail from "./pages/GameDetail";
+import { GamesService } from "./client/services/GamesService";
+import type { GameListItem } from "./client/models/GameListItem";
 
 function Home() {
   const [games, setGames] = useState<GameListItem[]>([]);
@@ -18,11 +14,11 @@ function Home() {
   useEffect(() => {
     const fetchGames = async () => {
       try {
-        const response = await GamesService.listGamesApiV1GamesGet();
+        const response = await GamesService.listGamesGamesGet();
         setGames(response);
         setLoading(false);
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch games');
+        setError(err.message || "Failed to fetch games");
         setLoading(false);
       }
     };
@@ -31,29 +27,35 @@ function Home() {
   }, []);
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <h1>Romulus Game Engine</h1>
 
-      <div style={{ marginBottom: '20px' }}>
-        <Link to="/games/create" style={{
-          display: 'inline-block',
-          padding: '10px 20px',
-          backgroundColor: '#007bff',
-          color: 'white',
-          textDecoration: 'none',
-          borderRadius: '4px',
-          marginRight: '10px'
-        }}>
+      <div style={{ marginBottom: "20px" }}>
+        <Link
+          to="/games/create"
+          style={{
+            display: "inline-block",
+            padding: "10px 20px",
+            backgroundColor: "#007bff",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: "4px",
+            marginRight: "10px",
+          }}
+        >
           Create New Game
         </Link>
-        <Link to="/admin/assets/raw" style={{
-          display: 'inline-block',
-          padding: '10px 20px',
-          backgroundColor: '#6c757d',
-          color: 'white',
-          textDecoration: 'none',
-          borderRadius: '4px'
-        }}>
+        <Link
+          to="/admin/assets/raw"
+          style={{
+            display: "inline-block",
+            padding: "10px 20px",
+            backgroundColor: "#6c757d",
+            color: "white",
+            textDecoration: "none",
+            borderRadius: "4px",
+          }}
+        >
           View Assets
         </Link>
       </div>
@@ -63,13 +65,15 @@ function Home() {
       {loading && <p>Loading games...</p>}
 
       {error && (
-        <div style={{
-          color: 'red',
-          padding: '10px',
-          border: '1px solid red',
-          borderRadius: '4px',
-          backgroundColor: '#fee'
-        }}>
+        <div
+          style={{
+            color: "red",
+            padding: "10px",
+            border: "1px solid red",
+            borderRadius: "4px",
+            backgroundColor: "#fee",
+          }}
+        >
           Error: {error}
         </div>
       )}
@@ -79,24 +83,32 @@ function Home() {
       )}
 
       {!loading && !error && games.length > 0 && (
-        <ul style={{ listStyle: 'none', padding: 0 }}>
+        <ul style={{ listStyle: "none", padding: 0 }}>
           {games.map((game) => (
-            <li key={game.id} style={{
-              marginBottom: '10px',
-              padding: '15px',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              backgroundColor: '#f9f9f9'
-            }}>
-              <Link to={`/games/${game.id}`} style={{
-                textDecoration: 'none',
-                color: '#007bff',
-                fontSize: '18px',
-                fontWeight: 'bold'
-              }}>
+            <li
+              key={game.id}
+              style={{
+                marginBottom: "10px",
+                padding: "15px",
+                border: "1px solid #ddd",
+                borderRadius: "4px",
+                backgroundColor: "#f9f9f9",
+              }}
+            >
+              <Link
+                to={`/games/${game.id}`}
+                style={{
+                  textDecoration: "none",
+                  color: "#007bff",
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                }}
+              >
                 {game.name}
               </Link>
-              <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+              <div
+                style={{ fontSize: "12px", color: "#666", marginTop: "5px" }}
+              >
                 ID: {game.id}
               </div>
             </li>
@@ -115,10 +127,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games/create" element={<CreateGame />} />
           <Route path="/games/:id" element={<GameDetail />} />
-          <Route path="/admin/assets/raw" element={<RawAssetsList />} />
-          <Route path="/admin/assets/raw/:filename" element={<RawAssetDetail />} />
-          <Route path="/admin/assets/grouped" element={<GroupedAssetsList />} />
-          <Route path="/admin/assets/grouped/:filename" element={<GroupedAssetDetail />} />
         </Routes>
       </div>
     </Router>

@@ -11,7 +11,7 @@ from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry, get_new_registry
 from core.rom.rom import Rom, get_empty_rom
 from dependencies import get_db
-from game.models import Game
+from api.games.models import Game
 
 
 @dataclass

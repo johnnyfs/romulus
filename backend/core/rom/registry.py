@@ -5,7 +5,7 @@ from core.rom.data import PaletteData
 from core.rom.subroutines import LoadSceneSubroutine
 from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
 from core.schemas import ComponentType
-from game.component.models import Component
+from api.games.components.models import Component
 
 DEFAULT_REGISTRY = {
     # Zero page

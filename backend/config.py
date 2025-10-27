@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = "/api/v1"
 
     # CORS
-    FRONTEND_URL: str = "http://localhost:3000"
+    FRONTEND_URL: str = "http://localhost:3001"
 
     # Security (add JWT secret, etc. as needed)
     # SECRET_KEY: str = "your-secret-key-here"

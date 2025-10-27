@@ -16,7 +16,7 @@ Before running integration tests, ensure:
 
 3. **FastAPI server is running**:
    ```bash
-   uvicorn main:app --reload
+   uvicorn main:app --reload --port 8000
    ```
 
    Or if you have a different startup command, use that. The tests expect the API to be available at `http://localhost:8000`.

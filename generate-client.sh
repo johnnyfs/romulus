@@ -3,18 +3,20 @@
 # Script to generate TypeScript client from FastAPI OpenAPI schema
 # Usage: ./generate-client.sh
 
+source .env
+
 set -e
 
 # Configuration
-API_URL="http://localhost:8000"
+API_URL="http://localhost:${BACKEND_PORT:-8000}"
 OPENAPI_FILE="openapi.json"
 OUTPUT_DIR="./frontend/src/client"
 
 echo "🚀 Generating TypeScript client from FastAPI OpenAPI schema..."
 
 # Step 1: Fetch the OpenAPI schema
-echo "📥 Fetching OpenAPI schema from ${API_URL}/openapi.json..."
-curl -s "${API_URL}/openapi.json" -o "${OPENAPI_FILE}"
+echo "📥 Fetching OpenAPI schema from ${API_URL}/api/v1/openapi.json..."
+curl -s "${API_URL}/api/v1/openapi.json" -o "${OPENAPI_FILE}"
 
 if [ ! -f "${OPENAPI_FILE}" ]; then
     echo "❌ Failed to fetch OpenAPI schema. Make sure FastAPI is running at ${API_URL}"

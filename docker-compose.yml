@@ -3,11 +3,11 @@ services:
     image: postgres:16-alpine
     container_name: romulus-postgres
     environment:
-      POSTGRES_USER: romulus
-      POSTGRES_PASSWORD: romulus
-      POSTGRES_DB: romulus
+      POSTGRES_USER: ${POSTGRES_USER:-romulus}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-romulus}
+      POSTGRES_DB: ${POSTGRES_DB:-romulus}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -18,23 +18,25 @@ services:
 
   api:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: romulus-api
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port ${BACKEND_PORT:-8000} --reload
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:${BACKEND_PORT:-8000}"
     volumes:
-      - .:/app
+      - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql+asyncpg://romulus:romulus@postgres:5432/romulus
+      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://romulus:romulus@postgres:5432/romulus}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - DEBUG=${DEBUG:-false}
     depends_on:
       postgres:
         condition: service_healthy
     develop:
       watch:
         - action: sync
-          path: ./
+          path: ./backend
           target: /app
           ignore:
             - __pycache__/
@@ -42,7 +44,7 @@ services:
             - .pytest_cache/
             - "*.pyc"
         - action: rebuild
-          path: ./pyproject.toml
+          path: ./backend/pyproject.toml
 
 volumes:
   postgres_data:

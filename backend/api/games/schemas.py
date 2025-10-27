@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from game.scene.schemas import SceneCreateResponse
+from api.games.scenes.schemas import SceneCreateResponse
 
 
 class GameCommon(BaseModel):

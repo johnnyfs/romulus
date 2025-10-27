@@ -15,7 +15,7 @@ function CreateGame() {
     setError(null);
 
     try {
-      const response = await GamesService.createGameApiV1GamesPost(
+      const response = await GamesService.createGameGamesPost(
         { name: name },
         true  // default_ = true to create with default scene
       );

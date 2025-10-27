@@ -15,13 +15,13 @@ export class ComponentsService {
      * @returns ComponentCreateResponse Successful Response
      * @throws ApiError
      */
-    public static createComponentApiV1GamesGameIdComponentsPost(
+    public static createComponentGamesGameIdComponentsPost(
         gameId: string,
         requestBody: ComponentCreateRequest,
     ): CancelablePromise<ComponentCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/games/{game_id}/components',
+            url: '/games/{game_id}/components',
             path: {
                 'game_id': gameId,
             },
@@ -39,13 +39,13 @@ export class ComponentsService {
      * @returns any Successful Response
      * @throws ApiError
      */
-    public static deleteComponentApiV1GamesGameIdComponentsComponentIdDelete(
+    public static deleteComponentGamesGameIdComponentsComponentIdDelete(
         gameId: string,
         componentId: string,
     ): CancelablePromise<any> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/v1/games/{game_id}/components/{component_id}',
+            url: '/games/{game_id}/components/{component_id}',
             path: {
                 'game_id': gameId,
                 'component_id': componentId,

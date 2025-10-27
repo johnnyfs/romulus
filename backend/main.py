@@ -1,25 +1,25 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from api.games.routers import router as game_router
+from api.games.scenes.routers import router as scene_router
+from api.games.components.routers import router as component_router
 from config import settings
-from game.component.routers import router as component_router
-from game.routers import router as game_router
-from game.scene.routers import router as scene_router
-from admin.assets import router as admin_assets_router
+
+v1_app = FastAPI()
+
+# Register routers
+v1_app.include_router(game_router, prefix="/games", tags=["games"])
+v1_app.include_router(scene_router, prefix="/games/{game_id}/scenes", tags=["scenes"])
+v1_app.include_router(component_router, prefix="/games/{game_id}/components", tags=["components"])
 
 app = FastAPI()
 
-# Configure CORS - allow all origins in development
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[f"{settings.FRONTEND_URL}"],
     allow_methods=["*"],
 )
 
-# Register routers
-app.include_router(game_router, prefix="/api/v1/games", tags=["games"])
-app.include_router(scene_router, prefix="/api/v1/games/{game_id}/scenes", tags=["scenes"])
-app.include_router(component_router, prefix="/api/v1/games/{game_id}/components", tags=["components"])
-
-# Admin routers (development only)
-app.include_router(admin_assets_router)
+app.mount("/api/v1", v1_app)

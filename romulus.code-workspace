@@ -1,11 +1,15 @@
 {
   "folders": [
     {
-      "name": "Backend",
+      "name": "romulus",
+      "path": "."
+    },
+    {
+      "name": "backend",
       "path": "backend"
     },
     {
-      "name": "Frontend",
+      "name": "frontend",
       "path": "frontend"
     }
   ],
@@ -16,9 +20,9 @@
       "**/.pytest_cache": true,
       "**/romulus.egg-info": true
     },
-    "python.defaultInterpreterPath": "${workspaceFolder:Backend}/.venv/bin/python",
+    "python.defaultInterpreterPath": "${workspaceFolder:backend}/.venv/bin/python",
     "python.analysis.extraPaths": [
-      "${workspaceFolder:Backend}/.venv/lib/python3.13/site-packages"
+      "${workspaceFolder:backend}/.venv/lib/python3.13/site-packages"
     ],
     "python.languageServer": "Pylance",
     "python.analysis.typeCheckingMode": "basic",

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import styles from './GameDetail.module.css';
 import { GamesService } from '../client/services/GamesService';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
+import { OpenAPI } from '../client/core/OpenAPI';
 import Chat from '../components/Chat';
 import RomPlayer from '../components/RomPlayer';
 import ComponentDisplay from '../components/ComponentDisplay';
@@ -19,7 +20,7 @@ function GameDetail() {
     if (!id) return;
 
     try {
-      const response = await GamesService.getGameApiV1GamesGameIdGet(id);
+      const response = await GamesService.getGameGamesGameIdGet(id);
       setGame(response);
       setLoading(false);
     } catch (err: any) {
@@ -36,7 +37,9 @@ function GameDetail() {
       console.log('Rendering ROM for game:', id);
 
       // Call the render endpoint directly with fetch (can't use generated client for binary data)
-      const response = await fetch(`http://localhost:8000/api/v1/games/${id}/render`, {
+      // The generated client's getResponseBody() always converts to JSON/text, which corrupts binary data
+      // We use OpenAPI.BASE (which includes /api/v1) to respect port configuration
+      const response = await fetch(`${OpenAPI.BASE}/games/${id}/render`, {
         method: 'POST',
       });
 

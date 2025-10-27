@@ -72,7 +72,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     setSaving(prev => new Set(prev).add(sceneId));
 
     try {
-      await ScenesService.updateSceneApiV1GamesGameIdScenesSceneIdPut(
+      await ScenesService.updateSceneGamesGameIdScenesSceneIdPut(
         game.id,
         sceneId,
         {
@@ -175,7 +175,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
 
     try {
       // Create the component on the backend with all 4 sub-palettes
-      const response = await ComponentsService.createComponentApiV1GamesGameIdComponentsPost(
+      const response = await ComponentsService.createComponentGamesGameIdComponentsPost(
         game.id,
         {
           name: palette.name,

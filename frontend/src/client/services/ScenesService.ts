@@ -18,13 +18,13 @@ export class ScenesService {
      * @returns SceneCreateResponse Successful Response
      * @throws ApiError
      */
-    public static createSceneApiV1GamesGameIdScenesPost(
+    public static createSceneGamesGameIdScenesPost(
         gameId: string,
         requestBody: SceneCreateRequest,
     ): CancelablePromise<SceneCreateResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/games/{game_id}/scenes',
+            url: '/games/{game_id}/scenes',
             path: {
                 'game_id': gameId,
             },
@@ -42,13 +42,13 @@ export class ScenesService {
      * @returns SceneDeleteResponse Successful Response
      * @throws ApiError
      */
-    public static deleteSceneApiV1GamesGameIdScenesSceneIdDelete(
+    public static deleteSceneGamesGameIdScenesSceneIdDelete(
         gameId: string,
         sceneId: string,
     ): CancelablePromise<SceneDeleteResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/v1/games/{game_id}/scenes/{scene_id}',
+            url: '/games/{game_id}/scenes/{scene_id}',
             path: {
                 'game_id': gameId,
                 'scene_id': sceneId,
@@ -66,14 +66,14 @@ export class ScenesService {
      * @returns SceneUpdateResponse Successful Response
      * @throws ApiError
      */
-    public static updateSceneApiV1GamesGameIdScenesSceneIdPut(
+    public static updateSceneGamesGameIdScenesSceneIdPut(
         gameId: string,
         sceneId: string,
         requestBody: SceneUpdateRequest,
     ): CancelablePromise<SceneUpdateResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/v1/games/{game_id}/scenes/{scene_id}',
+            url: '/games/{game_id}/scenes/{scene_id}',
             path: {
                 'game_id': gameId,
                 'scene_id': sceneId,
