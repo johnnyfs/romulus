@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import './GameDetail.css';
 import { GamesService } from '../client/services/GamesService';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 import Chat from '../components/Chat';
@@ -77,7 +78,7 @@ function GameDetail() {
 
   if (loading) {
     return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
+      <div className="game-detail-loading">
         <h2>Loading...</h2>
       </div>
     );
@@ -85,8 +86,8 @@ function GameDetail() {
 
   if (error) {
     return (
-      <div style={{ padding: '20px' }}>
-        <h2 style={{ color: 'red' }}>Error</h2>
+      <div className="game-detail-error">
+        <h2 className="game-detail-error-title">Error</h2>
         <p>{error}</p>
         <Link to="/">Back to Home</Link>
       </div>
@@ -94,45 +95,26 @@ function GameDetail() {
   }
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100vh',
-      overflow: 'hidden'
-    }}>
+    <div className="game-detail-container">
       {/* Header */}
-      <div style={{
-        padding: '10px 20px',
-        borderBottom: '1px solid #ddd',
-        backgroundColor: '#f5f5f5',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '20px'
-      }}>
-        <Link to="/" style={{ textDecoration: 'none', color: '#007bff' }}>← Back</Link>
-        <h2 style={{ margin: 0 }}>{game?.name}</h2>
+      <div className="game-detail-header">
+        <Link to="/" className="game-detail-back-link">← Back</Link>
+        <h2 className="game-detail-title">{game?.name}</h2>
       </div>
 
       {/* Three Column Layout */}
-      <div style={{
-        flex: 1,
-        display: 'grid',
-        gridTemplateColumns: '300px 1fr 350px',
-        gap: '10px',
-        padding: '10px',
-        overflow: 'hidden'
-      }}>
+      <div className="game-detail-layout">
         {/* Left Column - Chat */}
-        <div style={{ overflow: 'hidden' }}>
+        <div className="game-detail-column">
           <Chat gameId={id || ''} />
         </div>
 
         {/* Middle Column - ROM Player */}
-        <div style={{ overflow: 'hidden' }}>
+        <div className="game-detail-column">
           {romLoading ? (
-            <div style={{ textAlign: 'center' }}>
+            <div className="game-detail-rom-loading">
               <h3>Rendering ROM...</h3>
-              <p style={{ color: '#666' }}>Building your NES game</p>
+              <p className="game-detail-rom-loading-subtitle">Building your NES game</p>
             </div>
           ) : (
             <RomPlayer gameId={id || ''} romData={romData} />
@@ -140,7 +122,7 @@ function GameDetail() {
         </div>
 
         {/* Right Column - Component Display */}
-        <div style={{ overflow: 'hidden' }}>
+        <div className="game-detail-column">
           <ComponentDisplay game={game} />
         </div>
       </div>

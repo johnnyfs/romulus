@@ -100,30 +100,55 @@ Track in this file:
 #### Screenshots
 - **NES Screenshots Archive** - archive.org - Collection for reference/training
 
+## Asset Organization
+
+**Three Levels:**
+
+1. **Raw** (`assets/art/raw/sprites/`)
+   - Original downloaded sprite sheets
+   - Metadata YAML files with source URLs
+   - Example: `mychars.png` (24×16 grid of multiple characters)
+
+2. **Grouped** (`assets/art/grouped/sprites/`)
+   - Character/entity groups extracted from raw files
+   - Each group = one character's complete sprite set (all frames/colors)
+   - Example: `nes_char_00.png` (one character type with 10 color variants)
+   - Currently: 67 groups from processed files
+
+3. **Refined** (future)
+   - Individual frames sliced to 8×8 or 16×16 tiles
+   - Optimized for NES CHR ROM format
+   - Deduplicated and palette-optimized
+
 ## Asset Viewing
 
 The project includes a React-based admin interface for viewing and vetting assets:
 
 **Frontend Routes:**
 - `/admin/assets/raw` - Browse all raw sprite files
-- `/admin/assets/raw/:filename` - View raw asset details and derived sprites
-- `/admin/assets/grouped` - Browse all grouped sprites
-- `/admin/assets/grouped/:filename` - View grouped sprite details
+- `/admin/assets/raw/:filename` - View raw asset details and derived groups
+- `/admin/assets/grouped` - Browse all character/entity groups
+- `/admin/assets/grouped/:filename` - View group details
 
 **How It Works:**
 1. Assets are symlinked: `frontend/public/assets` → `assets/`
-2. Extraction script generates manifest files:
+2. Scripts generate manifest files:
    - `assets/art/raw/sprites/manifest.json`
    - `assets/art/grouped/sprites/manifest.json`
 3. React components read manifests to display assets
 4. Images served directly from public folder
 5. **No backend API needed** - all static files
 
-**After adding new assets:**
-Run the extraction script to update manifests:
+**After adding new raw assets:**
 ```bash
-python3 assets/art/scripts/extract_sprites.py
+python3 assets/art/scripts/group_sprites.py
 ```
+
+This script:
+- Analyzes raw sprite sheets
+- Extracts character/entity groups
+- Generates left-aligned YAML metadata
+- Updates manifest.json
 
 ## Next Steps
 

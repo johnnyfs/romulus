@@ -1,4 +1,5 @@
 import React from 'react';
+import './ComponentDisplay.css';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 
 interface ComponentDisplayProps {
@@ -7,56 +8,34 @@ interface ComponentDisplayProps {
 
 function ComponentDisplay({ game }: ComponentDisplayProps) {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      border: '1px solid #ddd',
-      borderRadius: '4px',
-      backgroundColor: '#fff'
-    }}>
-      <div style={{
-        padding: '10px',
-        borderBottom: '1px solid #ddd',
-        backgroundColor: '#f5f5f5',
-        fontWeight: 'bold'
-      }}>
+    <div className="component-display-container">
+      <div className="component-display-header">
         Component Inspector
       </div>
 
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '15px'
-      }}>
+      <div className="component-display-content">
         {!game ? (
-          <div style={{ color: '#999', textAlign: 'center', marginTop: '20px' }}>
+          <div className="component-display-loading">
             Loading game data...
           </div>
         ) : (
           <div>
-            <h3 style={{ marginTop: 0 }}>Game: {game.name}</h3>
+            <h3 className="component-display-game-title">Game: {game.name}</h3>
 
-            <div style={{ marginBottom: '20px' }}>
+            <div className="component-display-game-id">
               <strong>ID:</strong> <code>{game.id}</code>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <h4>Scenes ({game.scenes.length})</h4>
+            <div className="component-display-section">
+              <h4 className="component-display-section-title">Scenes ({game.scenes.length})</h4>
               {game.scenes.length === 0 ? (
-                <p style={{ color: '#999' }}>No scenes yet</p>
+                <p className="component-display-empty">No scenes yet</p>
               ) : (
-                <ul style={{ listStyle: 'none', padding: 0 }}>
+                <ul className="component-display-scenes-list">
                   {game.scenes.map((scene) => (
-                    <li key={scene.id} style={{
-                      padding: '10px',
-                      marginBottom: '8px',
-                      border: '1px solid #e0e0e0',
-                      borderRadius: '4px',
-                      backgroundColor: '#f9f9f9'
-                    }}>
-                      <div style={{ fontWeight: 'bold' }}>{scene.name}</div>
-                      <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
+                    <li key={scene.id} className="component-display-scene-item">
+                      <div className="component-display-scene-name">{scene.name}</div>
+                      <div className="component-display-scene-id">
                         ID: {scene.id}
                       </div>
                     </li>
@@ -65,18 +44,11 @@ function ComponentDisplay({ game }: ComponentDisplayProps) {
               )}
             </div>
 
-            <details style={{ marginTop: '20px' }}>
-              <summary style={{ cursor: 'pointer', fontWeight: 'bold', marginBottom: '10px' }}>
+            <details className="component-display-details">
+              <summary className="component-display-details-summary">
                 Raw Data
               </summary>
-              <pre style={{
-                backgroundColor: '#f5f5f5',
-                padding: '10px',
-                borderRadius: '4px',
-                fontSize: '12px',
-                overflow: 'auto',
-                border: '1px solid #ddd'
-              }}>
+              <pre className="component-display-details-pre">
                 {JSON.stringify(game, null, 2)}
               </pre>
             </details>

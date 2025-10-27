@@ -1,0 +1,18 @@
+source_url: https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets
+raw_file: assets/art/raw/sprites/popota_people.png
+source_rect:
+  x: 0
+  y: 0
+  width: 16
+  height: 192
+pov: pseudooverhead
+outlined: false
+genres:
+- fantasy
+- rpg
+gender: neuter
+tags:
+- nes
+- 4directional
+- no_outline
+- tricolor

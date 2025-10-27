@@ -1,0 +1,64 @@
+@import '../styles/variables.css';
+
+.game-detail-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.game-detail-header {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-bottom: var(--border-width) solid var(--border-color);
+  background-color: var(--bg-light);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xl);
+}
+
+.game-detail-back-link {
+  text-decoration: none;
+  color: var(--color-primary);
+}
+
+.game-detail-back-link:hover {
+  text-decoration: underline;
+}
+
+.game-detail-title {
+  margin: 0;
+}
+
+.game-detail-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr var(--right-panel-width);
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  overflow: hidden;
+}
+
+.game-detail-column {
+  overflow: hidden;
+}
+
+.game-detail-loading {
+  padding: var(--spacing-2xl);
+  text-align: center;
+}
+
+.game-detail-error {
+  padding: var(--spacing-2xl);
+}
+
+.game-detail-error-title {
+  color: var(--color-error);
+}
+
+.game-detail-rom-loading {
+  text-align: center;
+}
+
+.game-detail-rom-loading-subtitle {
+  color: var(--color-text-muted);
+}
