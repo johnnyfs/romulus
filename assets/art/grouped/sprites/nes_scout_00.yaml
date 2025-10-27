@@ -3,8 +3,8 @@ raw_file: assets/art/raw/sprites/scout.png
 source_rect:
   x: 0
   y: 0
-  width: 32
-  height: 160
+  width: 96
+  height: 128
 pov: pseudooverhead
 outlined: true
 genres:
@@ -14,5 +14,5 @@ gender: neuter
 tags:
 - nes
 - 4directional
-- color_variants
+- 12frames
 - scout

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import './GameDetail.css';
+import styles from './GameDetail.module.css';
 import { GamesService } from '../client/services/GamesService';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 import Chat from '../components/Chat';
@@ -78,7 +78,7 @@ function GameDetail() {
 
   if (loading) {
     return (
-      <div className="game-detail-loading">
+      <div className={styles.gameDetailLoading}>
         <h2>Loading...</h2>
       </div>
     );
@@ -86,8 +86,8 @@ function GameDetail() {
 
   if (error) {
     return (
-      <div className="game-detail-error">
-        <h2 className="game-detail-error-title">Error</h2>
+      <div className={styles.gameDetailError}>
+        <h2 className={styles.gameDetailErrorTitle}>Error</h2>
         <p>{error}</p>
         <Link to="/">Back to Home</Link>
       </div>
@@ -95,26 +95,26 @@ function GameDetail() {
   }
 
   return (
-    <div className="game-detail-container">
+    <div className={styles.gameDetailContainer}>
       {/* Header */}
-      <div className="game-detail-header">
-        <Link to="/" className="game-detail-back-link">← Back</Link>
-        <h2 className="game-detail-title">{game?.name}</h2>
+      <div className={styles.gameDetailHeader}>
+        <Link to="/" className={styles.gameDetailBackLink}>← Back</Link>
+        <h2 className={styles.gameDetailTitle}>{game?.name}</h2>
       </div>
 
       {/* Three Column Layout */}
-      <div className="game-detail-layout">
+      <div className={styles.gameDetailLayout}>
         {/* Left Column - Chat */}
-        <div className="game-detail-column">
+        <div className={styles.gameDetailColumn}>
           <Chat gameId={id || ''} />
         </div>
 
         {/* Middle Column - ROM Player */}
-        <div className="game-detail-column">
+        <div className={styles.gameDetailColumn}>
           {romLoading ? (
-            <div className="game-detail-rom-loading">
+            <div className={styles.gameDetailRomLoading}>
               <h3>Rendering ROM...</h3>
-              <p className="game-detail-rom-loading-subtitle">Building your NES game</p>
+              <p className={styles.gameDetailRomLoadingSubtitle}>Building your NES game</p>
             </div>
           ) : (
             <RomPlayer gameId={id || ''} romData={romData} />
@@ -122,7 +122,7 @@ function GameDetail() {
         </div>
 
         {/* Right Column - Component Display */}
-        <div className="game-detail-column">
+        <div className={styles.gameDetailColumn}>
           <ComponentDisplay game={game} />
         </div>
       </div>

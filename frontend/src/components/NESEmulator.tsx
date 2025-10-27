@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import './NESEmulator.css';
+import styles from './NESEmulator.module.css';
 // @ts-ignore - jsnes doesn't have type definitions
 import jsnes from 'jsnes';
 
@@ -214,7 +214,7 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
 
   if (error) {
     return (
-      <div className="nes-emulator-error">
+      <div className={styles.nesEmulatorError}>
         Error: {error}
       </div>
     );
@@ -222,20 +222,20 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
 
   if (!romData) {
     return (
-      <div className="nes-emulator-no-rom">
+      <div className={styles.nesEmulatorNoRom}>
         No ROM loaded
       </div>
     );
   }
 
   return (
-    <div className="nes-emulator-container">
-      <div className="nes-emulator-screen">
+    <div className={styles.nesEmulatorContainer}>
+      <div className={styles.nesEmulatorScreen}>
         <canvas
           ref={canvasRef}
           width={256}
           height={240}
-          className="nes-emulator-canvas"
+          className={styles.nesEmulatorCanvas}
           style={{
             width: `${width}px`,
             height: `${height}px`,
@@ -243,30 +243,30 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
         />
       </div>
 
-      <div className="nes-emulator-controls">
+      <div className={styles.nesEmulatorControls}>
         <button
           onClick={handlePlay}
           disabled={isRunning}
-          className={`nes-emulator-button nes-emulator-button--play`}
+          className={`${styles.nesEmulatorButton} ${styles.nesEmulatorButtonPlay}`}
         >
           {isRunning ? 'Playing' : 'Play'}
         </button>
         <button
           onClick={handlePause}
           disabled={!isRunning}
-          className={`nes-emulator-button nes-emulator-button--pause`}
+          className={`${styles.nesEmulatorButton} ${styles.nesEmulatorButtonPause}`}
         >
           Pause
         </button>
         <button
           onClick={handleReset}
-          className={`nes-emulator-button nes-emulator-button--reset`}
+          className={`${styles.nesEmulatorButton} ${styles.nesEmulatorButtonReset}`}
         >
           Reset
         </button>
       </div>
 
-      <div className="nes-emulator-help">
+      <div className={styles.nesEmulatorHelp}>
         Controls: Arrow Keys = D-Pad | Z = A | X = B | Enter = Start | Shift = Select | ESC = Pause
       </div>
     </div>

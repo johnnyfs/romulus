@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import styles from './CreateGame.module.css';
 import { GamesService } from '../client/services/GamesService';
 
 function CreateGame() {
@@ -28,12 +29,12 @@ function CreateGame() {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '500px', margin: '0 auto' }}>
-      <h1>Create New Game</h1>
+    <div className={styles.createGameContainer}>
+      <h1 className={styles.createGameTitle}>Create New Game</h1>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label htmlFor="gameName" style={{ display: 'block', marginBottom: '5px' }}>
+      <form onSubmit={handleSubmit} className={styles.createGameForm}>
+        <div className={styles.createGameFormGroup}>
+          <label htmlFor="gameName" className={styles.createGameLabel}>
             Game Name:
           </label>
           <input
@@ -42,26 +43,13 @@ function CreateGame() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            style={{
-              width: '100%',
-              padding: '8px',
-              fontSize: '16px',
-              border: '1px solid #ccc',
-              borderRadius: '4px'
-            }}
+            className={styles.createGameInput}
             disabled={loading}
           />
         </div>
 
         {error && (
-          <div style={{
-            color: 'red',
-            marginBottom: '15px',
-            padding: '10px',
-            border: '1px solid red',
-            borderRadius: '4px',
-            backgroundColor: '#fee'
-          }}>
+          <div className={styles.createGameError}>
             Error: {error}
           </div>
         )}
@@ -69,16 +57,7 @@ function CreateGame() {
         <button
           type="submit"
           disabled={loading || !name.trim()}
-          style={{
-            padding: '10px 20px',
-            fontSize: '16px',
-            backgroundColor: '#007bff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: loading || !name.trim() ? 'not-allowed' : 'pointer',
-            opacity: loading || !name.trim() ? 0.6 : 1
-          }}
+          className={styles.createGameSubmitButton}
         >
           {loading ? 'Creating...' : 'Create Game'}
         </button>

@@ -72,27 +72,53 @@ const GroupedAssetDetail: React.FC = () => {
 
       <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <h2>Metadata</h2>
-        <p>
-          <strong>Source:</strong>{' '}
-          {asset.metadata.source_url ? (
+        <div style={{ fontFamily: 'monospace', textAlign: 'left' }}>
+          <p><strong>source_url:</strong> {asset.metadata.source_url ? (
             <a href={asset.metadata.source_url} target="_blank" rel="noopener noreferrer">
               {asset.metadata.source_url}
             </a>
-          ) : (
-            'N/A'
-          )}
-        </p>
-        <p>
-          <strong>Raw File:</strong>{' '}
-          {rawFilename ? (
+          ) : 'N/A'}</p>
+
+          <p><strong>raw_file:</strong> {rawFilename ? (
             <Link to={`/admin/assets/raw/${rawFilename}`}>{rawFilename}</Link>
+          ) : 'N/A'}</p>
+
+          <p><strong>source_rect:</strong></p>
+          <div style={{ marginLeft: '20px' }}>
+            <p>x: {asset.metadata.source_rect?.x || 0}</p>
+            <p>y: {asset.metadata.source_rect?.y || 0}</p>
+            <p>width: {asset.metadata.source_rect?.width || 0}</p>
+            <p>height: {asset.metadata.source_rect?.height || 0}</p>
+          </div>
+
+          <p><strong>pov:</strong> {asset.metadata.pov || 'N/A'}</p>
+
+          <p><strong>outlined:</strong> {asset.metadata.outlined !== undefined ? String(asset.metadata.outlined) : 'N/A'}</p>
+
+          <p><strong>genres:</strong></p>
+          {asset.metadata.genres && asset.metadata.genres.length > 0 ? (
+            <div style={{ marginLeft: '20px' }}>
+              {asset.metadata.genres.map((genre: string) => (
+                <p key={genre}>- {genre}</p>
+              ))}
+            </div>
           ) : (
-            'N/A'
+            <p style={{ marginLeft: '20px' }}>[]</p>
           )}
-        </p>
-        <pre style={{ background: '#f4f4f4', padding: '15px', borderRadius: '4px', overflowX: 'auto', whiteSpace: 'pre' }}>
-          {JSON.stringify(asset.metadata, null, 0)}
-        </pre>
+
+          <p><strong>gender:</strong> {asset.metadata.gender || 'N/A'}</p>
+
+          <p><strong>tags:</strong></p>
+          {asset.metadata.tags && asset.metadata.tags.length > 0 ? (
+            <div style={{ marginLeft: '20px' }}>
+              {asset.metadata.tags.map((tag: string) => (
+                <p key={tag}>- {tag}</p>
+              ))}
+            </div>
+          ) : (
+            <p style={{ marginLeft: '20px' }}>[]</p>
+          )}
+        </div>
       </div>
     </div>
   );

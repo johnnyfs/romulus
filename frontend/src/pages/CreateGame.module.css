@@ -1,0 +1,68 @@
+@import '../styles/variables.css';
+
+.createGameContainer {
+  padding: var(--spacing-2xl);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.createGameTitle {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.createGameForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.createGameFormGroup {
+  margin-bottom: 15px;
+}
+
+.createGameLabel {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: var(--font-weight-medium);
+}
+
+.createGameInput {
+  width: 100%;
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-md);
+  border: var(--border-width) solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+}
+
+.createGameInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.createGameError {
+  color: var(--color-error);
+  margin-bottom: 15px;
+  padding: var(--spacing-md);
+  border: var(--border-width) solid var(--color-error);
+  border-radius: var(--border-radius-sm);
+  background-color: #fee;
+}
+
+.createGameSubmitButton {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  font-size: var(--font-size-md);
+  background-color: var(--color-primary);
+  color: var(--bg-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.createGameSubmitButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.createGameSubmitButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}

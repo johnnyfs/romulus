@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './Chat.css';
+import styles from './Chat.module.css';
 
 interface ChatProps {
   gameId: string;
@@ -32,14 +32,14 @@ function Chat({ gameId }: ChatProps) {
   };
 
   return (
-    <div className="chat-container">
-      <div className="chat-header">
+    <div className={styles.chatContainer}>
+      <div className={styles.chatHeader}>
         Chat
       </div>
 
-      <div className="chat-messages">
+      <div className={styles.chatMessages}>
         {messages.length === 0 && (
-          <div className="chat-empty">
+          <div className={styles.chatEmpty}>
             No messages yet. Start chatting!
           </div>
         )}
@@ -47,26 +47,26 @@ function Chat({ gameId }: ChatProps) {
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`chat-message chat-message--${msg.role}`}
+            className={`${styles.chatMessage} ${styles[`chatMessage${msg.role.charAt(0).toUpperCase() + msg.role.slice(1)}`]}`}
           >
             {msg.content}
           </div>
         ))}
       </div>
 
-      <div className="chat-input-container">
+      <div className={styles.chatInputContainer}>
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Type a message..."
-          className="chat-input"
+          className={styles.chatInput}
         />
         <button
           onClick={handleSend}
           disabled={!input.trim()}
-          className="chat-send-button"
+          className={styles.chatSendButton}
         >
           Send
         </button>

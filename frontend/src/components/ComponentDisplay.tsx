@@ -1,5 +1,5 @@
 import React from 'react';
-import './ComponentDisplay.css';
+import styles from './ComponentDisplay.module.css';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 
 interface ComponentDisplayProps {
@@ -8,34 +8,34 @@ interface ComponentDisplayProps {
 
 function ComponentDisplay({ game }: ComponentDisplayProps) {
   return (
-    <div className="component-display-container">
-      <div className="component-display-header">
+    <div className={styles.componentDisplayContainer}>
+      <div className={styles.componentDisplayHeader}>
         Component Inspector
       </div>
 
-      <div className="component-display-content">
+      <div className={styles.componentDisplayContent}>
         {!game ? (
-          <div className="component-display-loading">
+          <div className={styles.componentDisplayLoading}>
             Loading game data...
           </div>
         ) : (
           <div>
-            <h3 className="component-display-game-title">Game: {game.name}</h3>
+            <h3 className={styles.componentDisplayGameTitle}>Game: {game.name}</h3>
 
-            <div className="component-display-game-id">
+            <div className={styles.componentDisplayGameId}>
               <strong>ID:</strong> <code>{game.id}</code>
             </div>
 
-            <div className="component-display-section">
-              <h4 className="component-display-section-title">Scenes ({game.scenes.length})</h4>
+            <div className={styles.componentDisplaySection}>
+              <h4 className={styles.componentDisplaySectionTitle}>Scenes ({game.scenes.length})</h4>
               {game.scenes.length === 0 ? (
-                <p className="component-display-empty">No scenes yet</p>
+                <p className={styles.componentDisplayEmpty}>No scenes yet</p>
               ) : (
-                <ul className="component-display-scenes-list">
+                <ul className={styles.componentDisplayScenesList}>
                   {game.scenes.map((scene) => (
-                    <li key={scene.id} className="component-display-scene-item">
-                      <div className="component-display-scene-name">{scene.name}</div>
-                      <div className="component-display-scene-id">
+                    <li key={scene.id} className={styles.componentDisplaySceneItem}>
+                      <div className={styles.componentDisplaySceneName}>{scene.name}</div>
+                      <div className={styles.componentDisplaySceneId}>
                         ID: {scene.id}
                       </div>
                     </li>
@@ -44,11 +44,11 @@ function ComponentDisplay({ game }: ComponentDisplayProps) {
               )}
             </div>
 
-            <details className="component-display-details">
-              <summary className="component-display-details-summary">
+            <details className={styles.componentDisplayDetails}>
+              <summary className={styles.componentDisplayDetailsSummary}>
                 Raw Data
               </summary>
-              <pre className="component-display-details-pre">
+              <pre className={styles.componentDisplayDetailsPre}>
                 {JSON.stringify(game, null, 2)}
               </pre>
             </details>

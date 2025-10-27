@@ -73,19 +73,13 @@ const RawAssetDetail: React.FC = () => {
 
       <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
         <h2>Metadata</h2>
-        <p>
-          <strong>Source:</strong>{' '}
-          {asset.metadata.source_url ? (
+        <div style={{ fontFamily: 'monospace', textAlign: 'left' }}>
+          <p><strong>source_url:</strong> {asset.metadata.source_url ? (
             <a href={asset.metadata.source_url} target="_blank" rel="noopener noreferrer">
               {asset.metadata.source_url}
             </a>
-          ) : (
-            'N/A'
-          )}
-        </p>
-        <pre style={{ background: '#f4f4f4', padding: '15px', borderRadius: '4px', overflowX: 'auto', whiteSpace: 'pre' }}>
-          {JSON.stringify(asset.metadata, null, 0)}
-        </pre>
+          ) : 'N/A'}</p>
+        </div>
       </div>
 
       <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>

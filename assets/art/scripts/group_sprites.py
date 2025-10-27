@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-Intelligent sprite grouping script.
-Groups sprites by character/entity - each group contains all frames/variations of one character.
+Sprite grouping script - extracts character/entity groups from raw sprite sheets.
+Each group = one character with all its frames/animations/color variants.
 """
 
 from PIL import Image
 import yaml
 import json
 from pathlib import Path
-from typing import List, Dict, Tuple, Optional
+from typing import Dict
 
 
 def load_raw_metadata(image_path: Path) -> Dict:
@@ -21,15 +21,13 @@ def load_raw_metadata(image_path: Path) -> Dict:
 
 
 def save_grouped_metadata(grouped_sprites_dir: Path, name: str, metadata: Dict):
-    """Save metadata YAML for a grouped sprite (left-aligned, no indentation)."""
+    """Save metadata YAML for a grouped sprite (left-aligned)."""
     yaml_path = grouped_sprites_dir / f"{name}.yaml"
 
-    # Manually format YAML with no indentation
     lines = []
     lines.append(f"source_url: {metadata.get('source_url', '')}")
     lines.append(f"raw_file: {metadata.get('raw_file', '')}")
 
-    # Source rect
     sr = metadata.get('source_rect', {})
     lines.append("source_rect:")
     lines.append(f"  x: {sr.get('x', 0)}")
@@ -40,7 +38,6 @@ def save_grouped_metadata(grouped_sprites_dir: Path, name: str, metadata: Dict):
     lines.append(f"pov: {metadata.get('pov', 'unknown')}")
     lines.append(f"outlined: {str(metadata.get('outlined', False)).lower()}")
 
-    # Genres
     genres = metadata.get('genres', [])
     if genres:
         lines.append("genres:")
@@ -51,7 +48,6 @@ def save_grouped_metadata(grouped_sprites_dir: Path, name: str, metadata: Dict):
 
     lines.append(f"gender: {metadata.get('gender', 'neuter')}")
 
-    # Tags
     tags = metadata.get('tags', [])
     if tags:
         lines.append("tags:")
@@ -68,15 +64,11 @@ def extract_region(image_path: Path, x: int, y: int, w: int, h: int,
                    grouped_sprites_dir: Path, group_name: str, metadata: Dict):
     """Extract a rectangular region as a group."""
     img = Image.open(image_path).convert('RGBA')
-
-    # Extract region
     region = img.crop((x, y, x + w, y + h))
 
-    # Save
     group_path = grouped_sprites_dir / f"{group_name}.png"
     region.save(group_path)
 
-    # Update metadata with source rect
     metadata['source_rect'] = {'x': x, 'y': y, 'width': w, 'height': h}
     save_grouped_metadata(grouped_sprites_dir, group_name, metadata)
 
@@ -95,63 +87,47 @@ def main():
     grouped_sprites.mkdir(parents=True, exist_ok=True)
 
     print("Grouping sprites by character/entity...\n")
-
     group_count = 0
 
-    # mychars.png - 24x16 grid (384x256 pixels)
-    # Looking at the image: appears to be 12 columns of 2-sprite-wide characters
-    # Each character has 6 color variations vertically
-    # Let's extract each 2x10 block as one character group (32x160 pixels)
-    print("Processing mychars.png...")
-    raw_meta = load_raw_metadata(raw_sprites / "mychars.png")
-    for col in range(12):  # 12 character types
-        x = col * 32  # 2 sprites wide (16*2)
-        extract_region(
-            raw_sprites / "mychars.png",
-            x=x, y=0, w=32, h=160,  # 10 rows of color variations
-            grouped_sprites_dir=grouped_sprites,
-            group_name=f"nes_char_{col:02d}",
-            metadata={
-                'source_url': raw_meta.get('source_url', ''),
-                'raw_file': 'assets/art/raw/sprites/mychars.png',
-                'pov': 'pseudooverhead',
-                'outlined': True,
-                'genres': ['fantasy', 'rpg'],
-                'gender': 'neuter',
-                'tags': ['nes', '4directional', 'color_variants']
-            }
-        )
-        group_count += 1
-    print(f"  Created {12} character groups")
-
-    # Apply same logic to other similar files
+    # CORRECTED: mychars.png, bard.png, etc.
+    # Structure: 8 characters in 4×2 layout
+    # Each character: 96×128 pixels (3×4 grid of 32×32 frames)
     for filename, prefix in [
+        ('mychars.png', 'nes_char'),
         ('bard.png', 'nes_bard'),
         ('conjurer.png', 'nes_conjurer'),
         ('scout.png', 'nes_scout'),
         ('soldier.png', 'nes_soldier')
     ]:
-        print(f"\nProcessing {filename}...")
+        print(f"Processing {filename}...")
         raw_meta = load_raw_metadata(raw_sprites / filename)
-        for col in range(12):
-            x = col * 32
-            extract_region(
-                raw_sprites / filename,
-                x=x, y=0, w=32, h=160,
-                grouped_sprites_dir=grouped_sprites,
-                group_name=f"{prefix}_{col:02d}",
-                metadata={
-                    'source_url': raw_meta.get('source_url', ''),
-                    'raw_file': f'assets/art/raw/sprites/{filename}',
-                    'pov': 'pseudooverhead',
-                    'outlined': True,
-                    'genres': ['fantasy', 'rpg'],
-                    'gender': 'neuter',
-                    'tags': ['nes', '4directional', 'color_variants', prefix.split('_')[1]]
-                }
-            )
-            group_count += 1
-        print(f"  Created 12 character groups")
+
+        # 4 characters across, 2 down
+        char_num = 0
+        for row in range(2):
+            for col in range(4):
+                x = col * 96  # Each character is 96px wide (6 tiles)
+                y = row * 128  # Each character is 128px tall (8 tiles)
+
+                extract_region(
+                    raw_sprites / filename,
+                    x=x, y=y, w=96, h=128,
+                    grouped_sprites_dir=grouped_sprites,
+                    group_name=f"{prefix}_{char_num:02d}",
+                    metadata={
+                        'source_url': raw_meta.get('source_url', ''),
+                        'raw_file': f'assets/art/raw/sprites/{filename}',
+                        'pov': 'pseudooverhead',
+                        'outlined': True,
+                        'genres': ['fantasy', 'rpg'],
+                        'gender': 'neuter',
+                        'tags': ['nes', '4directional', '12frames', prefix.split('_')[-1]]
+                    }
+                )
+                char_num += 1
+                group_count += 1
+
+        print(f"  Created 8 character groups")
 
     # Single character walk cycles
     print("\nProcessing $delphinewalk_sheet.png (single character)...")
@@ -194,14 +170,17 @@ def main():
     )
     group_count += 1
 
-    # popota_people.png - 4 columns × 12 rows
-    # Each column is one character
+    # popota_people.png - 4 characters, each 48×64 pixels (3×4 grid of 16×16 sprites)
+    # Content bounding box: (6, 128, 380, 256) - so content starts at y=128
     print("\nProcessing popota_people.png (4 characters)...")
     raw_meta = load_raw_metadata(raw_sprites / "popota_people.png")
+
+    # Expected: 4 groups, each 48×64, starting at y=128
     for col in range(4):
+        x = 6 + (col * 48)  # Start at x=6 (bbox left), each character is 48px wide
         extract_region(
             raw_sprites / "popota_people.png",
-            x=col * 16, y=0, w=16, h=192,  # 12 rows high
+            x=x, y=128, w=48, h=64,  # Content starts at y=128
             grouped_sprites_dir=grouped_sprites,
             group_name=f"tricolor_people_{col:02d}",
             metadata={
@@ -211,11 +190,11 @@ def main():
                 'outlined': False,
                 'genres': ['fantasy', 'rpg'],
                 'gender': 'neuter',
-                'tags': ['nes', '4directional', 'no_outline', 'tricolor']
+                'tags': ['nes', '4directional', 'no_outline', 'tricolor', '12frames']
             }
         )
         group_count += 1
-    print(f"  Created 4 character groups")
+    print(f"  Created 4 character groups (48×64 each, starting at y=128)")
 
     # Dragon boss
     print("\nProcessing $popota_dragonbosssprite.png (single boss)...")
@@ -234,6 +213,29 @@ def main():
             'genres': ['fantasy', 'rpg'],
             'gender': 'neuter',
             'tags': ['nes', 'dragon', 'boss', 'monster', 'no_outline', 'tricolor', '32x32']
+        }
+    )
+    group_count += 1
+
+    # DENZI_CC0_32x48_monsters.png - extract individual monsters
+    print("\nProcessing DENZI_CC0_32x48_monsters.png...")
+    img = Image.open(raw_sprites / "DENZI_CC0_32x48_monsters.png")
+    raw_meta = load_raw_metadata(raw_sprites / "DENZI_CC0_32x48_monsters.png")
+
+    # This appears to be various sized sprites, extract as single group for now
+    extract_region(
+        raw_sprites / "DENZI_CC0_32x48_monsters.png",
+        x=0, y=0, w=img.width, h=img.height,
+        grouped_sprites_dir=grouped_sprites,
+        group_name="denzi_monsters",
+        metadata={
+            'source_url': raw_meta.get('source_url', ''),
+            'raw_file': 'assets/art/raw/sprites/DENZI_CC0_32x48_monsters.png',
+            'pov': 'side',
+            'outlined': True,
+            'genres': ['fantasy', 'horror'],
+            'gender': 'neuter',
+            'tags': ['monsters', 'various_sizes', '32x48']
         }
     )
     group_count += 1
@@ -266,13 +268,11 @@ def generate_manifest(repo_root: Path):
 
         grouped_manifest.append(asset)
 
-        # Group by prefix
         prefix = png_file.name.split('_')[0]
         if prefix not in grouped_by_prefix:
             grouped_by_prefix[prefix] = []
         grouped_by_prefix[prefix].append(asset)
 
-    # Write grouped manifest
     grouped_manifest_path = grouped_sprites / "manifest.json"
     with open(grouped_manifest_path, 'w') as f:
         json.dump({

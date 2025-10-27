@@ -1,10 +1,10 @@
 source_url: https://opengameart.org/content/more-nes-style-rpg-characters
 raw_file: assets/art/raw/sprites/conjurer.png
 source_rect:
-  x: 160
-  y: 0
-  width: 32
-  height: 160
+  x: 96
+  y: 128
+  width: 96
+  height: 128
 pov: pseudooverhead
 outlined: true
 genres:
@@ -14,5 +14,5 @@ gender: neuter
 tags:
 - nes
 - 4directional
-- color_variants
+- 12frames
 - conjurer

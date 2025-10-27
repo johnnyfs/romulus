@@ -1,0 +1,17 @@
+source_url: https://opengameart.org/content/denzis-public-domain-art
+raw_file: assets/art/raw/sprites/DENZI_CC0_32x48_monsters.png
+source_rect:
+  x: 0
+  y: 0
+  width: 448
+  height: 528
+pov: side
+outlined: true
+genres:
+- fantasy
+- horror
+gender: neuter
+tags:
+- monsters
+- various_sizes
+- 32x48

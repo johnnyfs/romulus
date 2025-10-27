@@ -1,6 +1,6 @@
 @import '../styles/variables.css';
 
-.chat-container {
+.chatContainer {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -9,14 +9,14 @@
   background-color: var(--bg-white);
 }
 
-.chat-header {
+.chatHeader {
   padding: var(--spacing-md);
   border-bottom: var(--border-width) solid var(--border-color);
   background-color: var(--bg-light);
   font-weight: var(--font-weight-bold);
 }
 
-.chat-messages {
+.chatMessages {
   flex: 1;
   overflow-y: auto;
   padding: var(--spacing-md);
@@ -25,38 +25,38 @@
   gap: var(--spacing-md);
 }
 
-.chat-empty {
+.chatEmpty {
   color: var(--color-text-light);
   text-align: center;
   margin-top: var(--spacing-2xl);
 }
 
-.chat-message {
+.chatMessage {
   max-width: 80%;
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--border-radius-md);
 }
 
-.chat-message--user {
+.chatMessageUser {
   align-self: flex-end;
   background-color: var(--bg-message-user);
   color: var(--bg-white);
 }
 
-.chat-message--assistant {
+.chatMessageAssistant {
   align-self: flex-start;
   background-color: var(--bg-message-assistant);
   color: var(--color-text);
 }
 
-.chat-input-container {
+.chatInputContainer {
   padding: var(--spacing-md);
   border-top: var(--border-width) solid var(--border-color);
   display: flex;
   gap: var(--spacing-md);
 }
 
-.chat-input {
+.chatInput {
   flex: 1;
   padding: var(--spacing-sm);
   border: var(--border-width) solid var(--border-color);
@@ -64,7 +64,7 @@
   font-size: var(--font-size-sm);
 }
 
-.chat-send-button {
+.chatSendButton {
   padding: var(--spacing-sm) var(--spacing-xl);
   background-color: var(--color-primary);
   color: var(--bg-white);
@@ -74,11 +74,11 @@
   transition: background-color var(--transition-fast);
 }
 
-.chat-send-button:hover:not(:disabled) {
+.chatSendButton:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
 }
 
-.chat-send-button:disabled {
+.chatSendButton:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }

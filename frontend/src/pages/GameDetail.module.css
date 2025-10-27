@@ -1,13 +1,13 @@
 @import '../styles/variables.css';
 
-.game-detail-container {
+.gameDetailContainer {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
 }
 
-.game-detail-header {
+.gameDetailHeader {
   padding: var(--spacing-md) var(--spacing-2xl);
   border-bottom: var(--border-width) solid var(--border-color);
   background-color: var(--bg-light);
@@ -16,20 +16,20 @@
   gap: var(--spacing-2xl);
 }
 
-.game-detail-back-link {
+.gameDetailBackLink {
   text-decoration: none;
   color: var(--color-primary);
 }
 
-.game-detail-back-link:hover {
+.gameDetailBackLink:hover {
   text-decoration: underline;
 }
 
-.game-detail-title {
+.gameDetailTitle {
   margin: 0;
 }
 
-.game-detail-layout {
+.gameDetailLayout {
   flex: 1;
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr var(--right-panel-width);
@@ -38,27 +38,27 @@
   overflow: hidden;
 }
 
-.game-detail-column {
+.gameDetailColumn {
   overflow: hidden;
 }
 
-.game-detail-loading {
+.gameDetailLoading {
   padding: var(--spacing-2xl);
   text-align: center;
 }
 
-.game-detail-error {
+.gameDetailError {
   padding: var(--spacing-2xl);
 }
 
-.game-detail-error-title {
+.gameDetailErrorTitle {
   color: var(--color-error);
 }
 
-.game-detail-rom-loading {
+.gameDetailRomLoading {
   text-align: center;
 }
 
-.game-detail-rom-loading-subtitle {
+.gameDetailRomLoadingSubtitle {
   color: var(--color-text-muted);
 }
