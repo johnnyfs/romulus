@@ -11,9 +11,9 @@ class Game(UUIDMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
 
     # Relationships
-    scenes: Mapped[list["Scene"]] = relationship(
+    scenes: Mapped[list["Scene"]] = relationship( # type: ignore
         "Scene", back_populates="game", cascade="all, delete-orphan", lazy="raise"
-    )  # type: ignore
-    components: Mapped[list["Component"]] = relationship(
+    )  
+    components: Mapped[list["Component"]] = relationship( # type: ignore
         "Component", back_populates="game", cascade="all, delete-orphan", lazy="raise"
     )  # type: ignore
