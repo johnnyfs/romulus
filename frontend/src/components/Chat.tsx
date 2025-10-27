@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './Chat.css';
 
 interface ChatProps {
   gameId: string;
@@ -31,33 +32,14 @@ function Chat({ gameId }: ChatProps) {
   };
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%',
-      border: '1px solid #ddd',
-      borderRadius: '4px',
-      backgroundColor: '#fff'
-    }}>
-      <div style={{
-        padding: '10px',
-        borderBottom: '1px solid #ddd',
-        backgroundColor: '#f5f5f5',
-        fontWeight: 'bold'
-      }}>
+    <div className="chat-container">
+      <div className="chat-header">
         Chat
       </div>
 
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '10px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '10px'
-      }}>
+      <div className="chat-messages">
         {messages.length === 0 && (
-          <div style={{ color: '#999', textAlign: 'center', marginTop: '20px' }}>
+          <div className="chat-empty">
             No messages yet. Start chatting!
           </div>
         )}
@@ -65,52 +47,26 @@ function Chat({ gameId }: ChatProps) {
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            style={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: '80%',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              backgroundColor: msg.role === 'user' ? '#007bff' : '#e9ecef',
-              color: msg.role === 'user' ? '#fff' : '#000'
-            }}
+            className={`chat-message chat-message--${msg.role}`}
           >
             {msg.content}
           </div>
         ))}
       </div>
 
-      <div style={{
-        padding: '10px',
-        borderTop: '1px solid #ddd',
-        display: 'flex',
-        gap: '10px'
-      }}>
+      <div className="chat-input-container">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Type a message..."
-          style={{
-            flex: 1,
-            padding: '8px',
-            border: '1px solid #ddd',
-            borderRadius: '4px',
-            fontSize: '14px'
-          }}
+          className="chat-input"
         />
         <button
           onClick={handleSend}
           disabled={!input.trim()}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#007bff',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: input.trim() ? 'pointer' : 'not-allowed',
-            opacity: input.trim() ? 1 : 0.6
-          }}
+          className="chat-send-button"
         >
           Send
         </button>
