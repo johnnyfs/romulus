@@ -117,9 +117,9 @@ function GameDetail() {
       <div style={{
         flex: 1,
         display: 'grid',
-        gridTemplateColumns: '300px auto 350px',
-        gap: '0',
-        padding: '0',
+        gridTemplateColumns: '300px 1fr 350px',
+        gap: '10px',
+        padding: '10px',
         overflow: 'hidden'
       }}>
         {/* Left Column - Chat */}
@@ -128,7 +128,7 @@ function GameDetail() {
         </div>
 
         {/* Middle Column - ROM Player */}
-        <div style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ overflow: 'hidden' }}>
           {romLoading ? (
             <div style={{ textAlign: 'center' }}>
               <h3>Rendering ROM...</h3>
