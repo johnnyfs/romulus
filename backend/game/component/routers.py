@@ -1,11 +1,11 @@
 import uuid
 
-from dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException
-from game.component.models import Component
-from game.component.schemas import ComponentCreateRequest, ComponentCreateResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from dependencies import get_db
+from game.component.models import Component
+from game.component.schemas import ComponentCreateRequest, ComponentCreateResponse
 
 router = APIRouter()
 

@@ -1,17 +1,17 @@
-from dataclasses import dataclass
 import uuid
+from dataclasses import dataclass
+
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from core.rom.code_block import CodeBlock
 from core.rom.data import SceneData
 from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry, get_new_registry
 from core.rom.rom import Rom, get_empty_rom
-from core.rom.subroutines import LoadSceneSubroutine
-from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
 from dependencies import get_db
-from fastapi import Depends
 from game.models import Game
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 
 @dataclass
@@ -21,10 +21,7 @@ class RomBuilder:
     registry: CodeBlockRegistry
 
     async def build(self, game_id: uuid.UUID, initial_scene_name: str = "main") -> bytes:
-        game = await self.db.get(Game, game_id, options=[
-            selectinload(Game.scenes),
-            selectinload(Game.components)
-        ])
+        game = await self.db.get(Game, game_id, options=[selectinload(Game.scenes), selectinload(Game.components)])
 
         if game is None or not game.scenes:
             raise ValueError(f"Game with ID {game_id} not found or has no scenes.")
@@ -50,9 +47,9 @@ class RomBuilder:
         for component in game.components:
             for code_block in self.registry.get_code_blocks(component):
                 self._add(rom, code_block)
-        
+
         return rom.render()
-    
+
     def _add(self, rom: Rom, code_block: CodeBlock):
         """
         First add all dependencies, recursively depth-first. Then add the code block itself.
@@ -64,5 +61,10 @@ class RomBuilder:
         rom.add(code_block)
         self.registry.add_code_block(code_block)
 
-def get_rom_builder(db: AsyncSession = Depends(get_db), rom: Rom = Depends(get_empty_rom), registry: CodeBlockRegistry = Depends(get_new_registry)) -> RomBuilder:
+
+def get_rom_builder(
+    db: AsyncSession = Depends(get_db),
+    rom: Rom = Depends(get_empty_rom),
+    registry: CodeBlockRegistry = Depends(get_new_registry),
+) -> RomBuilder:
     return RomBuilder(db=db, rom=rom, registry=registry)

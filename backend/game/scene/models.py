@@ -11,13 +11,11 @@ from database import Base
 
 class Scene(UUIDMixin, Base):
     __tablename__ = "scenes"
-    __table_args__ = (
-        UniqueConstraint("game_id", "name", name="uq_scene_game_name"),
-    )
+    __table_args__ = (UniqueConstraint("game_id", "name", name="uq_scene_game_name"),)
 
     game_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("games.id"), nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     scene_data: Mapped[NESScene] = mapped_column(PydanticType(NESScene), nullable=False)
 
     # Relationship to Game
-    game: Mapped["Game"] = relationship("Game", back_populates="scenes") # type: ignore
+    game: Mapped["Game"] = relationship("Game", back_populates="scenes")  # type: ignore

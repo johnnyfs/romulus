@@ -1,8 +1,9 @@
+import enum
 from abc import abstractmethod
 from dataclasses import dataclass
-import enum
 
 from pydantic import BaseModel
+
 
 class CodeBlockType(enum.Enum):
     """
@@ -13,6 +14,7 @@ class CodeBlockType(enum.Enum):
     subroutine: a callable subroutine
     data: raw data to be included in the ROM
     """
+
     ZEROPAGE = "ZEROPAGE"
     PREAMBLE = "PREAMBLE"
     VBLANK = "VBLANK"
@@ -20,13 +22,16 @@ class CodeBlockType(enum.Enum):
     SUBROUTINE = "SUBROUTINE"
     DATA = "DATA"
 
+
 @dataclass
 class RenderedCodeBlock:
     """
     Given a fixed start offset, the literal code plus a mapping of exported names to absolute addresses.
     """
+
     code: bytes
     exported_names: dict[str, int]
+
 
 class CodeBlock(BaseModel):
     @property

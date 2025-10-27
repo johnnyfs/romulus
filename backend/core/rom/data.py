@@ -1,7 +1,8 @@
 from pydantic import PrivateAttr
+
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESPalette, NESPaletteData, NESScene
-from game.scene.models import Scene
+from core.schemas import NESPaletteData, NESScene
+
 
 class AddressData(CodeBlock):
     """
@@ -9,6 +10,7 @@ class AddressData(CodeBlock):
 
     - used to store 2-byte values
     """
+
     _name: str = PrivateAttr()
     _referenced_value_name: str = PrivateAttr()
 
@@ -40,12 +42,14 @@ class AddressData(CodeBlock):
         code = value.to_bytes(2, "little")
         return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
 
+
 class PaletteData(CodeBlock):
     """
     A palette data code block.
 
     - contains NES palette data
     """
+
     _name: str = PrivateAttr()
     _palette_data: NESPaletteData = PrivateAttr()
 
@@ -78,12 +82,14 @@ class PaletteData(CodeBlock):
                 code.append(color.index)
         return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
 
+
 class SceneData(CodeBlock):
     """
     A scene data code block.
 
     - contains the data for a scene
     """
+
     _name: str = PrivateAttr()
     _scene: NESScene = PrivateAttr()
 
@@ -108,12 +114,12 @@ class SceneData(CodeBlock):
         if (sp := self._scene.sprite_palettes) is not None:
             dependencies.append(sp)
         return dependencies
-    
+
     @property
     def size(self) -> int:
         """Scene is 1 byte for background color + 4 bytes for the palette addresses (which must still be present if null.)"""
         return 1 + 2 + 2
-    
+
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         scene_data = self._scene
         code = bytearray()

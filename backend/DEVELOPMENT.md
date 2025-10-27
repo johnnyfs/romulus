@@ -71,6 +71,38 @@ You should see:
 - File size: 24,592 bytes (16-byte header + 16KB PRG + 8KB CHR)
 - Header: `NES\x1a` (first 4 bytes)
 
+## Code Quality & Linting
+
+The project uses [Ruff](https://docs.astral.sh/ruff/) for linting and formatting.
+
+### Running the Linter
+
+```bash
+# Check for issues (don't fix)
+./lint.sh
+
+# Auto-fix all fixable issues
+./lint.sh --fix
+
+# CI mode (check only, fail on issues)
+./lint.sh --check
+```
+
+### What the Linter Checks
+
+- **Code style:** PEP 8 compliance, line length (120 chars)
+- **Import sorting:** Automatic import organization with isort
+- **Code quality:** Unused imports, variables, buggy patterns
+- **Type hints:** Pyupgrade for modern Python syntax
+- **Simplifications:** Flake8-simplify for cleaner code
+
+### Configuration
+
+Ruff configuration is in `pyproject.toml` under `[tool.ruff]`. Key settings:
+- Line length: 120 characters
+- Target: Python 3.13
+- Excludes: `.venv`, `alembic/versions`, cache directories
+
 ## Running Tests
 
 ```bash

@@ -16,6 +16,7 @@ class PreambleCodeBlock(CodeBlock):
     7. Call load_scene subroutine
     8. Loop forever (main game loop will be in NMI handler)
     """
+
     _main_scene_name: str
 
     @property
@@ -30,11 +31,14 @@ class PreambleCodeBlock(CodeBlock):
     def size(self) -> int:
         # Pre-calculate by building the code once
         # This is called during layout, so we use dummy addresses
-        asm = self._build_code(start_offset=0x8000, names={
-            "zp__src1": 0x00,
-            f"scene_data__{self._main_scene_name}": 0x8000,
-            "load_scene": 0x8000,
-        })
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={
+                "zp__src1": 0x00,
+                f"scene_data__{self._main_scene_name}": 0x8000,
+                "load_scene": 0x8000,
+            },
+        )
         return len(asm)
 
     @property

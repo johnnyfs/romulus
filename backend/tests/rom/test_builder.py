@@ -1,4 +1,3 @@
-import uuid
 from unittest.mock import Mock
 
 import pytest
@@ -9,8 +8,6 @@ from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom, RomCodeArea
 from core.rom.subroutines import LoadSceneSubroutine
-from core.schemas import ComponentType, NESColor, NESPalette, NESPaletteData
-from game.component.models import Component
 
 
 class TrackingRom(Rom):
@@ -24,8 +21,8 @@ class TrackingRom(Rom):
     def __init__(self, **data):
         super().__init__(**data)
         # Use object.__setattr__ to bypass Pydantic validation
-        object.__setattr__(self, 'add_order', [])
-        object.__setattr__(self, 'add_count', {})
+        object.__setattr__(self, "add_order", [])
+        object.__setattr__(self, "add_count", {})
 
     def add(self, code_block: CodeBlock) -> None:
         self.add_order.append(code_block.name)
@@ -183,11 +180,7 @@ class TestRomBuilder:
 
         # Create a palette code block and add to registry directly
         # (simulating what would happen when registry.add_components() is called)
-        palette_block = MockCodeBlock(
-            "bg_palette",
-            dependencies=[],
-            block_type=CodeBlockType.DATA
-        )
+        palette_block = MockCodeBlock("bg_palette", dependencies=[], block_type=CodeBlockType.DATA)
         registry.add_code_block(palette_block)
 
         # Create a scene block that references the palette
@@ -195,7 +188,7 @@ class TestRomBuilder:
         scene_block = MockCodeBlock(
             "scene_data__main",
             dependencies=["bg_palette"],  # Scene references palette by name
-            block_type=CodeBlockType.DATA
+            block_type=CodeBlockType.DATA,
         )
 
         # Add scene BEFORE we would iterate over components in build()

@@ -10,9 +10,9 @@ from alembic import context
 # Import your models and config
 from config import settings
 from database import Base
+from game.component.models import Component  # noqa
 from game.models import Game  # noqa
 from game.scene.models import Scene  # noqa
-from game.component.models import Component  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -1,11 +1,13 @@
-
-
 import enum
-from core.rom.code_block import CodeBlock, CodeBlockType
+
 from pydantic import BaseModel, Field
+
+from core.rom.code_block import CodeBlock, CodeBlockType
+
 
 class RomCodeArea(enum.Enum):
     """Code areas are different than code block types; they represent different sections of the ROM where code blocks can be placed."""
+
     ZEROPAGE = "ZEROPAGE"
     RESET = "RESET"
     NMI_VBLANK = "NMI_VBLANK"
@@ -27,6 +29,7 @@ class RomCodeArea(enum.Enum):
         else:
             raise ValueError(f"Unsupported code block type: {code_block_type}")
 
+
 def _empty_code_blocks_factory() -> dict[RomCodeArea, dict[str, CodeBlock]]:
     return {
         RomCodeArea.ZEROPAGE: {},
@@ -35,7 +38,6 @@ def _empty_code_blocks_factory() -> dict[RomCodeArea, dict[str, CodeBlock]]:
         RomCodeArea.NMI_POST_VBLANK: {},
         RomCodeArea.PRG_ROM: {},
     }
-
 
 
 class Rom(BaseModel):
@@ -136,7 +138,7 @@ class Rom(BaseModel):
         if padding_needed < 0:
             raise ValueError(f"PRG ROM overflow: code is {-padding_needed} bytes too large")
 
-        full_prg.extend(b'\x00' * padding_needed)
+        full_prg.extend(b"\x00" * padding_needed)
 
         # Add vectors: NMI, RESET, IRQ
         # NMI vector
@@ -148,20 +150,33 @@ class Rom(BaseModel):
 
         # NES ROM header (iNES format)
         # See: https://www.nesdev.org/wiki/INES
-        header = bytearray([
-            0x4E, 0x45, 0x53, 0x1A,  # "NES" + MS-DOS EOF
-            0x01,  # 1x 16KB PRG ROM
-            0x01,  # 1x 8KB CHR ROM
-            0x00,  # Mapper 0, horizontal mirroring
-            0x00,  # Mapper 0 (continued)
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00  # Padding
-        ])
+        header = bytearray(
+            [
+                0x4E,
+                0x45,
+                0x53,
+                0x1A,  # "NES" + MS-DOS EOF
+                0x01,  # 1x 16KB PRG ROM
+                0x01,  # 1x 8KB CHR ROM
+                0x00,  # Mapper 0, horizontal mirroring
+                0x00,  # Mapper 0 (continued)
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,
+                0x00,  # Padding
+            ]
+        )
 
         # Blank CHR ROM (8KB of pattern tables)
         chr_rom = bytes(8192)
 
         # Final ROM: header + PRG ROM + CHR ROM
         return bytes(header + full_prg + chr_rom)
-    
+
+
 def get_empty_rom() -> Rom:
     return Rom()

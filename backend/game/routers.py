@@ -1,22 +1,25 @@
 import uuid
+
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+
 from core.rom.builder import RomBuilder
 from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom
 from core.schemas import NESColor, NESScene
 from dependencies import get_db
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import Response
 from game.models import Game
 from game.scene.models import Scene
 from game.scene.routers import router as scene_router
 from game.scene.schemas import SceneCreateResponse
 from game.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 router = APIRouter()
 router.include_router(scene_router, prefix="/{game_id}/scenes", tags=["scenes"])
+
 
 @router.get("", response_model=list[GameListItem])
 async def list_games(
@@ -26,10 +29,11 @@ async def list_games(
     stmt = select(Game)
 
     result = await db.execute(stmt)
-    
+
     games = result.scalars().all()
 
     return [GameListItem(id=game.id, name=game.name) for game in games]
+
 
 @router.post("", response_model=GameCreateResponse)
 async def create_game(
@@ -49,6 +53,7 @@ async def create_game(
     await db.flush()  # Flush to generate the UUID
     return GameCreateResponse(id=game.id, name=game.name)
 
+
 @router.get("/{game_id}", response_model=GameGetResponse)
 async def get_game(
     game_id: uuid.UUID,
@@ -64,16 +69,12 @@ async def get_game(
 
     # Convert scenes to response format
     scenes = [
-        SceneCreateResponse(
-            id=scene.id,
-            game_id=scene.game_id,
-            name=scene.name,
-            scene_data=scene.scene_data
-        )
+        SceneCreateResponse(id=scene.id, game_id=scene.game_id, name=scene.name, scene_data=scene.scene_data)
         for scene in game.scenes
     ]
 
     return GameGetResponse(id=game.id, name=game.name, scenes=scenes)
+
 
 @router.delete("/{game_id}", response_model=GameDeleteResponse)
 async def delete_game(
@@ -85,6 +86,7 @@ async def delete_game(
         raise HTTPException(status_code=404, detail="Game not found")
     await db.delete(game)
     return GameDeleteResponse(id=game.id)
+
 
 @router.post("/{game_id}/render")
 async def render_game(
@@ -113,7 +115,5 @@ async def render_game(
     return Response(
         content=rom_bytes,
         media_type="application/octet-stream",
-        headers={
-            "Content-Disposition": f'attachment; filename="game_{game_id}.nes"'
-        }
+        headers={"Content-Disposition": f'attachment; filename="game_{game_id}.nes"'},
     )

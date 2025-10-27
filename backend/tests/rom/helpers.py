@@ -1,5 +1,4 @@
-from collections import defaultdict
-from typing import Callable
+from collections.abc import Callable
 
 from py65.devices.mpu6502 import MPU
 from py65.memory import ObservableMemory
@@ -47,9 +46,7 @@ class MemoryObserver:
 
 
 def create_test_cpu(
-    code: bytes,
-    code_address: int = 0x8000,
-    observers: dict[int | range, MemoryObserver] | None = None
+    code: bytes, code_address: int = 0x8000, observers: dict[int | range, MemoryObserver] | None = None
 ) -> tuple[MPU, ObservableMemory]:
     """
     Create a test CPU with code loaded and optional memory observers.
@@ -87,11 +84,7 @@ def create_test_cpu(
     return cpu, memory
 
 
-def run_until(
-    cpu: MPU,
-    condition: Callable[[], bool],
-    max_cycles: int = 10000
-) -> int:
+def run_until(cpu: MPU, condition: Callable[[], bool], max_cycles: int = 10000) -> int:
     """
     Run the CPU until a condition is met or max cycles reached.
 
@@ -120,11 +113,7 @@ def run_until(
 
 
 def run_subroutine(
-    cpu: MPU,
-    memory: ObservableMemory,
-    subroutine_address: int,
-    return_address: int = 0xFFFF,
-    max_cycles: int = 10000
+    cpu: MPU, memory: ObservableMemory, subroutine_address: int, return_address: int = 0xFFFF, max_cycles: int = 10000
 ) -> int:
     """
     Run a subroutine via JSR and return when RTS is executed.

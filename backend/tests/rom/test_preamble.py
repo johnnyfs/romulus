@@ -1,10 +1,7 @@
-import pytest
-
 from core.rom.preamble import PreambleCodeBlock
 from tests.rom.helpers import (
     MemoryObserver,
     create_test_cpu,
-    run_until,
 )
 
 
@@ -22,7 +19,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": 0xA000,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -45,15 +42,11 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": 0xA000,
-            }
+            },
         )
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={0x2000: ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={0x2000: ppu_observer})
 
         # Run until we've initialized the stack
         # (after PPUCTRL write but before JSR)
@@ -75,7 +68,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": 0xA000,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -101,7 +94,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": 0xA000,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -134,7 +127,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": zp_src_addr,
                 "scene_data__main": scene_data_addr,
                 "load_scene": 0xA000,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -164,7 +157,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": load_scene_addr,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -195,7 +188,7 @@ class TestPreambleCodeBlock:
                 "zp__src1": 0x10,
                 "scene_data__main": 0x9000,
                 "load_scene": load_scene_addr,
-            }
+            },
         )
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
@@ -232,15 +225,11 @@ class TestPreambleCodeBlock:
                 "zp__src1": zp_src_addr,
                 "scene_data__main": scene_data_addr,
                 "load_scene": load_scene_addr,
-            }
+            },
         )
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Put RTS at load_scene
         memory[load_scene_addr] = 0x60

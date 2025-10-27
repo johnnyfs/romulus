@@ -1,5 +1,3 @@
-import pytest
-
 from core.rom.subroutines import LoadSceneSubroutine
 from tests.rom.helpers import (
     MemoryObserver,
@@ -15,24 +13,19 @@ class TestLoadSceneSubroutine:
         """Verify that background color (byte 0) is written to palette index 0."""
         # Create the subroutine
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         # Set up PPU register observer
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Create scene data at 0x9000
         scene_data = [
             0x0F,  # Background color (palette index 0x0F - black)
-            0x00, 0x00,  # BG palette pointer (null)
-            0x00, 0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # BG palette pointer (null)
+            0x00,
+            0x00,  # Sprite palette pointer (null)
         ]
         memory.write(0x9000, scene_data)
 
@@ -61,17 +54,10 @@ class TestLoadSceneSubroutine:
     def test_loads_background_palette_when_pointer_is_not_null(self):
         """Verify that 12 bytes of BG palette data are loaded when pointer is non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Create BG palette data at 0x9100
         bg_palette = [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C]
@@ -80,8 +66,10 @@ class TestLoadSceneSubroutine:
         # Create scene data pointing to BG palette
         scene_data = [
             0x0F,  # Background color
-            0x00, 0x91,  # BG palette pointer -> 0x9100
-            0x00, 0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x91,  # BG palette pointer -> 0x9100
+            0x00,
+            0x00,  # Sprite palette pointer (null)
         ]
         memory.write(0x9000, scene_data)
 
@@ -102,23 +90,18 @@ class TestLoadSceneSubroutine:
     def test_skips_background_palette_when_pointer_is_null(self):
         """Verify that BG palette is skipped when pointer is 0x0000."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Scene data with null BG palette pointer
         scene_data = [
             0x0F,  # Background color
-            0x00, 0x00,  # BG palette pointer (null)
-            0x00, 0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # BG palette pointer (null)
+            0x00,
+            0x00,  # Sprite palette pointer (null)
         ]
         memory.write(0x9000, scene_data)
 
@@ -137,17 +120,10 @@ class TestLoadSceneSubroutine:
     def test_loads_sprite_palette_when_pointer_is_not_null(self):
         """Verify that 12 bytes of sprite palette data are loaded when pointer is non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Create sprite palette data at 0x9200
         sprite_palette = [0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1A, 0x1B, 0x1C]
@@ -156,8 +132,10 @@ class TestLoadSceneSubroutine:
         # Scene data with sprite palette pointer
         scene_data = [
             0x0F,  # Background color
-            0x00, 0x00,  # BG palette pointer (null)
-            0x00, 0x92,  # Sprite palette pointer -> 0x9200
+            0x00,
+            0x00,  # BG palette pointer (null)
+            0x00,
+            0x92,  # Sprite palette pointer -> 0x9200
         ]
         memory.write(0x9000, scene_data)
 
@@ -175,17 +153,10 @@ class TestLoadSceneSubroutine:
     def test_loads_both_palettes_when_both_pointers_are_not_null(self):
         """Verify both BG and sprite palettes are loaded when both pointers are non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Create both palettes
         bg_palette = [0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C]
@@ -196,8 +167,10 @@ class TestLoadSceneSubroutine:
         # Scene data with both pointers
         scene_data = [
             0x0F,  # Background color
-            0x00, 0x91,  # BG palette pointer -> 0x9100
-            0x00, 0x92,  # Sprite palette pointer -> 0x9200
+            0x00,
+            0x91,  # BG palette pointer -> 0x9100
+            0x00,
+            0x92,  # Sprite palette pointer -> 0x9200
         ]
         memory.write(0x9000, scene_data)
 
@@ -218,17 +191,10 @@ class TestLoadSceneSubroutine:
     def test_enables_ppu_and_nmi_at_end(self):
         """Verify that PPU and NMI are enabled at the end of the subroutine."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         ppu_observer = MemoryObserver()
-        cpu, memory = create_test_cpu(
-            code.code,
-            code_address=0x8000,
-            observers={range(0x2000, 0x2008): ppu_observer}
-        )
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Minimal scene data
         scene_data = [0x0F, 0x00, 0x00, 0x00, 0x00]
@@ -250,10 +216,7 @@ class TestLoadSceneSubroutine:
     def test_returns_via_rts(self):
         """Verify that the subroutine properly returns via RTS."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(
-            start_offset=0x8000,
-            names={"zp__src1": 0x10, "zp__src2": 0x12}
-        )
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
 

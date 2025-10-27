@@ -1,6 +1,7 @@
 import pytest
+
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.rom.rom import Rom, RomCodeArea
+from core.rom.rom import Rom
 
 
 class MockCodeBlock(CodeBlock):
@@ -36,10 +37,7 @@ class MockCodeBlock(CodeBlock):
         return []
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        return RenderedCodeBlock(
-            code=self._code,
-            exported_names={self.name: start_offset}
-        )
+        return RenderedCodeBlock(code=self._code, exported_names={self.name: start_offset})
 
 
 class TestRomRender:
@@ -74,7 +72,7 @@ class TestRomRender:
         # Vector table is last 6 bytes of PRG ROM
         # Header is 16 bytes, PRG ROM is 16KB
         vectors_offset = 16 + (16 * 1024) - 6
-        vectors = rendered[vectors_offset:vectors_offset + 6]
+        vectors = rendered[vectors_offset : vectors_offset + 6]
 
         # Should have 3 vectors (NMI, RESET, IRQ) as little-endian words
         assert len(vectors) == 6
@@ -84,7 +82,7 @@ class TestRomRender:
         rom = Rom()
 
         # Add a zero page block
-        zp_block = MockCodeBlock("zp_var", CodeBlockType.ZEROPAGE, size=2, code=b"\xAA\xBB")
+        zp_block = MockCodeBlock("zp_var", CodeBlockType.ZEROPAGE, size=2, code=b"\xaa\xbb")
         rom.add(zp_block)
 
         rendered = rom.render()
@@ -117,7 +115,7 @@ class TestRomRender:
 
         # PRG ROM starts after 16-byte header
         prg_start = 16
-        prg_rom = rendered[prg_start:prg_start + 16 * 1024]
+        prg_rom = rendered[prg_start : prg_start + 16 * 1024]
 
         # First 10 bytes should be our subroutine
         assert prg_rom[0:10] == b"\x60" * 10
@@ -134,7 +132,7 @@ class TestRomRender:
 
         # PRG ROM starts after 16-byte header
         prg_start = 16
-        prg_rom = rendered[prg_start:prg_start + 16 * 1024]
+        prg_rom = rendered[prg_start : prg_start + 16 * 1024]
 
         # First 6 bytes should be our data
         assert prg_rom[0:6] == b"\x01\x02\x03\x04\x05\x06"
@@ -144,7 +142,7 @@ class TestRomRender:
         rom = Rom()
 
         # Add a vblank block
-        vblank = MockCodeBlock("vblank", CodeBlockType.VBLANK, size=3, code=b"\xEA\xEA\xEA")
+        vblank = MockCodeBlock("vblank", CodeBlockType.VBLANK, size=3, code=b"\xea\xea\xea")
         rom.add(vblank)
 
         rendered = rom.render()
@@ -154,7 +152,7 @@ class TestRomRender:
         prg_start = 16
         vectors_offset = prg_start + (16 * 1024) - 6
 
-        nmi_vector_bytes = rendered[vectors_offset:vectors_offset + 2]
+        nmi_vector_bytes = rendered[vectors_offset : vectors_offset + 2]
         nmi_address = int.from_bytes(nmi_vector_bytes, "little")
 
         # NMI routine should be in PRG ROM
@@ -162,8 +160,8 @@ class TestRomRender:
         nmi_rom_offset = prg_start + (nmi_address - 0xC000)
 
         # NMI routine is 3 bytes + RTI (0x40)
-        nmi_routine = rendered[nmi_rom_offset:nmi_rom_offset + 4]
-        assert nmi_routine == b"\xEA\xEA\xEA\x40"  # 3 NOPs + RTI
+        nmi_routine = rendered[nmi_rom_offset : nmi_rom_offset + 4]
+        assert nmi_routine == b"\xea\xea\xea\x40"  # 3 NOPs + RTI
 
     def test_reset_vector_points_to_preamble(self):
         """Verify RESET vector points to preamble code."""
@@ -180,14 +178,14 @@ class TestRomRender:
         vectors_offset = prg_start + (16 * 1024) - 6
 
         # RESET vector is second word in table
-        reset_vector_bytes = rendered[vectors_offset + 2:vectors_offset + 4]
+        reset_vector_bytes = rendered[vectors_offset + 2 : vectors_offset + 4]
         reset_address = int.from_bytes(reset_vector_bytes, "little")
 
         # Convert absolute address to ROM offset
         reset_rom_offset = prg_start + (reset_address - 0xC000)
 
         # Reset routine should be our preamble
-        reset_routine = rendered[reset_rom_offset:reset_rom_offset + 5]
+        reset_routine = rendered[reset_rom_offset : reset_rom_offset + 5]
         assert reset_routine == b"\x78" * 5
 
     def test_nmi_post_vblank_comes_before_vblank(self):
@@ -195,11 +193,11 @@ class TestRomRender:
         rom = Rom()
 
         # Add post vblank block
-        post_vblank = MockCodeBlock("post_vblank", CodeBlockType.UPDATE, size=3, code=b"\xAA\xAA\xAA")
+        post_vblank = MockCodeBlock("post_vblank", CodeBlockType.UPDATE, size=3, code=b"\xaa\xaa\xaa")
         rom.add(post_vblank)
 
         # Add vblank block
-        vblank = MockCodeBlock("vblank", CodeBlockType.VBLANK, size=3, code=b"\xBB\xBB\xBB")
+        vblank = MockCodeBlock("vblank", CodeBlockType.VBLANK, size=3, code=b"\xbb\xbb\xbb")
         rom.add(vblank)
 
         rendered = rom.render()
@@ -207,13 +205,13 @@ class TestRomRender:
         # Find NMI start in ROM
         prg_start = 16
         vectors_offset = prg_start + (16 * 1024) - 6
-        nmi_vector_bytes = rendered[vectors_offset:vectors_offset + 2]
+        nmi_vector_bytes = rendered[vectors_offset : vectors_offset + 2]
         nmi_address = int.from_bytes(nmi_vector_bytes, "little")
         nmi_rom_offset = prg_start + (nmi_address - 0xC000)
 
         # NMI should be: post_vblank (3 bytes) + vblank (3 bytes) + RTI (1 byte)
-        nmi_routine = rendered[nmi_rom_offset:nmi_rom_offset + 7]
-        assert nmi_routine == b"\xAA\xAA\xAA\xBB\xBB\xBB\x40"
+        nmi_routine = rendered[nmi_rom_offset : nmi_rom_offset + 7]
+        assert nmi_routine == b"\xaa\xaa\xaa\xbb\xbb\xbb\x40"
 
     def test_prg_overflow_raises_error(self):
         """Verify error if PRG ROM exceeds 16KB."""
@@ -256,7 +254,7 @@ class TestRomRender:
         rendered = rom.render()
 
         prg_start = 16
-        prg_rom = rendered[prg_start:prg_start + 9]
+        prg_rom = rendered[prg_start : prg_start + 9]
 
         # Blocks should be in reverse order (leaf dependencies first)
         # Since we added them in order, they'll be reversed

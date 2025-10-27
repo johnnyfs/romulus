@@ -1,11 +1,14 @@
 import uuid
-from dependencies import get_db
+
 from fastapi import APIRouter, Depends, HTTPException
-from game.scene.models import Scene
-from game.scene.schemas import SceneCreateRequest, SceneCreateResponse, SceneDeleteResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from dependencies import get_db
+from game.scene.models import Scene
+from game.scene.schemas import SceneCreateRequest, SceneCreateResponse, SceneDeleteResponse
+
 router = APIRouter()
+
 
 @router.post("", response_model=SceneCreateResponse)
 async def create_scene(
@@ -17,6 +20,7 @@ async def create_scene(
     db.add(scene)
     await db.flush()  # Flush to generate the UUID
     return SceneCreateResponse(id=scene.id, game_id=scene.game_id, name=scene.name, scene_data=scene.scene_data)
+
 
 @router.delete("/{scene_id}", response_model=SceneDeleteResponse)
 async def delete_scene(

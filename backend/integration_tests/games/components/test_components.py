@@ -37,7 +37,9 @@ async def test_create_and_delete_component(base_url: str):
             f"/api/v1/games/{game_id}/components",
             json=component_data,
         )
-        assert create_component_response.status_code == 200, f"Failed to create component: {create_component_response.text}"
+        assert create_component_response.status_code == 200, (
+            f"Failed to create component: {create_component_response.text}"
+        )
 
         created_component = create_component_response.json()
         assert "id" in created_component
@@ -50,7 +52,9 @@ async def test_create_and_delete_component(base_url: str):
 
         # Delete the component
         delete_component_response = await client.delete(f"/api/v1/games/{game_id}/components/{component_id}")
-        assert delete_component_response.status_code == 200, f"Failed to delete component: {delete_component_response.text}"
+        assert delete_component_response.status_code == 200, (
+            f"Failed to delete component: {delete_component_response.text}"
+        )
 
         deleted_component = delete_component_response.json()
         assert deleted_component["id"] == component_id

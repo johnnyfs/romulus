@@ -1,7 +1,7 @@
 import pytest
 
 from core.rom.data import AddressData, PaletteData, SceneData
-from core.schemas import NESColor, NESPalette, NESPaletteData, NESScene, ComponentType
+from core.schemas import ComponentType, NESColor, NESPalette, NESPaletteData, NESScene
 
 
 class TestPaletteData:
@@ -14,13 +14,15 @@ class TestPaletteData:
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[
-                    NESPalette(colors=(
-                        NESColor(index=1),
-                        NESColor(index=2),
-                        NESColor(index=3),
-                    ))
-                ]
-            )
+                    NESPalette(
+                        colors=(
+                            NESColor(index=1),
+                            NESColor(index=2),
+                            NESColor(index=3),
+                        )
+                    )
+                ],
+            ),
         )
 
         assert palette_data.name == "palette_data__test_pal"
@@ -31,8 +33,8 @@ class TestPaletteData:
             _name="test",
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
-                palettes=[NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))]
-            )
+                palettes=[NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))],
+            ),
         )
 
         assert palette_data.dependencies == []
@@ -44,10 +46,8 @@ class TestPaletteData:
             _name="pal1",
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
-                palettes=[
-                    NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))
-                ]
-            )
+                palettes=[NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))],
+            ),
         )
         assert palette_data_1.size == 3
 
@@ -59,8 +59,8 @@ class TestPaletteData:
                 palettes=[
                     NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3))),
                     NESPalette(colors=(NESColor(index=4), NESColor(index=5), NESColor(index=6))),
-                ]
-            )
+                ],
+            ),
         )
         assert palette_data_2.size == 6
 
@@ -73,8 +73,8 @@ class TestPaletteData:
                 palettes=[
                     NESPalette(colors=(NESColor(index=0x01), NESColor(index=0x02), NESColor(index=0x03))),
                     NESPalette(colors=(NESColor(index=0x14), NESColor(index=0x25), NESColor(index=0x36))),
-                ]
-            )
+                ],
+            ),
         )
 
         rendered = palette_data.render(start_offset=0x8000, names={})
@@ -107,10 +107,7 @@ class TestAddressData:
         addr_data = AddressData(_name="ptr", _referenced_value_name="target")
 
         # Target is at address 0x9ABC
-        rendered = addr_data.render(
-            start_offset=0x8000,
-            names={"target": 0x9ABC}
-        )
+        rendered = addr_data.render(start_offset=0x8000, names={"target": 0x9ABC})
 
         # Little endian: BC 9A
         assert rendered.code == bytes([0xBC, 0x9A])
@@ -201,7 +198,7 @@ class TestSceneData:
             names={
                 "bg_pal": 0x9100,
                 "sprite_pal": 0x9200,
-            }
+            },
         )
 
         # 21 (bg color) + 00 91 (bg pal @ 0x9100) + 00 92 (sprite pal @ 0x9200)

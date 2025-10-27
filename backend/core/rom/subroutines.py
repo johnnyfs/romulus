@@ -29,10 +29,13 @@ class LoadSceneSubroutine(CodeBlock):
     @property
     def size(self) -> int:
         # Pre-calculate by building the code once
-        asm = self._build_code(start_offset=0x8000, names={
-            "zp__src1": 0x00,
-            "zp__src2": 0x02,
-        })
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={
+                "zp__src1": 0x00,
+                "zp__src2": 0x02,
+            },
+        )
         return len(asm)
 
     @property
@@ -42,10 +45,10 @@ class LoadSceneSubroutine(CodeBlock):
     def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
         """Build the load_scene subroutine assembly code."""
         asm = Asm6502()
-        
+
         zp_src1 = names["zp__src1"]
         zp_src2 = names["zp__src2"]
-        
+
         PPU_ADDR = 0x2006
         PPU_DATA = 0x2007
         PPU_CTRL = 0x2000
@@ -83,7 +86,7 @@ class LoadSceneSubroutine(CodeBlock):
         skip_bg_offset = len(asm) + 2  # BNE takes 2 bytes
         # We'll calculate the actual offset after writing the BG palette code
         bg_palette_start = len(asm)
-        
+
         # Placeholder for BEQ (skip if null) - we'll fix this up
         asm.beq(0)  # Will be patched
         beq_fixup_pos = len(asm) - 1
@@ -117,7 +120,7 @@ class LoadSceneSubroutine(CodeBlock):
         # Check if sprite palette pointer is null
         asm.ora_imm(0)
         sprite_palette_start = len(asm)
-        
+
         # Placeholder for BEQ (skip if null)
         asm.beq(0)  # Will be patched
         beq_sprite_fixup_pos = len(asm) - 1

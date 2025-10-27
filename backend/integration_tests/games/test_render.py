@@ -44,7 +44,7 @@ async def test_render_game_with_default_scene(base_url: str):
         assert rom_bytes[4] == 0x01, "Should have 1x 16KB PRG ROM"
         assert rom_bytes[5] == 0x01, "Should have 1x 8KB CHR ROM"
 
-        print(f"Successfully rendered ROM with valid iNES structure")
+        print("Successfully rendered ROM with valid iNES structure")
 
         # Clean up: delete the game
         delete_response = await client.delete(f"/api/v1/games/{game_id}")
@@ -115,17 +115,9 @@ async def test_render_game_with_component(base_url: str):
                 "name": "test_palette",
                 "component_data": {
                     "type": "palette",
-                    "palettes": [
-                        {
-                            "colors": [
-                                {"index": 1},
-                                {"index": 2},
-                                {"index": 3}
-                            ]
-                        }
-                    ]
-                }
-            }
+                    "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
+                },
+            },
         )
         assert palette_response.status_code == 200, f"Failed to create palette: {palette_response.text}"
         print("Added palette component")
@@ -141,7 +133,7 @@ async def test_render_game_with_component(base_url: str):
         expected_size = 16 + (16 * 1024) + (8 * 1024)
         assert len(rom_bytes) == expected_size
 
-        print(f"Successfully rendered ROM with palette component")
+        print("Successfully rendered ROM with palette component")
 
         # Clean up
         delete_response = await client.delete(f"/api/v1/games/{game_id}")
@@ -175,9 +167,9 @@ async def test_rendered_rom_has_correct_vector_table(base_url: str):
         vector_offset = prg_start + prg_size - 6
 
         # Extract vectors
-        nmi_vector = rom_bytes[vector_offset:vector_offset + 2]
-        reset_vector = rom_bytes[vector_offset + 2:vector_offset + 4]
-        irq_vector = rom_bytes[vector_offset + 4:vector_offset + 6]
+        nmi_vector = rom_bytes[vector_offset : vector_offset + 2]
+        reset_vector = rom_bytes[vector_offset + 2 : vector_offset + 4]
+        irq_vector = rom_bytes[vector_offset + 4 : vector_offset + 6]
 
         # Verify vectors point to valid addresses in PRG ROM ($C000-$FFFF)
         nmi_addr = int.from_bytes(nmi_vector, "little")
