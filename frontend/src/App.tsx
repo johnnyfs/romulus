@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import CreateGame from './pages/CreateGame';
 import GameDetail from './pages/GameDetail';
+import RawAssetsList from './pages/admin/RawAssetsList';
+import RawAssetDetail from './pages/admin/RawAssetDetail';
+import GroupedAssetsList from './pages/admin/GroupedAssetsList';
+import GroupedAssetDetail from './pages/admin/GroupedAssetDetail';
 import { GamesService } from './client/services/GamesService';
 import type { GameListItem } from './client/models/GameListItem';
 
@@ -37,9 +41,20 @@ function Home() {
           backgroundColor: '#007bff',
           color: 'white',
           textDecoration: 'none',
-          borderRadius: '4px'
+          borderRadius: '4px',
+          marginRight: '10px'
         }}>
           Create New Game
+        </Link>
+        <Link to="/admin/assets/raw" style={{
+          display: 'inline-block',
+          padding: '10px 20px',
+          backgroundColor: '#6c757d',
+          color: 'white',
+          textDecoration: 'none',
+          borderRadius: '4px'
+        }}>
+          View Assets
         </Link>
       </div>
 
@@ -100,6 +115,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games/create" element={<CreateGame />} />
           <Route path="/games/:id" element={<GameDetail />} />
+          <Route path="/admin/assets/raw" element={<RawAssetsList />} />
+          <Route path="/admin/assets/raw/:filename" element={<RawAssetDetail />} />
+          <Route path="/admin/assets/grouped" element={<GroupedAssetsList />} />
+          <Route path="/admin/assets/grouped/:filename" element={<GroupedAssetDetail />} />
         </Routes>
       </div>
     </Router>

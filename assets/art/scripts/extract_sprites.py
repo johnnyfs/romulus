@@ -2,10 +2,12 @@
 """
 Sprite extraction script for grouping and organizing game art assets.
 Extracts individual sprites/characters from sprite sheets and creates metadata.
+Also generates manifest.json files for frontend consumption.
 """
 
 from PIL import Image
 import yaml
+import json
 import os
 from pathlib import Path
 from typing import List, Dict, Tuple, Optional
@@ -273,6 +275,71 @@ def main():
     )
 
     print("\n✓ Sprite extraction complete!")
+    print("\nGenerating manifest files...")
+    generate_manifests(repo_root)
+    print("✓ Manifest files generated!")
+
+
+def generate_manifests(repo_root: Path):
+    """Generate manifest.json files for raw and grouped assets."""
+
+    # Generate raw sprites manifest
+    raw_sprites = repo_root / "assets/art/raw/sprites"
+    raw_manifest = []
+
+    for png_file in sorted(raw_sprites.glob("*.png")):
+        yaml_file = png_file.with_suffix('.yaml')
+        metadata = {}
+        if yaml_file.exists():
+            with open(yaml_file, 'r') as f:
+                metadata = yaml.safe_load(f) or {}
+
+        raw_manifest.append({
+            'name': png_file.name,
+            'path': f"/assets/art/raw/sprites/{png_file.name}",
+            'metadata': metadata
+        })
+
+    # Write raw manifest
+    raw_manifest_path = raw_sprites / "manifest.json"
+    with open(raw_manifest_path, 'w') as f:
+        json.dump({'assets': raw_manifest}, f, indent=2)
+    print(f"  Generated {raw_manifest_path} ({len(raw_manifest)} files)")
+
+    # Generate grouped sprites manifest
+    grouped_sprites = repo_root / "assets/art/grouped/sprites"
+    grouped_manifest = []
+    grouped_by_prefix = {}
+
+    for png_file in sorted(grouped_sprites.glob("*.png")):
+        yaml_file = png_file.with_suffix('.yaml')
+        metadata = {}
+        if yaml_file.exists():
+            with open(yaml_file, 'r') as f:
+                metadata = yaml.safe_load(f) or {}
+
+        asset = {
+            'name': png_file.name,
+            'path': f"/assets/art/grouped/sprites/{png_file.name}",
+            'metadata': metadata
+        }
+
+        grouped_manifest.append(asset)
+
+        # Group by prefix
+        prefix = png_file.name.split('_')[0]
+        if prefix not in grouped_by_prefix:
+            grouped_by_prefix[prefix] = []
+        grouped_by_prefix[prefix].append(asset)
+
+    # Write grouped manifest
+    grouped_manifest_path = grouped_sprites / "manifest.json"
+    with open(grouped_manifest_path, 'w') as f:
+        json.dump({
+            'assets': grouped_manifest,
+            'grouped': grouped_by_prefix
+        }, f, indent=2)
+    print(f"  Generated {grouped_manifest_path} ({len(grouped_manifest)} files)")
 
 
 if __name__ == "__main__":

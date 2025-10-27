@@ -100,6 +100,31 @@ Track in this file:
 #### Screenshots
 - **NES Screenshots Archive** - archive.org - Collection for reference/training
 
+## Asset Viewing
+
+The project includes a React-based admin interface for viewing and vetting assets:
+
+**Frontend Routes:**
+- `/admin/assets/raw` - Browse all raw sprite files
+- `/admin/assets/raw/:filename` - View raw asset details and derived sprites
+- `/admin/assets/grouped` - Browse all grouped sprites
+- `/admin/assets/grouped/:filename` - View grouped sprite details
+
+**How It Works:**
+1. Assets are symlinked: `frontend/public/assets` → `assets/`
+2. Extraction script generates manifest files:
+   - `assets/art/raw/sprites/manifest.json`
+   - `assets/art/grouped/sprites/manifest.json`
+3. React components read manifests to display assets
+4. Images served directly from public folder
+5. **No backend API needed** - all static files
+
+**After adding new assets:**
+Run the extraction script to update manifests:
+```bash
+python3 assets/art/scripts/extract_sprites.py
+```
+
 ## Next Steps
 
 1. Classify extracted assets (automatic or manual)

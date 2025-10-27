@@ -1,10 +1,11 @@
 """
 Admin interface for viewing and vetting game assets.
 Simple HTML pages for browsing raw and grouped assets.
+Images are served via frontend at http://localhost:3000/assets
 """
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pathlib import Path
 import yaml
 from typing import Dict, List, Optional
@@ -12,10 +13,17 @@ from typing import Dict, List, Optional
 router = APIRouter(prefix="/admin/assets", tags=["admin"])
 
 # Base paths
+# __file__ = /home/johnnyfs/Projects/romulus/backend/admin/assets.py
+# .parent = /home/johnnyfs/Projects/romulus/backend/admin
+# .parent.parent = /home/johnnyfs/Projects/romulus/backend
+# .parent.parent.parent = /home/johnnyfs/Projects/romulus
 REPO_ROOT = Path(__file__).parent.parent.parent
-ASSETS_ROOT = REPO_ROOT / "assets/art"
-RAW_SPRITES = ASSETS_ROOT / "raw/sprites"
-GROUPED_SPRITES = ASSETS_ROOT / "grouped/sprites"
+ASSETS_ROOT = REPO_ROOT / "assets" / "art"
+RAW_SPRITES = ASSETS_ROOT / "raw" / "sprites"
+GROUPED_SPRITES = ASSETS_ROOT / "grouped" / "sprites"
+
+# Frontend serves assets via symlink in public/assets
+FRONTEND_ASSETS_URL = "http://localhost:3000/assets"
 
 
 def load_yaml(path: Path) -> Dict:
@@ -34,7 +42,7 @@ def get_raw_sprites() -> List[Dict]:
         metadata = load_yaml(yaml_file)
         sprites.append({
             'name': png_file.name,
-            'path': f"/assets/art/raw/sprites/{png_file.name}",
+            'path': f"{FRONTEND_ASSETS_URL}/art/raw/sprites/{png_file.name}",
             'metadata': metadata
         })
     return sprites
@@ -48,7 +56,7 @@ def get_grouped_sprites() -> List[Dict]:
         metadata = load_yaml(yaml_file)
         sprites.append({
             'name': png_file.name,
-            'path': f"/assets/art/grouped/sprites/{png_file.name}",
+            'path': f"{FRONTEND_ASSETS_URL}/art/grouped/sprites/{png_file.name}",
             'metadata': metadata
         })
     return sprites
@@ -66,11 +74,18 @@ def get_derived_sprites(raw_filename: str) -> List[Dict]:
         if metadata.get('raw_file') == raw_path:
             derived.append({
                 'name': png_file.name,
-                'path': f"/assets/art/grouped/sprites/{png_file.name}",
+                'path': f"{FRONTEND_ASSETS_URL}/art/grouped/sprites/{png_file.name}",
                 'metadata': metadata
             })
 
     return derived
+
+
+@router.get("/raw/data")
+async def list_raw_assets_json():
+    """Get raw sprite assets as JSON."""
+    sprites = get_raw_sprites()
+    return {"assets": sprites}
 
 
 @router.get("/raw", response_class=HTMLResponse)
@@ -133,6 +148,26 @@ async def list_raw_assets():
     return html
 
 
+@router.get("/raw/{filename}/data")
+async def view_raw_asset_json(filename: str):
+    """Get raw asset metadata and derived sprites as JSON."""
+    png_file = RAW_SPRITES / filename
+    yaml_file = png_file.with_suffix('.yaml')
+
+    if not png_file.exists():
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    metadata = load_yaml(yaml_file)
+    derived = get_derived_sprites(filename)
+
+    return {
+        "name": filename,
+        "path": f"{FRONTEND_ASSETS_URL}/art/raw/sprites/{filename}",
+        "metadata": metadata,
+        "derived": derived
+    }
+
+
 @router.get("/raw/{filename}", response_class=HTMLResponse)
 async def view_raw_asset(filename: str):
     """View individual raw asset with metadata and derived sprites."""
@@ -179,7 +214,7 @@ async def view_raw_asset(filename: str):
         <div class="container">
             <h1>{filename}</h1>
             <div class="image-container">
-                <img src="/assets/art/raw/sprites/{filename}" />
+                <img src="{FRONTEND_ASSETS_URL}/art/raw/sprites/{filename}" />
             </div>
         </div>
 
@@ -212,6 +247,22 @@ async def view_raw_asset(filename: str):
     """
 
     return html
+
+
+@router.get("/grouped/data")
+async def list_grouped_assets_json():
+    """Get grouped sprite assets as JSON."""
+    sprites = get_grouped_sprites()
+
+    # Group by prefix for better organization
+    grouped_by_prefix = {}
+    for sprite in sprites:
+        prefix = sprite['name'].split('_')[0]
+        if prefix not in grouped_by_prefix:
+            grouped_by_prefix[prefix] = []
+        grouped_by_prefix[prefix].append(sprite)
+
+    return {"assets": sprites, "grouped": grouped_by_prefix}
 
 
 @router.get("/grouped", response_class=HTMLResponse)
@@ -287,6 +338,24 @@ async def list_grouped_assets():
     return html
 
 
+@router.get("/grouped/{filename}/data")
+async def view_grouped_asset_json(filename: str):
+    """Get grouped asset metadata as JSON."""
+    png_file = GROUPED_SPRITES / filename
+    yaml_file = png_file.with_suffix('.yaml')
+
+    if not png_file.exists():
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    metadata = load_yaml(yaml_file)
+
+    return {
+        "name": filename,
+        "path": f"{FRONTEND_ASSETS_URL}/art/grouped/sprites/{filename}",
+        "metadata": metadata
+    }
+
+
 @router.get("/grouped/{filename}", response_class=HTMLResponse)
 async def view_grouped_asset(filename: str):
     """View individual grouped asset with metadata."""
@@ -337,7 +406,7 @@ async def view_grouped_asset(filename: str):
         <div class="container">
             <h1>{filename}</h1>
             <div class="image-container">
-                <img src="/assets/art/grouped/sprites/{filename}" />
+                <img src="{FRONTEND_ASSETS_URL}/art/grouped/sprites/{filename}" />
             </div>
         </div>
 

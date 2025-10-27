@@ -1,0 +1,123 @@
+{
+  "assets": [
+    {
+      "name": "$delphinewalk_sheet.png",
+      "path": "/assets/art/raw/sprites/$delphinewalk_sheet.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets"
+      }
+    },
+    {
+      "name": "$popota_dragonbosssprite.png",
+      "path": "/assets/art/raw/sprites/$popota_dragonbosssprite.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets"
+      }
+    },
+    {
+      "name": "$popotawalk_sheet.png",
+      "path": "/assets/art/raw/sprites/$popotawalk_sheet.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets"
+      }
+    },
+    {
+      "name": "DENZI_CC0_32x48_monsters.png",
+      "path": "/assets/art/raw/sprites/DENZI_CC0_32x48_monsters.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/denzis-public-domain-art"
+      }
+    },
+    {
+      "name": "Preview.png",
+      "path": "/assets/art/raw/sprites/Preview.png",
+      "metadata": {}
+    },
+    {
+      "name": "Sample.png",
+      "path": "/assets/art/raw/sprites/Sample.png",
+      "metadata": {}
+    },
+    {
+      "name": "backgrounds.png",
+      "path": "/assets/art/raw/sprites/backgrounds.png",
+      "metadata": {}
+    },
+    {
+      "name": "bard.png",
+      "path": "/assets/art/raw/sprites/bard.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/more-nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "conjurer.png",
+      "path": "/assets/art/raw/sprites/conjurer.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/more-nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "mychars.png",
+      "path": "/assets/art/raw/sprites/mychars.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "myfaces.png",
+      "path": "/assets/art/raw/sprites/myfaces.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "popota_people.png",
+      "path": "/assets/art/raw/sprites/popota_people.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets"
+      }
+    },
+    {
+      "name": "popota_people_4.png",
+      "path": "/assets/art/raw/sprites/popota_people_4.png",
+      "metadata": {}
+    },
+    {
+      "name": "popotachars_orig1x_4.png",
+      "path": "/assets/art/raw/sprites/popotachars_orig1x_4.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets"
+      }
+    },
+    {
+      "name": "preview.png",
+      "path": "/assets/art/raw/sprites/preview.png",
+      "metadata": {}
+    },
+    {
+      "name": "sample.png",
+      "path": "/assets/art/raw/sprites/sample.png",
+      "metadata": {}
+    },
+    {
+      "name": "scout.png",
+      "path": "/assets/art/raw/sprites/scout.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/more-nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "soldier.png",
+      "path": "/assets/art/raw/sprites/soldier.png",
+      "metadata": {
+        "source_url": "https://opengameart.org/content/more-nes-style-rpg-characters"
+      }
+    },
+    {
+      "name": "spritesheet.png",
+      "path": "/assets/art/raw/sprites/spritesheet.png",
+      "metadata": {}
+    }
+  ]
+}
