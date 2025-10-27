@@ -86,4 +86,28 @@ export class GamesService {
             },
         });
     }
+    /**
+     * Render Game
+     * Renders a game into a NES ROM file.
+     *
+     * Returns the ROM data as application/octet-stream which can be
+     * loaded directly into a NES emulator.
+     * @param gameId
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static renderGameApiV1GamesGameIdRenderPost(
+        gameId: string,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/games/{game_id}/render',
+            path: {
+                'game_id': gameId,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
 }

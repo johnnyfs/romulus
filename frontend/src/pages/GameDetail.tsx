@@ -12,6 +12,7 @@ function GameDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [romData, setRomData] = useState<Uint8Array | null>(null);
+  const [romLoading, setRomLoading] = useState(false);
 
   useEffect(() => {
     const fetchGame = async () => {
@@ -30,17 +31,19 @@ function GameDetail() {
     fetchGame();
   }, [id]);
 
-  // Load test ROM
+  // Render ROM from game data
   useEffect(() => {
-    const loadRom = async () => {
+    const renderRom = async () => {
+      if (!id) return;
+
       try {
-        const response = await fetch('/test.nes');
-        console.log('ROM fetch response:', response.status, response.headers.get('content-type'));
+        setRomLoading(true);
+        console.log('Rendering ROM for game:', id);
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch ROM: ${response.status} ${response.statusText}`);
-        }
+        // Call the render endpoint
+        const response = await GamesService.renderGameApiV1GamesGameIdRenderPost(id);
 
+        // The response is a Blob, convert it to Uint8Array
         const arrayBuffer = await response.arrayBuffer();
         const romBytes = new Uint8Array(arrayBuffer);
 
@@ -53,15 +56,18 @@ function GameDetail() {
           throw new Error('Invalid NES ROM format');
         }
 
+        console.log('✅ ROM rendered successfully:', romBytes.length, 'bytes');
         setRomData(romBytes);
+        setRomLoading(false);
       } catch (err: any) {
-        console.error('Failed to load ROM:', err);
-        setError(err.message || 'Failed to load ROM');
+        console.error('Failed to render ROM:', err);
+        setError(err.message || 'Failed to render ROM');
+        setRomLoading(false);
       }
     };
 
-    loadRom();
-  }, []);
+    renderRom();
+  }, [id]);
 
   if (loading) {
     return (
@@ -116,8 +122,15 @@ function GameDetail() {
         </div>
 
         {/* Middle Column - ROM Player */}
-        <div style={{ overflow: 'hidden' }}>
-          <RomPlayer gameId={id || ''} romData={romData} />
+        <div style={{ overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {romLoading ? (
+            <div style={{ textAlign: 'center' }}>
+              <h3>Rendering ROM...</h3>
+              <p style={{ color: '#666' }}>Building your NES game</p>
+            </div>
+          ) : (
+            <RomPlayer gameId={id || ''} romData={romData} />
+          )}
         </div>
 
         {/* Right Column - Component Display */}
