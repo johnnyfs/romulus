@@ -171,8 +171,37 @@ class Rom(BaseModel):
             ]
         )
 
-        # Blank CHR ROM (8KB of pattern tables)
-        chr_rom = bytes(8192)
+        # CHR ROM (8KB of pattern tables)
+        # For testing: First tile shows 4 quadrants with colors 0, 1, 2, 3
+        chr_rom = bytearray(8192)
+
+        # NES CHR format: Each tile is 16 bytes (8x8 pixels, 2 bits per pixel)
+        # First 8 bytes are low bit plane, second 8 bytes are high bit plane
+        # We'll create a tile divided into 4 4x4 quadrants:
+        # Top-left: color 0 (00), Top-right: color 1 (01)
+        # Bottom-left: color 2 (10), Bottom-right: color 3 (11)
+
+        # Low bit plane (bit 0 of color)
+        chr_rom[0] = 0b00001111  # Row 0: color 0 left half, color 1 right half
+        chr_rom[1] = 0b00001111  # Row 1
+        chr_rom[2] = 0b00001111  # Row 2
+        chr_rom[3] = 0b00001111  # Row 3
+        chr_rom[4] = 0b11111111  # Row 4: color 2 left half, color 3 right half
+        chr_rom[5] = 0b11111111  # Row 5
+        chr_rom[6] = 0b11111111  # Row 6
+        chr_rom[7] = 0b11111111  # Row 7
+
+        # High bit plane (bit 1 of color)
+        chr_rom[8] = 0b00000000   # Row 0: color 0 left half, color 1 right half
+        chr_rom[9] = 0b00000000   # Row 1
+        chr_rom[10] = 0b00000000  # Row 2
+        chr_rom[11] = 0b00000000  # Row 3
+        chr_rom[12] = 0b11111111  # Row 4: color 2 left half, color 3 right half
+        chr_rom[13] = 0b11111111  # Row 5
+        chr_rom[14] = 0b11111111  # Row 6
+        chr_rom[15] = 0b11111111  # Row 7
+
+        chr_rom = bytes(chr_rom)
 
         # Final ROM: header + PRG ROM + CHR ROM
         return bytes(header + full_prg + chr_rom)

@@ -103,3 +103,101 @@ async def test_scene_validates_nesscene_schema(base_url: str):
 
         # Clean up
         await client.delete(f"/api/v1/games/{game_id}")
+
+
+@pytest.mark.asyncio
+async def test_update_scene(base_url: str):
+    """
+    Integration test that creates a game, creates a scene, updates it, then deletes both.
+    """
+    async with httpx.AsyncClient(base_url=base_url) as client:
+        # Create a game
+        game_response = await client.post(
+            "/api/v1/games",
+            json={"name": "Test Game for Scene Update"},
+        )
+        assert game_response.status_code == 200
+        game_id = game_response.json()["id"]
+
+        # Create a scene
+        initial_scene_data = {
+            "game_id": game_id,
+            "name": "Original Scene Name",
+            "scene_data": {
+                "background_color": {"index": 0},
+                "background_palettes": None,
+                "sprite_palettes": None,
+            },
+        }
+
+        create_response = await client.post(
+            f"/api/v1/games/{game_id}/scenes",
+            json=initial_scene_data,
+        )
+        assert create_response.status_code == 200
+        scene = create_response.json()
+        scene_id = scene["id"]
+        assert scene["name"] == "Original Scene Name"
+        assert scene["scene_data"]["background_color"]["index"] == 0
+
+        # Update only the background color
+        update_data = {
+            "scene_data": {
+                "background_color": {"index": 15},
+                "background_palettes": None,
+                "sprite_palettes": None,
+            }
+        }
+
+        update_response = await client.put(
+            f"/api/v1/games/{game_id}/scenes/{scene_id}",
+            json=update_data,
+        )
+        assert update_response.status_code == 200
+        updated_scene = update_response.json()
+        assert updated_scene["id"] == scene_id
+        assert updated_scene["name"] == "Original Scene Name"  # Unchanged
+        assert updated_scene["scene_data"]["background_color"]["index"] == 15  # Updated
+
+        # Update only the name
+        name_update_data = {"name": "Updated Scene Name"}
+
+        name_update_response = await client.put(
+            f"/api/v1/games/{game_id}/scenes/{scene_id}",
+            json=name_update_data,
+        )
+        assert name_update_response.status_code == 200
+        name_updated_scene = name_update_response.json()
+        assert name_updated_scene["name"] == "Updated Scene Name"  # Updated
+        assert name_updated_scene["scene_data"]["background_color"]["index"] == 15  # Still 15
+
+        # Update both name and scene_data
+        full_update_data = {
+            "name": "Fully Updated Scene",
+            "scene_data": {
+                "background_color": {"index": 30},
+                "background_palettes": None,
+                "sprite_palettes": None,
+            }
+        }
+
+        full_update_response = await client.put(
+            f"/api/v1/games/{game_id}/scenes/{scene_id}",
+            json=full_update_data,
+        )
+        assert full_update_response.status_code == 200
+        fully_updated_scene = full_update_response.json()
+        assert fully_updated_scene["name"] == "Fully Updated Scene"
+        assert fully_updated_scene["scene_data"]["background_color"]["index"] == 30
+
+        # Test updating non-existent scene
+        fake_scene_id = "00000000-0000-0000-0000-000000000000"
+        error_response = await client.put(
+            f"/api/v1/games/{game_id}/scenes/{fake_scene_id}",
+            json=update_data,
+        )
+        assert error_response.status_code == 404
+
+        # Clean up
+        await client.delete(f"/api/v1/games/{game_id}/scenes/{scene_id}")
+        await client.delete(f"/api/v1/games/{game_id}")

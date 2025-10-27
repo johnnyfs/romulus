@@ -19,5 +19,14 @@ class SceneCreateResponse(SceneCommon):
     id: uuid.UUID
 
 
+class SceneUpdateRequest(BaseModel):
+    name: str | None = None
+    scene_data: NESScene | None = None
+
+
+class SceneUpdateResponse(SceneCommon):
+    id: uuid.UUID
+
+
 class SceneDeleteResponse(BaseModel):
     id: uuid.UUID

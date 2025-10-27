@@ -10,6 +10,7 @@ from alembic import context
 # Import your models and config
 from config import settings
 from database import Base
+from assets.models import Asset  # noqa
 from game.component.models import Component  # noqa
 from game.models import Game  # noqa
 from game.scene.models import Scene  # noqa

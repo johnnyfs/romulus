@@ -39,3 +39,4 @@ class NESScene(BaseModel):
     background_color: NESColor
     background_palettes: NESRef | None = None
     sprite_palettes: NESRef | None = None
+    components: list[NESRef] = []

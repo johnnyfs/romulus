@@ -5,7 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from dependencies import get_db
 from game.scene.models import Scene
-from game.scene.schemas import SceneCreateRequest, SceneCreateResponse, SceneDeleteResponse
+from game.scene.schemas import (
+    SceneCreateRequest,
+    SceneCreateResponse,
+    SceneDeleteResponse,
+    SceneUpdateRequest,
+    SceneUpdateResponse,
+)
 
 router = APIRouter()
 
@@ -33,3 +39,23 @@ async def delete_scene(
         raise HTTPException(status_code=404, detail="Scene not found")
     await db.delete(scene)
     return SceneDeleteResponse(id=scene.id)
+
+
+@router.put("/{scene_id}", response_model=SceneUpdateResponse)
+async def update_scene(
+    game_id: uuid.UUID,
+    scene_id: uuid.UUID,
+    request: SceneUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    scene = await db.get(Scene, scene_id)
+    if scene is None or scene.game_id != game_id:
+        raise HTTPException(status_code=404, detail="Scene not found")
+    
+    if request.name is not None:
+        scene.name = request.name
+    if request.scene_data is not None:
+        scene.scene_data = request.scene_data
+    
+    await db.flush()
+    return SceneUpdateResponse(id=scene.id, game_id=scene.game_id, name=scene.name, scene_data=scene.scene_data)

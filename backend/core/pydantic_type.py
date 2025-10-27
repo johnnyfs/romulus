@@ -1,6 +1,6 @@
 from typing import Any
 
-from pydantic import TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 from sqlalchemy import JSON, TypeDecorator
 
 
@@ -19,7 +19,7 @@ class PydanticType(TypeDecorator):
         """Convert Pydantic model to JSON dict for database."""
         if value is None:
             return None
-        if isinstance(value, self.pydantic_type):
+        if isinstance(value, BaseModel):
             return value.model_dump()
         return value
 

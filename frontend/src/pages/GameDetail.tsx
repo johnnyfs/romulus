@@ -15,64 +15,72 @@ function GameDetail() {
   const [romData, setRomData] = useState<Uint8Array | null>(null);
   const [romLoading, setRomLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchGame = async () => {
-      if (!id) return;
+  const fetchGame = async () => {
+    if (!id) return;
 
-      try {
-        const response = await GamesService.getGameApiV1GamesGameIdGet(id);
-        setGame(response);
-        setLoading(false);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch game');
-        setLoading(false);
+    try {
+      const response = await GamesService.getGameApiV1GamesGameIdGet(id);
+      setGame(response);
+      setLoading(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch game');
+      setLoading(false);
+    }
+  };
+
+  const renderRom = async () => {
+    if (!id) return;
+
+    try {
+      setRomLoading(true);
+      console.log('Rendering ROM for game:', id);
+
+      // Call the render endpoint directly with fetch (can't use generated client for binary data)
+      const response = await fetch(`http://localhost:8000/api/v1/games/${id}/render`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to render ROM: ${response.status} ${response.statusText}`);
       }
-    };
 
+      // The response is binary, convert it to Uint8Array
+      const arrayBuffer = await response.arrayBuffer();
+      const romBytes = new Uint8Array(arrayBuffer);
+
+      // Check for NES header magic bytes
+      const header = String.fromCharCode(...romBytes.slice(0, 4));
+      console.log('ROM header:', header, 'Length:', romBytes.length);
+
+      if (!header.startsWith('NES')) {
+        console.error('Invalid NES ROM - first bytes:', Array.from(romBytes.slice(0, 16)));
+        throw new Error('Invalid NES ROM format');
+      }
+
+      console.log('✅ ROM rendered successfully:', romBytes.length, 'bytes');
+      setRomData(romBytes);
+      setRomLoading(false);
+    } catch (err: any) {
+      console.error('Failed to render ROM:', err);
+      setError(err.message || 'Failed to render ROM');
+      setRomLoading(false);
+    }
+  };
+
+  const handleRebuildROM = () => {
+    renderRom();
+  };
+
+  const handleSceneUpdated = () => {
+    fetchGame();
+  };
+
+  useEffect(() => {
     fetchGame();
   }, [id]);
 
   // Render ROM from game data
   useEffect(() => {
-    const renderRom = async () => {
-      if (!id) return;
-
-      try {
-        setRomLoading(true);
-        console.log('Rendering ROM for game:', id);
-
-        // Call the render endpoint directly with fetch (can't use generated client for binary data)
-        const response = await fetch(`http://localhost:8000/api/v1/games/${id}/render`, {
-          method: 'POST',
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to render ROM: ${response.status} ${response.statusText}`);
-        }
-
-        // The response is binary, convert it to Uint8Array
-        const arrayBuffer = await response.arrayBuffer();
-        const romBytes = new Uint8Array(arrayBuffer);
-
-        // Check for NES header magic bytes
-        const header = String.fromCharCode(...romBytes.slice(0, 4));
-        console.log('ROM header:', header, 'Length:', romBytes.length);
-
-        if (!header.startsWith('NES')) {
-          console.error('Invalid NES ROM - first bytes:', Array.from(romBytes.slice(0, 16)));
-          throw new Error('Invalid NES ROM format');
-        }
-
-        console.log('✅ ROM rendered successfully:', romBytes.length, 'bytes');
-        setRomData(romBytes);
-        setRomLoading(false);
-      } catch (err: any) {
-        console.error('Failed to render ROM:', err);
-        setError(err.message || 'Failed to render ROM');
-        setRomLoading(false);
-      }
-    };
-
     renderRom();
   }, [id]);
 
@@ -123,7 +131,11 @@ function GameDetail() {
 
         {/* Right Column - Component Display */}
         <div className={styles.gameDetailColumn}>
-          <ComponentDisplay game={game} />
+          <ComponentDisplay
+            game={game}
+            onRebuildROM={handleRebuildROM}
+            onSceneUpdated={handleSceneUpdated}
+          />
         </div>
       </div>
     </div>
