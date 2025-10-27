@@ -117,9 +117,9 @@ function GameDetail() {
       <div style={{
         flex: 1,
         display: 'grid',
-        gridTemplateColumns: '300px 1fr 350px',
-        gap: '10px',
-        padding: '10px',
+        gridTemplateColumns: '300px auto 350px',
+        gap: '0',
+        padding: '0',
         overflow: 'hidden'
       }}>
         {/* Left Column - Chat */}
