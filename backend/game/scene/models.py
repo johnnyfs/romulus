@@ -20,4 +20,4 @@ class Scene(UUIDMixin, Base):
     scene_data: Mapped[NESScene] = mapped_column(PydanticType(NESScene), nullable=False)
 
     # Relationship to Game
-    game: Mapped["Game"] = relationship("Game", back_populates="scenes")
+    game: Mapped["Game"] = relationship("Game", back_populates="scenes") # type: ignore

@@ -1,5 +1,6 @@
+from pydantic import PrivateAttr
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESPalette, NESScene
+from core.schemas import NESPalette, NESPaletteData, NESScene
 from game.scene.models import Scene
 
 class AddressData(CodeBlock):
@@ -8,8 +9,13 @@ class AddressData(CodeBlock):
 
     - used to store 2-byte values
     """
-    _name: str
-    _referenced_value_name: str
+    _name: str = PrivateAttr()
+    _referenced_value_name: str = PrivateAttr()
+
+    def __init__(self, _name: str, _referenced_value_name: str):
+        super().__init__()
+        self._name = _name
+        self._referenced_value_name = _referenced_value_name
 
     @property
     def type(self) -> CodeBlockType:
@@ -40,8 +46,13 @@ class PaletteData(CodeBlock):
 
     - contains NES palette data
     """
-    _name: str
-    _palette: NESPalette
+    _name: str = PrivateAttr()
+    _palette_data: NESPaletteData = PrivateAttr()
+
+    def __init__(self, _name: str, _palette_data: NESPaletteData):
+        super().__init__()
+        self._name = _name
+        self._palette_data = _palette_data
 
     @property
     def type(self) -> CodeBlockType:
@@ -57,12 +68,14 @@ class PaletteData(CodeBlock):
 
     @property
     def size(self) -> int:
-        return 12 # NES palettes are 12 bytes (4 colors x 3 bytes each)
+        # Each palette has 3 colors, each color is 1 byte
+        return len(self._palette_data.palettes) * 3
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = bytearray()
-        for color in self._palette.colors:
-            code.append(color.index)
+        for palette in self._palette_data.palettes:
+            for color in palette.colors:
+                code.append(color.index)
         return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
 
 class SceneData(CodeBlock):
@@ -71,9 +84,13 @@ class SceneData(CodeBlock):
 
     - contains the data for a scene
     """
-    # Ignored by pydantic
-    _name: str
-    _scene: NESScene
+    _name: str = PrivateAttr()
+    _scene: NESScene = PrivateAttr()
+
+    def __init__(self, _name: str, _scene: NESScene):
+        super().__init__()
+        self._name = _name
+        self._scene = _scene
 
     @property
     def type(self) -> CodeBlockType:
@@ -85,7 +102,7 @@ class SceneData(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        dependencies = ["data__initial_scene"]
+        dependencies = []
         if (bp := self._scene.background_palettes) is not None:
             dependencies.append(bp)
         if (sp := self._scene.sprite_palettes) is not None:

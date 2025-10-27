@@ -1,7 +1,11 @@
 import uuid
+from core.rom.builder import RomBuilder
+from core.rom.registry import CodeBlockRegistry
+from core.rom.rom import Rom
 from core.schemas import NESColor, NESScene
 from dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
 from game.models import Game
 from game.scene.models import Scene
 from game.scene.routers import router as scene_router
@@ -20,7 +24,9 @@ async def list_games(
 ):
     # Query all games
     stmt = select(Game)
+
     result = await db.execute(stmt)
+    
     games = result.scalars().all()
 
     return [GameListItem(id=game.id, name=game.name) for game in games]
@@ -79,3 +85,35 @@ async def delete_game(
         raise HTTPException(status_code=404, detail="Game not found")
     await db.delete(game)
     return GameDeleteResponse(id=game.id)
+
+@router.post("/{game_id}/render")
+async def render_game(
+    game_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Renders a game into a NES ROM file.
+
+    Returns the ROM data as application/octet-stream which can be
+    loaded directly into a NES emulator.
+    """
+    # Build and render the ROM
+    rom = Rom()
+    registry = CodeBlockRegistry()
+    builder = RomBuilder(db=db, rom=rom, registry=registry)
+
+    try:
+        rom_bytes = await builder.build(game_id=game_id, initial_scene_name="main")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=400, detail=f"Missing dependency: {str(e)}")
+
+    # Return as binary data with appropriate content type
+    return Response(
+        content=rom_bytes,
+        media_type="application/octet-stream",
+        headers={
+            "Content-Disposition": f'attachment; filename="game_{game_id}.nes"'
+        }
+    )

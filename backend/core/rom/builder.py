@@ -3,6 +3,7 @@ import uuid
 from core.rom.code_block import CodeBlock
 from core.rom.data import SceneData
 from core.rom.preamble import PreambleCodeBlock
+from core.rom.registry import CodeBlockRegistry, get_new_registry
 from core.rom.rom import Rom, get_empty_rom
 from core.rom.subroutines import LoadSceneSubroutine
 from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
@@ -17,18 +18,12 @@ from sqlalchemy.orm import selectinload
 class RomBuilder:
     db: AsyncSession
     rom: Rom
-    registry = {
-        # Zero page
-        "zp__src1": ZeroPageSource1(),
-        "zp__src2": ZeroPageSource2(),
-
-        # Subroutines
-        "load_scene": LoadSceneSubroutine(),
-    }
+    registry: CodeBlockRegistry
 
     async def build(self, game_id: uuid.UUID, initial_scene_name: str = "main") -> bytes:
         game = await self.db.get(Game, game_id, options=[
-            selectinload(Game.scenes)
+            selectinload(Game.scenes),
+            selectinload(Game.components)
         ])
 
         if game is None or not game.scenes:
@@ -36,18 +31,26 @@ class RomBuilder:
 
         rom = Rom()
 
+        # Pre-populate the registry with all code blocks yielded by the components.
+        # This is to avoid the need to sort components by dependency order beforehand.
+        self.registry.add_components(game.components)
+
         saw_main = False
         for scene in game.scenes:
             saw_main = saw_main or (scene.name == initial_scene_name)
             scene_block = SceneData(_name=scene.name, _scene=scene.scene_data)
             self._add(rom, scene_block)
 
+        if not saw_main:
+            raise ValueError(f"Game must have a scene named '{initial_scene_name}'.")
+
         preamble = PreambleCodeBlock(_main_scene_name=initial_scene_name)
         self._add(rom, preamble)
-        
-        if not saw_main:
-            raise ValueError(f"Game must have a scene named '{initial_scene_name}'.")       
 
+        for component in game.components:
+            for code_block in self.registry.get_code_blocks(component):
+                self._add(rom, code_block)
+        
         return rom.render()
     
     def _add(self, rom: Rom, code_block: CodeBlock):
@@ -56,12 +59,10 @@ class RomBuilder:
         Adding a code block idempotently does nothing if it is already present.
         """
         for dependency_name in code_block.dependencies:
-            if dependency_name not in self.registry:
-                raise ValueError(f"Unknown dependency: {dependency_name}")
             dependency = self.registry[dependency_name]
             self._add(rom, dependency)
         rom.add(code_block)
-        self.registry[code_block.name] = code_block
+        self.registry.add_code_block(code_block)
 
-def get_rom_builder(db: AsyncSession = Depends(get_db), rom: Rom = Depends(get_empty_rom)) -> RomBuilder:
-    return RomBuilder(db=db, rom=rom)
+def get_rom_builder(db: AsyncSession = Depends(get_db), rom: Rom = Depends(get_empty_rom), registry: CodeBlockRegistry = Depends(get_new_registry)) -> RomBuilder:
+    return RomBuilder(db=db, rom=rom, registry=registry)

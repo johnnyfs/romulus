@@ -31,6 +31,18 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /app
+          ignore:
+            - __pycache__/
+            - .venv/
+            - .pytest_cache/
+            - "*.pyc"
+        - action: rebuild
+          path: ./pyproject.toml
 
 volumes:
   postgres_data:

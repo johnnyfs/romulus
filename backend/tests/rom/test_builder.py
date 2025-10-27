@@ -7,7 +7,7 @@ from core.rom.builder import RomBuilder
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
 from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry
-from core.rom.rom import Rom
+from core.rom.rom import Rom, RomCodeArea
 from core.rom.subroutines import LoadSceneSubroutine
 from core.schemas import ComponentType, NESColor, NESPalette, NESPaletteData
 from game.component.models import Component
@@ -73,9 +73,9 @@ class TestRomBuilder:
         block = MockCodeBlock("simple_block", dependencies=[])
         builder._add(rom, block)
 
-        # Should be in the ROM
-        assert "simple_block" in rom.code_blocks[CodeBlockType.SUBROUTINE]
-        assert rom.code_blocks[CodeBlockType.SUBROUTINE]["simple_block"] is block
+        # Should be in the ROM (SUBROUTINE type maps to PRG_ROM area)
+        assert "simple_block" in rom.code_blocks[RomCodeArea.PRG_ROM]
+        assert rom.code_blocks[RomCodeArea.PRG_ROM]["simple_block"] is block
 
         # Should be in the registry
         assert "simple_block" in registry
@@ -205,9 +205,9 @@ class TestRomBuilder:
         # Verify the palette was added first (dependency resolution)
         assert rom.add_order.index("bg_palette") < rom.add_order.index("scene_data__main")
 
-        # Verify both are in ROM
-        assert "bg_palette" in rom.code_blocks[CodeBlockType.DATA]
-        assert "scene_data__main" in rom.code_blocks[CodeBlockType.DATA]
+        # Verify both are in ROM (DATA type maps to PRG_ROM area)
+        assert "bg_palette" in rom.code_blocks[RomCodeArea.PRG_ROM]
+        assert "scene_data__main" in rom.code_blocks[RomCodeArea.PRG_ROM]
 
     def test_preamble_adds_all_dependencies(self):
         """Integration test: verify preamble adds zp__src1, scene_data, and load_scene."""
