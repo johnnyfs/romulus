@@ -40,10 +40,16 @@ function GameDetail() {
         setRomLoading(true);
         console.log('Rendering ROM for game:', id);
 
-        // Call the render endpoint
-        const response = await GamesService.renderGameApiV1GamesGameIdRenderPost(id);
+        // Call the render endpoint directly with fetch (can't use generated client for binary data)
+        const response = await fetch(`http://localhost:8000/api/v1/games/${id}/render`, {
+          method: 'POST',
+        });
 
-        // The response is a Blob, convert it to Uint8Array
+        if (!response.ok) {
+          throw new Error(`Failed to render ROM: ${response.status} ${response.statusText}`);
+        }
+
+        // The response is binary, convert it to Uint8Array
         const arrayBuffer = await response.arrayBuffer();
         const romBytes = new Uint8Array(arrayBuffer);
 

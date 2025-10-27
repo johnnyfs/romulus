@@ -17,7 +17,7 @@ class PreambleCodeBlock(CodeBlock):
     8. Loop forever (main game loop will be in NMI handler)
     """
 
-    _main_scene_name: str
+    _main_scene_name: str = "main"
 
     @property
     def type(self) -> CodeBlockType:

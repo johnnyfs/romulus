@@ -1,0 +1,19 @@
+source_url: https://opengameart.org/content/tricolor-nes-rpg-character-sprite-sheets
+raw_file: assets/art/raw/sprites/$delphinewalk_sheet.png
+source_rect:
+  x: 32
+  y: 48
+  width: 16
+  height: 16
+pov: pseudooverhead
+outlined: false
+genres:
+- fantasy
+- rpg
+gender: female
+tags:
+- nes
+- 4directional
+- walk_cycle
+- no_outline
+- tricolor

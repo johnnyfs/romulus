@@ -1,0 +1,20 @@
+source_url: https://opengameart.org/content/more-nes-style-rpg-characters
+raw_file: assets/art/raw/sprites/conjurer.png
+source_rect:
+  x: 272
+  y: 96
+  width: 16
+  height: 16
+pov: pseudooverhead
+outlined: true
+genres:
+- fantasy
+- rpg
+gender: neuter
+tags:
+- nes
+- 4directional
+- mage
+- wizard
+- class
+- robe

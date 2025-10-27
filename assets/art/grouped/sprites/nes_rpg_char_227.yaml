@@ -1,0 +1,18 @@
+source_url: https://opengameart.org/content/nes-style-rpg-characters
+raw_file: assets/art/raw/sprites/mychars.png
+source_rect:
+  x: 176
+  y: 144
+  width: 16
+  height: 16
+pov: pseudooverhead
+outlined: true
+genres:
+- fantasy
+- rpg
+gender: neuter
+tags:
+- nes
+- 4directional
+- warrior
+- mage
