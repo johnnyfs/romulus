@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
+import './NESEmulator.css';
 // @ts-ignore - jsnes doesn't have type definitions
 import jsnes from 'jsnes';
 
@@ -213,15 +214,7 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
 
   if (error) {
     return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'red',
-        backgroundColor: '#000'
-      }}>
+      <div className="nes-emulator-error">
         Error: {error}
       </div>
     );
@@ -229,106 +222,51 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
 
   if (!romData) {
     return (
-      <div style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#666',
-        backgroundColor: '#000'
-      }}>
+      <div className="nes-emulator-no-rom">
         No ROM loaded
       </div>
     );
   }
 
   return (
-    <div style={{
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#000'
-      }}>
+    <div className="nes-emulator-container">
+      <div className="nes-emulator-screen">
         <canvas
           ref={canvasRef}
           width={256}
           height={240}
+          className="nes-emulator-canvas"
           style={{
             width: `${width}px`,
             height: `${height}px`,
-            imageRendering: 'pixelated',
-            border: '2px solid #333'
           }}
         />
       </div>
 
-      <div style={{
-        padding: '10px',
-        borderTop: '1px solid #ddd',
-        display: 'flex',
-        gap: '10px',
-        justifyContent: 'center',
-        backgroundColor: '#f9f9f9'
-      }}>
+      <div className="nes-emulator-controls">
         <button
           onClick={handlePlay}
           disabled={isRunning}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: isRunning ? '#6c757d' : '#28a745',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: isRunning ? 'not-allowed' : 'pointer'
-          }}
+          className={`nes-emulator-button nes-emulator-button--play`}
         >
           {isRunning ? 'Playing' : 'Play'}
         </button>
         <button
           onClick={handlePause}
           disabled={!isRunning}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: !isRunning ? '#6c757d' : '#ffc107',
-            color: !isRunning ? '#fff' : '#000',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: !isRunning ? 'not-allowed' : 'pointer'
-          }}
+          className={`nes-emulator-button nes-emulator-button--pause`}
         >
           Pause
         </button>
         <button
           onClick={handleReset}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc3545',
-            color: '#fff',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
+          className={`nes-emulator-button nes-emulator-button--reset`}
         >
           Reset
         </button>
       </div>
 
-      <div style={{
-        padding: '8px',
-        fontSize: '12px',
-        textAlign: 'center',
-        backgroundColor: '#f0f0f0',
-        borderTop: '1px solid #ddd',
-        color: '#666'
-      }}>
+      <div className="nes-emulator-help">
         Controls: Arrow Keys = D-Pad | Z = A | X = B | Enter = Start | Shift = Select | ESC = Pause
       </div>
     </div>

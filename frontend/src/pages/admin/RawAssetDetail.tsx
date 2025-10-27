@@ -66,8 +66,8 @@ const RawAssetDetail: React.FC = () => {
 
       <div style={{ background: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
         <h1>{asset.name}</h1>
-        <div style={{ textAlign: 'center', padding: '20px', background: '#fff' }}>
-          <img src={asset.path} alt={asset.name} style={{ maxWidth: '100%', imageRendering: 'pixelated', border: '1px solid #ddd' }} />
+        <div style={{ textAlign: 'center', padding: '20px', background: '#fff', maxHeight: '600px', overflow: 'auto' }}>
+          <img src={asset.path} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '500px', imageRendering: 'pixelated', border: '1px solid #ddd' }} />
         </div>
       </div>
 
@@ -83,8 +83,8 @@ const RawAssetDetail: React.FC = () => {
             'N/A'
           )}
         </p>
-        <pre style={{ background: '#f4f4f4', padding: '15px', borderRadius: '4px', overflowX: 'auto' }}>
-          {JSON.stringify(asset.metadata, null, 2)}
+        <pre style={{ background: '#f4f4f4', padding: '15px', borderRadius: '4px', overflowX: 'auto', whiteSpace: 'pre' }}>
+          {JSON.stringify(asset.metadata, null, 0)}
         </pre>
       </div>
 

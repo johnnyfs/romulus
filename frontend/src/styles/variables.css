@@ -9,6 +9,10 @@
   --color-text-light: #999;
   --color-error: #dc3545;
   --color-success: #28a745;
+  --color-warning: #ffc107;
+  --color-secondary: #6c757d;
+  --color-black: #000;
+  --color-dark-gray: #333;
 
   /* Backgrounds */
   --bg-white: #fff;

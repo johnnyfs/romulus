@@ -1,0 +1,95 @@
+@import '../styles/variables.css';
+
+.nes-emulator-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.nes-emulator-error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-error);
+  background-color: var(--color-black);
+}
+
+.nes-emulator-no-rom {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  background-color: var(--color-black);
+}
+
+.nes-emulator-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-black);
+}
+
+.nes-emulator-canvas {
+  image-rendering: pixelated;
+  border: 2px solid var(--color-dark-gray);
+}
+
+.nes-emulator-controls {
+  padding: var(--spacing-md);
+  border-top: var(--border-width) solid var(--border-color);
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  background-color: #f9f9f9;
+}
+
+.nes-emulator-button {
+  padding: var(--spacing-sm) var(--spacing-xl);
+  color: var(--bg-white);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+}
+
+.nes-emulator-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.nes-emulator-button--play {
+  background-color: var(--color-success);
+}
+
+.nes-emulator-button--play:disabled {
+  background-color: var(--color-secondary);
+}
+
+.nes-emulator-button--pause {
+  background-color: var(--color-warning);
+  color: var(--color-text);
+}
+
+.nes-emulator-button--pause:disabled {
+  background-color: var(--color-secondary);
+  color: var(--bg-white);
+}
+
+.nes-emulator-button--reset {
+  background-color: var(--color-error);
+}
+
+.nes-emulator-help {
+  padding: var(--spacing-sm);
+  font-size: 12px;
+  text-align: center;
+  background-color: #f0f0f0;
+  border-top: var(--border-width) solid var(--border-color);
+  color: var(--color-text-muted);
+}
