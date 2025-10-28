@@ -83,6 +83,34 @@ async def list_assets(
     ]
 
 
+@router.put("/{asset_id}", response_model=AssetResponse)
+async def update_asset(
+    game_id: uuid.UUID,
+    asset_id: uuid.UUID,
+    request: AssetCreateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Update a game asset."""
+    asset = await db.get(Asset, asset_id)
+    if asset is None or asset.game_id != game_id:
+        raise HTTPException(status_code=404, detail="Game asset not found")
+
+    # Update asset fields
+    asset.name = request.name
+    asset.type = request.type
+    asset.data = request.data
+
+    await db.flush()
+
+    return AssetResponse(
+        id=asset.id,
+        game_id=asset.game_id,
+        name=asset.name,
+        type=asset.type,
+        data=asset.data,
+    )
+
+
 @router.delete("/{asset_id}")
 async def delete_asset(
     game_id: uuid.UUID,

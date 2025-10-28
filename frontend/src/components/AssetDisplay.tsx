@@ -5,6 +5,7 @@ import type { GameGetResponse } from '../client/models/GameGetResponse';
 import { ScenesService } from '../client/services/ScenesService';
 import { AssetsService } from '../client/services/AssetsService';
 import { EntitiesService } from '../client/services/EntitiesService';
+import { AssetType } from '../client/models/AssetType';
 import { getNESColor } from '../constants/nesColors';
 import { getDefaultPalette } from '../constants/palettePresets';
 import ColorPicker from './ColorPicker';
@@ -272,9 +273,9 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
     try {
       const assetData = {
         name: palette.name,
-        type: 'palette' as const,
+        type: AssetType.PALETTE,
         data: {
-          type: 'palette' as const,
+          type: AssetType.PALETTE,
           palettes: palette.subPalettes.map(subPalette => ({
             colors: subPalette.map(index => ({ index })),
           })),

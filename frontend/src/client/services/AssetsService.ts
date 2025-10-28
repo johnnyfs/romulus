@@ -61,6 +61,34 @@ export class AssetsService {
         });
     }
     /**
+     * Update Asset
+     * Update a game asset.
+     * @param gameId
+     * @param assetId
+     * @param requestBody
+     * @returns AssetResponse Successful Response
+     * @throws ApiError
+     */
+    public static updateAssetGamesGameIdAssetsAssetIdPut(
+        gameId: string,
+        assetId: string,
+        requestBody: AssetCreateRequest,
+    ): CancelablePromise<AssetResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/games/{game_id}/assets/{asset_id}',
+            path: {
+                'game_id': gameId,
+                'asset_id': assetId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
      * Delete Asset
      * Delete a game asset.
      * @param gameId
