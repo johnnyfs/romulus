@@ -2,7 +2,14 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import NESScene
+from core.schemas import NESScene, NESEntity
+
+
+class EntityResponse(BaseModel):
+    id: uuid.UUID
+    scene_id: uuid.UUID
+    name: str
+    entity_data: NESEntity
 
 
 class SceneCommon(BaseModel):
@@ -17,6 +24,7 @@ class SceneCreateRequest(SceneCommon):
 
 class SceneCreateResponse(SceneCommon):
     id: uuid.UUID
+    entities: list[EntityResponse] = []
 
 
 class SceneUpdateRequest(BaseModel):

@@ -13,7 +13,9 @@ from core.schemas import NESColor, NESScene
 from dependencies import get_db
 from api.games.models import Game
 from api.games.scenes.models import Scene
+from api.games.entities.models import Entity
 from api.games.scenes.schemas import SceneCreateResponse
+from api.games.entities.schemas import EntityCreateResponse
 from api.games.components.schemas import ComponentCreateResponse
 from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
 
@@ -58,9 +60,9 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    # Query game with scenes and components eagerly loaded
+    # Query game with scenes, entities, and components eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
-        selectinload(Game.scenes),
+        selectinload(Game.scenes).selectinload(Scene.entities),
         selectinload(Game.components)
     )
     result = await db.execute(stmt)
@@ -69,9 +71,23 @@ async def get_game(
     if game is None:
         raise HTTPException(status_code=404, detail="Game not found")
 
-    # Convert scenes to response format
+    # Convert scenes to response format (with entities)
     scenes = [
-        SceneCreateResponse(id=scene.id, game_id=scene.game_id, name=scene.name, scene_data=scene.scene_data)
+        SceneCreateResponse(
+            id=scene.id,
+            game_id=scene.game_id,
+            name=scene.name,
+            scene_data=scene.scene_data,
+            entities=[
+                EntityCreateResponse(
+                    id=entity.id,
+                    scene_id=entity.scene_id,
+                    name=entity.name,
+                    entity_data=entity.entity_data,
+                )
+                for entity in scene.entities
+            ]
+        )
         for scene in game.scenes
     ]
 

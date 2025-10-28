@@ -7,12 +7,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from core.rom.code_block import CodeBlock
-from core.rom.data import SceneData
+from core.rom.data import EntityData, SceneData
 from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry, get_new_registry
 from core.rom.rom import Rom, get_empty_rom
 from dependencies import get_db
 from api.games.models import Game
+from api.games.scenes.models import Scene
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,14 @@ class RomBuilder:
     registry: CodeBlockRegistry
 
     async def build(self, game_id: uuid.UUID, initial_scene_name: str = "main") -> bytes:
-        game = await self.db.get(Game, game_id, options=[selectinload(Game.scenes), selectinload(Game.components)])
+        game = await self.db.get(
+            Game,
+            game_id,
+            options=[
+                selectinload(Game.scenes).selectinload(Scene.entities),
+                selectinload(Game.components),
+            ],
+        )
 
         if game is None or not game.scenes:
             raise ValueError(f"Game with ID {game_id} not found or has no scenes.")
@@ -40,6 +48,11 @@ class RomBuilder:
             saw_main = saw_main or (scene.name == initial_scene_name)
             scene_block = SceneData(_name=scene.name, _scene=scene.scene_data)
             self._add(rom, scene_block)
+
+            # Add entities for this scene
+            for entity in scene.entities:
+                entity_block = EntityData(_name=entity.name, _entity=entity.entity_data)
+                self._add(rom, entity_block)
 
         if not saw_main:
             raise ValueError(f"Game must have a scene named '{initial_scene_name}'.")

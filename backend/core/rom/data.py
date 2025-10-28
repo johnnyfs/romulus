@@ -1,7 +1,7 @@
 from pydantic import PrivateAttr
 
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESPaletteData, NESScene
+from core.schemas import NESEntity, NESPaletteData, NESScene
 
 
 class AddressData(CodeBlock):
@@ -139,5 +139,50 @@ class SceneData(CodeBlock):
         sprite_pal_name = f"component__{scene_data.sprite_palettes}" if scene_data.sprite_palettes else None
         sprite_pal_addr = 0 if not sprite_pal_name else names.get(sprite_pal_name, 0)
         code.extend(sprite_pal_addr.to_bytes(2, "little"))
+
+        return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
+
+
+class EntityData(CodeBlock):
+    """
+    An entity data code block.
+
+    - contains entity position data (x, y)
+    """
+
+    _name: str = PrivateAttr()
+    _entity: NESEntity = PrivateAttr()
+
+    def __init__(self, _name: str, _entity: NESEntity):
+        super().__init__()
+        self._name = _name
+        self._entity = _entity
+
+    @property
+    def type(self) -> CodeBlockType:
+        return CodeBlockType.DATA
+
+    @property
+    def name(self) -> str:
+        return f"entity_data__{self._name}"
+
+    @property
+    def dependencies(self) -> list[str]:
+        return []
+
+    @property
+    def size(self) -> int:
+        """Entity is 2 bytes: x position + y position."""
+        return 2
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        entity_data = self._entity
+        code = bytearray()
+
+        # X position (byte)
+        code.append(entity_data.x & 0xFF)
+
+        # Y position (byte)
+        code.append(entity_data.y & 0xFF)
 
         return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})

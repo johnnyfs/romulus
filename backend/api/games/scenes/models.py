@@ -17,5 +17,6 @@ class Scene(UUIDMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     scene_data: Mapped[NESScene] = mapped_column(PydanticType(NESScene), nullable=False)
 
-    # Relationship to Game
+    # Relationships
     game: Mapped["Game"] = relationship("Game", back_populates="scenes")  # type: ignore
+    entities: Mapped[list["Entity"]] = relationship("Entity", back_populates="scene", cascade="all, delete-orphan")  # type: ignore
