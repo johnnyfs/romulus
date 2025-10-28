@@ -7,6 +7,7 @@ from api.assets.models import Asset
 from api.assets.schemas import (
     AssetCreateRequest,
     AssetCreateResponse,
+    AssetUpdateRequest,
     UploadTicketRequest,
     UploadTicketResponse,
 )
@@ -106,6 +107,51 @@ async def get_asset(
 
     # Generate download URL for the response
     storage = get_storage_client()
+    download_url = storage.get_download_url(asset.storage_key)
+
+    return AssetCreateResponse(
+        id=asset.id,
+        storage_key=asset.storage_key,
+        asset_data=asset.asset_data,
+        download_url=download_url,
+    )
+
+
+@router.put("/{asset_id}", response_model=AssetCreateResponse)
+async def update_asset(
+    asset_id: uuid.UUID,
+    request: AssetUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Update an asset's metadata.
+
+    Typical use: Mark a raw asset as processed=true after creating grouped versions.
+    Updates both the database record and the metadata.json file in storage.
+    """
+    asset = await db.get(Asset, asset_id)
+    if asset is None:
+        raise HTTPException(status_code=404, detail="Asset not found")
+
+    # Update asset data
+    asset.asset_data = request.asset_data
+    asset.type = request.asset_data.type  # Keep SQL column in sync
+
+    await db.flush()
+    await db.commit()
+
+    # Update metadata.json in storage
+    storage = get_storage_client()
+    metadata = {
+        "id": str(asset.id),
+        "type": asset.type.value,
+        "storage_key": asset.storage_key,
+        "asset_data": asset.asset_data.model_dump(mode='json'),
+        "created_at": asset.created_at.isoformat() if hasattr(asset, 'created_at') else None,
+    }
+    storage.write_metadata(asset.storage_key, metadata)
+
+    # Generate download URL for the response
     download_url = storage.get_download_url(asset.storage_key)
 
     return AssetCreateResponse(
