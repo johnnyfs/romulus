@@ -4,10 +4,9 @@
 /* eslint-disable */
 import type { ImageResourceData } from './ImageResourceData';
 /**
- * Request to get a presigned upload URL.
+ * Request to update a resource's metadata.
  */
-export type UploadTicketRequest = {
-    filename: string;
+export type ResourceUpdateRequest = {
     resource_data: ImageResourceData;
 };
 

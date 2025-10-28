@@ -6,9 +6,9 @@ import type { ImageState } from './ImageState';
 import type { ImageTag } from './ImageTag';
 import type { ImageType } from './ImageType';
 /**
- * Data for an image asset.
+ * Data for an image resource.
  */
-export type ImageAssetData = {
+export type ImageResourceData = {
     type?: string;
     state: ImageState;
     image_type: ImageType;

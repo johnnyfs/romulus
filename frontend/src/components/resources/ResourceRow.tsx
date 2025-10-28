@@ -1,13 +1,13 @@
 import React from "react";
-import { AssetImage } from "./AssetImage";
-import type { AssetCreateResponse } from "../../client";
+import { ResourceImage } from "./ResourceImage";
+import type { ResourceCreateResponse } from "../../client";
 
-interface AssetRowProps {
-  asset: AssetCreateResponse;
-  onClick?: (asset: AssetCreateResponse) => void;
+interface ResourceRowProps {
+  asset: ResourceCreateResponse;
+  onClick?: (asset: ResourceCreateResponse) => void;
 }
 
-export const AssetRow: React.FC<AssetRowProps> = ({ asset, onClick }) => {
+export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
   const filename = asset.storage_key.split("/").pop() || "unknown";
   const isProcessed = asset.asset_data.processed;
 
@@ -34,7 +34,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({ asset, onClick }) => {
         e.currentTarget.style.backgroundColor = isProcessed ? "#f9f9f9" : "#fff";
       }}
     >
-      <AssetImage url={asset.download_url} alt={filename} size={64} />
+      <ResourceImage url={asset.download_url} alt={filename} size={64} />
 
       <div style={{ flex: 1, minWidth: 0 }}>
         <div

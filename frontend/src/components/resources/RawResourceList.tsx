@@ -1,13 +1,13 @@
 import React from "react";
-import { AssetRow } from "./AssetRow";
-import type { AssetCreateResponse } from "../../client";
+import { ResourceRow } from "./ResourceRow";
+import type { ResourceCreateResponse } from "../../client";
 
-interface RawAssetListProps {
-  assets: AssetCreateResponse[];
-  onAssetClick?: (asset: AssetCreateResponse) => void;
+interface RawResourceListProps {
+  assets: ResourceCreateResponse[];
+  onResourceClick?: (asset: ResourceCreateResponse) => void;
 }
 
-export const RawAssetList: React.FC<RawAssetListProps> = ({ assets, onAssetClick }) => {
+export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onResourceClick }) => {
   if (assets.length === 0) {
     return (
       <div
@@ -25,12 +25,12 @@ export const RawAssetList: React.FC<RawAssetListProps> = ({ assets, onAssetClick
   }
 
   // Separate unprocessed and processed assets (already sorted by API)
-  const unprocessedAssets = assets.filter((a) => !a.asset_data.processed);
-  const processedAssets = assets.filter((a) => a.asset_data.processed);
+  const unprocessedResources = assets.filter((a) => !a.asset_data.processed);
+  const processedResources = assets.filter((a) => a.asset_data.processed);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-      {unprocessedAssets.length > 0 && (
+      {unprocessedResources.length > 0 && (
         <>
           <div
             style={{
@@ -42,15 +42,15 @@ export const RawAssetList: React.FC<RawAssetListProps> = ({ assets, onAssetClick
               marginBottom: "4px",
             }}
           >
-            Unprocessed ({unprocessedAssets.length})
+            Unprocessed ({unprocessedResources.length})
           </div>
-          {unprocessedAssets.map((asset) => (
-            <AssetRow key={asset.id} asset={asset} onClick={onAssetClick} />
+          {unprocessedResources.map((asset) => (
+            <ResourceRow key={asset.id} asset={asset} onClick={onResourceClick} />
           ))}
         </>
       )}
 
-      {processedAssets.length > 0 && (
+      {processedResources.length > 0 && (
         <>
           <div
             style={{
@@ -58,14 +58,14 @@ export const RawAssetList: React.FC<RawAssetListProps> = ({ assets, onAssetClick
               fontWeight: "600",
               color: "#666",
               textTransform: "uppercase",
-              marginTop: unprocessedAssets.length > 0 ? "24px" : "8px",
+              marginTop: unprocessedResources.length > 0 ? "24px" : "8px",
               marginBottom: "4px",
             }}
           >
-            Processed ({processedAssets.length})
+            Processed ({processedResources.length})
           </div>
-          {processedAssets.map((asset) => (
-            <AssetRow key={asset.id} asset={asset} onClick={onAssetClick} />
+          {processedResources.map((asset) => (
+            <ResourceRow key={asset.id} asset={asset} onClick={onResourceClick} />
           ))}
         </>
       )}

@@ -3,13 +3,15 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AssetType } from './AssetType';
-import type { NESPaletteAssetData_Input } from './NESPaletteAssetData_Input';
+import type { NESPaletteAssetData_Output } from './NESPaletteAssetData_Output';
 /**
- * Request to create an asset.
+ * Response for an asset.
  */
-export type AssetCreateRequest = {
+export type AssetResponse = {
+    id: string;
+    game_id: string;
     name: string;
     type: AssetType;
-    data: NESPaletteAssetData_Input;
+    data: NESPaletteAssetData_Output;
 };
 

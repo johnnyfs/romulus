@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Types of assets that can be stored.
+ * Types of game assets.
  */
 export enum AssetType {
-    IMAGE = 'image',
+    PALETTE = 'palette',
 }

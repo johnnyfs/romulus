@@ -4,9 +4,9 @@
 /* eslint-disable */
 import type { NESPalette } from './NESPalette';
 /**
- * Data for a compiled palette asset.
+ * Data for a palette asset.
  */
-export type NESPaletteCompiledData_Input = {
+export type NESPaletteAssetData_Output = {
     type?: string;
     palettes: Array<NESPalette>;
 };

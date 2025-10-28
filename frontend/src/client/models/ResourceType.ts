@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Types of compiled assets that can be used in games.
+ * Types of raw resources that can be uploaded.
  */
-export enum CompiledAssetType {
-    PALETTE = 'palette',
+export enum ResourceType {
+    IMAGE = 'image',
 }

@@ -2,14 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { ImageAssetData } from './ImageAssetData';
+import type { ImageResourceData } from './ImageResourceData';
 /**
- * Response after creating an asset.
+ * Response after creating a resource.
  */
-export type AssetCreateResponse = {
+export type ResourceCreateResponse = {
     id: string;
     storage_key: string;
-    asset_data: ImageAssetData;
+    resource_data: ImageResourceData;
     download_url: string;
 };
 

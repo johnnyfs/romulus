@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 
-interface AssetImageProps {
+interface ResourceImageProps {
   url: string;
   alt: string;
   size?: number;
 }
 
-export const AssetImage: React.FC<AssetImageProps> = ({ url, alt, size = 64 }) => {
+export const ResourceImage: React.FC<ResourceImageProps> = ({ url, alt, size = 64 }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 

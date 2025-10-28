@@ -4,10 +4,10 @@
 /* eslint-disable */
 import type { ImageResourceData } from './ImageResourceData';
 /**
- * Request to get a presigned upload URL.
+ * Request to finalize a resource upload with metadata.
  */
-export type UploadTicketRequest = {
-    filename: string;
+export type ResourceCreateRequest = {
+    storage_key: string;
     resource_data: ImageResourceData;
 };
 
