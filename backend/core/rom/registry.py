@@ -27,7 +27,7 @@ def _to_code_blocks(component: Component) -> list[CodeBlock]:
 def _asset_to_code_blocks(asset: Asset) -> list[CodeBlock]:
     """Convert an asset to code blocks (data blocks)."""
     if asset.type == AssetType.PALETTE:
-        return [PaletteData(_component_id=str(asset.id), _palette_data=asset.data)]
+        return [PaletteData(_component_id=str(asset.id), _palette_data=asset.data, _is_asset=True)]
     else:
         raise ValueError(f"Unsupported asset type: {asset.type}")
 

@@ -48,15 +48,18 @@ class PaletteData(CodeBlock):
     A palette data code block.
 
     - contains NES palette data
+    - can be from a component (legacy) or an asset
     """
 
-    _component_id: str = PrivateAttr()  # UUID as string
+    _id: str = PrivateAttr()  # UUID as string
     _palette_data: NESPaletteData = PrivateAttr()
+    _is_asset: bool = PrivateAttr()  # True if this is an asset, False if component
 
-    def __init__(self, _component_id: str, _palette_data: NESPaletteData):
+    def __init__(self, _component_id: str, _palette_data: NESPaletteData, _is_asset: bool = False):
         super().__init__()
-        self._component_id = _component_id
+        self._id = _component_id  # Keep param name for backward compatibility
         self._palette_data = _palette_data
+        self._is_asset = _is_asset
 
     @property
     def type(self) -> CodeBlockType:
@@ -64,7 +67,12 @@ class PaletteData(CodeBlock):
 
     @property
     def name(self) -> str:
-        return f"component__{self._component_id}"
+        # TODO: Standardize all names to {component|asset}__{type}__{id} format
+        # for better type safety and clearer error messages
+        if self._is_asset:
+            return f"asset__palette__{self._id}"
+        else:
+            return f"component__{self._id}"
 
     @property
     def dependencies(self) -> list[str]:
@@ -109,11 +117,15 @@ class SceneData(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
+        # TODO: Once we fully migrate to assets, we should add type info to NESScene
+        # to distinguish between component and asset references. For now, we try both
+        # naming conventions: asset__palette__{id} first (new), then component__{id} (legacy)
         dependencies = []
         if (bp := self._scene.background_palettes) is not None:
-            dependencies.append(f"component__{bp}")
+            # Try asset naming first, will fall back to component if not found
+            dependencies.append(f"asset__palette__{bp}")
         if (sp := self._scene.sprite_palettes) is not None:
-            dependencies.append(f"component__{sp}")
+            dependencies.append(f"asset__palette__{sp}")
         return dependencies
 
     @property
@@ -129,15 +141,21 @@ class SceneData(CodeBlock):
         code.append(scene_data.background_color.index)
 
         # Background palettes address
-        # Look up the component by UUID
-        bg_pal_name = f"component__{scene_data.background_palettes}" if scene_data.background_palettes else None
-        bg_pal_addr = 0 if not bg_pal_name else names.get(bg_pal_name, 0)
+        # Try asset naming first, fall back to component naming (legacy)
+        bg_pal_addr = 0
+        if scene_data.background_palettes:
+            asset_name = f"asset__palette__{scene_data.background_palettes}"
+            component_name = f"component__{scene_data.background_palettes}"
+            bg_pal_addr = names.get(asset_name, names.get(component_name, 0))
         code.extend(bg_pal_addr.to_bytes(2, "little"))
 
         # Sprite palettes address
-        # Look up the component by UUID
-        sprite_pal_name = f"component__{scene_data.sprite_palettes}" if scene_data.sprite_palettes else None
-        sprite_pal_addr = 0 if not sprite_pal_name else names.get(sprite_pal_name, 0)
+        # Try asset naming first, fall back to component naming (legacy)
+        sprite_pal_addr = 0
+        if scene_data.sprite_palettes:
+            asset_name = f"asset__palette__{scene_data.sprite_palettes}"
+            component_name = f"component__{scene_data.sprite_palettes}"
+            sprite_pal_addr = names.get(asset_name, names.get(component_name, 0))
         code.extend(sprite_pal_addr.to_bytes(2, "little"))
 
         return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
