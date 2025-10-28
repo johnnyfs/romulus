@@ -9,7 +9,7 @@ interface ResourceRowProps {
 
 export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
   const filename = asset.storage_key.split("/").pop() || "unknown";
-  const isProcessed = asset.asset_data.processed;
+  const isProcessed = asset.resource_data.processed;
 
   return (
     <div
@@ -51,7 +51,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
           {filename}
         </div>
         <div style={{ fontSize: "12px", color: "#666" }}>
-          {asset.asset_data.image_type} • {asset.asset_data.tags?.join(", ") || "no tags"}
+          {asset.resource_data.image_type} • {asset.resource_data.tags?.join(", ") || "no tags"}
         </div>
       </div>
 

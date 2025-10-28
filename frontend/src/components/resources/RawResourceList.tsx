@@ -24,9 +24,9 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onReso
     );
   }
 
-  // Separate unprocessed and processed assets (already sorted by API)
-  const unprocessedResources = assets.filter((a) => !a.asset_data.processed);
-  const processedResources = assets.filter((a) => a.asset_data.processed);
+  // Separate unprocessed and processed resources (already sorted by API)
+  const unprocessedResources = assets.filter((a) => !a.resource_data.processed);
+  const processedResources = assets.filter((a) => a.resource_data.processed);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
