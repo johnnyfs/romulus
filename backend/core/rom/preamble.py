@@ -59,6 +59,7 @@ class PreambleCodeBlock(CodeBlock):
         # Disable NMI by writing 0 to PPU control register ($2000)
         asm.lda_imm(0x00)
         asm.sta_abs(0x2000)  # PPUCTRL
+        asm.sta_abs(0x2001)  # PPUMASK
 
         # Initialize stack pointer to 0xFF (top of stack)
         asm.ldx_imm(0xFF)
@@ -91,31 +92,31 @@ class PreambleCodeBlock(CodeBlock):
         # Draw tile 0 (our test pattern) at nametable position (0, 0)
         # Nametable 0 starts at $2000
 
-        # Wait for PPU to be ready
-        asm.bit_abs(0x2002)  # Read PPUSTATUS to clear address latch
+        # # Wait for PPU to be ready
+        # asm.bit_abs(0x2002)  # Read PPUSTATUS to clear address latch
 
-        # Set PPU address to nametable 0 position (0,0) = $2000
-        asm.lda_imm(0x20)
-        asm.sta_abs(0x2006)  # PPUADDR high byte
-        asm.lda_imm(0x00)
-        asm.sta_abs(0x2006)  # PPUADDR low byte
+        # # Set PPU address to nametable 0 position (0,0) = $2000
+        # asm.lda_imm(0x20)
+        # asm.sta_abs(0x2006)  # PPUADDR high byte
+        # asm.lda_imm(0x00)
+        # asm.sta_abs(0x2006)  # PPUADDR low byte
 
-        # Fill more of the screen with the test tile for visibility
-        # Draw an 8x8 grid of the test tile (64 tiles total)
-        asm.ldx_imm(64)  # Counter for 64 tiles
-        # Loop starts here
-        loop_start = start_offset + len(asm)
-        asm.lda_imm(0x00)  # Tile 0 (our test pattern)
-        asm.sta_abs(0x2007)  # PPUDATA
-        asm.dex()
-        # Calculate relative offset for BNE
-        # BNE branches to loop_start, and the branch is relative to PC after BNE instruction
-        # We need to emit the BNE instruction first to know its position
-        current_pos = len(asm)
-        # BNE takes 2 bytes, so PC after BNE will be at current_pos + 2
-        # Relative offset = target - (current_pos + 2)
-        relative_offset = loop_start - (start_offset + current_pos + 2)
-        asm.bne(relative_offset)
+        # # Fill more of the screen with the test tile for visibility
+        # # Draw an 8x8 grid of the test tile (64 tiles total)
+        # asm.ldx_imm(64)  # Counter for 64 tiles
+        # # Loop starts here
+        # loop_start = start_offset + len(asm)
+        # asm.lda_imm(0x00)  # Tile 0 (our test pattern)
+        # asm.sta_abs(0x2007)  # PPUDATA
+        # asm.dex()
+        # # Calculate relative offset for BNE
+        # # BNE branches to loop_start, and the branch is relative to PC after BNE instruction
+        # # We need to emit the BNE instruction first to know its position
+        # current_pos = len(asm)
+        # # BNE takes 2 bytes, so PC after BNE will be at current_pos + 2
+        # # Relative offset = target - (current_pos + 2)
+        # relative_offset = loop_start - (start_offset + current_pos + 2)
+        # asm.bne(relative_offset)
 
         # === Main Loop ===
         # Infinite loop (actual game logic runs in NMI handler)

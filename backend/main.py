@@ -1,3 +1,6 @@
+import logging
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -5,6 +8,21 @@ from api.games.routers import router as game_router
 from api.games.scenes.routers import router as scene_router
 from api.games.components.routers import router as component_router
 from config import settings
+
+# Configure logging
+log_level = os.getenv("LOG_LEVEL", "INFO").upper()
+log_level_value = getattr(logging, log_level, logging.INFO)
+
+logging.basicConfig(
+    level=log_level_value,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+
+# Set root logger level explicitly (this will cascade to all child loggers)
+logging.getLogger().setLevel(log_level_value)
+
+logger = logging.getLogger(__name__)
+logger.info(f"Logging configured at {log_level} level")
 
 v1_app = FastAPI()
 

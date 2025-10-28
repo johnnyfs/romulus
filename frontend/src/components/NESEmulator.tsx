@@ -142,6 +142,87 @@ function NESEmulator({ romData, width = 256, height = 240 }: NESEmulatorProps) {
     };
   }, [isRunning]);
 
+  // Debug: Log PPU state every second
+  useEffect(() => {
+    if (!nesRef.current || !isRunning) return;
+
+    const debugInterval = setInterval(() => {
+      const nes = nesRef.current;
+      if (!nes || !nes.ppu || !nes.ppu.vramMem) return;
+
+      const ppu = nes.ppu;
+
+      // Read PPU control registers
+      console.log('=== PPU Control Registers ===');
+
+      // PPUCTRL ($2000) - f flags
+      const ppuCtrl = ppu.f_nmiOnVblank << 7 |
+                      ppu.f_spriteSize << 5 |
+                      ppu.f_bgPatternTable << 4 |
+                      ppu.f_spPatternTable << 3 |
+                      ppu.f_addrInc << 2 |
+                      ppu.f_nTblAddress;
+      console.log(`PPUCTRL ($2000): $${ppuCtrl.toString(16).padStart(2, '0').toUpperCase()} (0b${ppuCtrl.toString(2).padStart(8, '0')})`);
+      console.log(`  NMI on VBlank: ${ppu.f_nmiOnVblank ? 'ON' : 'OFF'}`);
+      console.log(`  Sprite Size: ${ppu.f_spriteSize ? '8x16' : '8x8'}`);
+      console.log(`  BG Pattern Table: $${ppu.f_bgPatternTable ? '1000' : '0000'}`);
+      console.log(`  Sprite Pattern Table: $${ppu.f_spPatternTable ? '1000' : '0000'}`);
+      console.log(`  VRAM Inc: ${ppu.f_addrInc ? '32 (vertical)' : '1 (horizontal)'}`);
+      console.log(`  Nametable Address: ${ppu.f_nTblAddress}`);
+
+      // PPUMASK ($2001) - s flags
+      const ppuMask = ppu.f_color << 5 |
+                      ppu.f_spVisibility << 4 |
+                      ppu.f_bgVisibility << 3 |
+                      ppu.f_spClipping << 2 |
+                      ppu.f_bgClipping << 1 |
+                      ppu.f_dispType;
+      console.log(`PPUMASK ($2001): $${ppuMask.toString(16).padStart(2, '0').toUpperCase()} (0b${ppuMask.toString(2).padStart(8, '0')})`);
+      console.log(`  Show Sprites: ${ppu.f_spVisibility ? 'ON' : 'OFF'}`);
+      console.log(`  Show Background: ${ppu.f_bgVisibility ? 'ON' : 'OFF'}`);
+      console.log(`  Sprite Clipping (left 8px): ${ppu.f_spClipping ? 'OFF' : 'ON'}`);
+      console.log(`  BG Clipping (left 8px): ${ppu.f_bgClipping ? 'OFF' : 'ON'}`);
+      console.log(`  Display Type: ${ppu.f_dispType}`);
+      console.log(`  Color Emphasis: ${ppu.f_color}`);
+
+      // Read palette RAM from PPU
+      // Palette RAM is at $3F00-$3F1F in PPU address space
+      const paletteRam = ppu.vramMem;
+      const paletteStart = 0x3F00;
+
+      console.log('=== NES Palette RAM ($3F00-$3F1F) ===');
+      console.log('Universal BG Color ($3F00):', `$${paletteRam[paletteStart].toString(16).padStart(2, '0').toUpperCase()}`);
+
+      // Background palettes
+      for (let i = 0; i < 4; i++) {
+        const offset = paletteStart + (i * 4);
+        const colors = [
+          paletteRam[offset],
+          paletteRam[offset + 1],
+          paletteRam[offset + 2],
+          paletteRam[offset + 3]
+        ];
+        console.log(`BG Palette ${i} ($${offset.toString(16).toUpperCase()}):`,
+          colors.map(c => `$${c.toString(16).padStart(2, '0').toUpperCase()}`).join(', '));
+      }
+
+      // Sprite palettes
+      for (let i = 0; i < 4; i++) {
+        const offset = paletteStart + 0x10 + (i * 4);
+        const colors = [
+          paletteRam[offset],
+          paletteRam[offset + 1],
+          paletteRam[offset + 2],
+          paletteRam[offset + 3]
+        ];
+        console.log(`Sprite Palette ${i} ($${offset.toString(16).toUpperCase()}):`,
+          colors.map(c => `$${c.toString(16).padStart(2, '0').toUpperCase()}`).join(', '));
+      }
+    }, 1000); // Every second
+
+    return () => clearInterval(debugInterval);
+  }, [isRunning]);
+
   const handlePlay = () => {
     if (nesRef.current && !isRunning) {
       setIsRunning(true);

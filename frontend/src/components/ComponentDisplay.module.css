@@ -160,6 +160,26 @@
   color: var(--color-text-muted);
 }
 
+.scenePaletteSelect {
+  flex: 1;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius-sm);
+  background-color: white;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.scenePaletteSelect:hover {
+  border-color: #999;
+}
+
+.scenePaletteSelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
 .sceneItemId {
   font-size: 10px;
   color: var(--color-text-muted);

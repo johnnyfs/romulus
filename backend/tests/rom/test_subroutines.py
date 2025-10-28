@@ -181,8 +181,8 @@ class TestLoadSceneSubroutine:
 
         ppu_data_writes = ppu_observer.get_writes_to(0x2007)
 
-        # Should have: bg_color + 12 BG palette bytes + 12 sprite palette bytes = 25 total
-        assert len(ppu_data_writes) == 25
+        # Should have: 16 BG palette bytes (1 backdrop + 15 with mirrors) + 16 sprite palette bytes = 32 total
+        assert len(ppu_data_writes) == 32
 
         # Verify all palette values are present
         for palette_value in bg_palette + sprite_palette:
@@ -234,3 +234,87 @@ class TestLoadSceneSubroutine:
         # If we got here, RTS worked correctly
         assert cpu.pc == 0xFFFF
         assert cycles > 0  # Verify we executed some instructions
+
+    def test_ppu_writes_exact_sequence_with_component_palette(self):
+        """
+        INTEGRATION TEST: Verify exact sequence of PPU writes when scene references a component palette.
+
+        This is the critical test that verifies the complete PPU write sequence:
+        1. PPU_ADDR = 0x3F (high byte)
+        2. PPU_ADDR = 0x00 (low byte)
+        3. PPU_DATA = background_color
+        4. PPU_DATA = palette[0]
+        5. PPU_DATA = palette[1]
+        ... (all 12 palette bytes in sequence)
+
+        This test simulates the real scenario where a scene has a background_palettes
+        component reference (like "Classic Mario Set").
+        """
+        subroutine = LoadSceneSubroutine()
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+
+        ppu_observer = MemoryObserver()
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
+
+        # Create the "Classic Mario Set" palette data (4 sub-palettes × 3 colors = 12 bytes)
+        classic_mario_palette = [
+            22, 39, 24,  # Palette 0
+            26, 42, 25,  # Palette 1
+            17, 33, 49,  # Palette 2
+            40, 56, 22,  # Palette 3
+        ]
+        memory.write(0x8100, classic_mario_palette)
+
+        # Create scene data referencing the palette
+        scene_data = [
+            0x02,  # Background color (index 2)
+            0x00,
+            0x81,  # BG palette pointer -> 0x8100 (little-endian)
+            0x00,
+            0x00,  # Sprite palette pointer (null)
+        ]
+        memory.write(0x9000, scene_data)
+
+        # Set zp__src1 to point to scene data
+        memory[0x10] = 0x00  # Low byte of 0x9000
+        memory[0x11] = 0x90  # High byte of 0x9000
+
+        # Run the subroutine
+        run_subroutine(cpu, memory, subroutine_address=0x8000)
+
+        # Get all writes in chronological order
+        all_writes = ppu_observer.get_writes()
+
+        # Extract PPU_ADDR and PPU_DATA writes in order
+        ppu_addr_writes = [(addr, value) for addr, value in all_writes if addr == 0x2006]
+        ppu_data_writes = [(addr, value) for addr, value in all_writes if addr == 0x2007]
+
+        # Verify PPU_ADDR sequence: should set address to $3F00 (palette RAM)
+        # First two PPU_ADDR writes should be 0x3F, 0x00
+        assert len(ppu_addr_writes) >= 2, f"Expected at least 2 PPU_ADDR writes, got {len(ppu_addr_writes)}"
+        assert ppu_addr_writes[0][1] == 0x3F, f"First PPU_ADDR write should be 0x3F (high byte), got {ppu_addr_writes[0][1]:02X}"
+        assert ppu_addr_writes[1][1] == 0x00, f"Second PPU_ADDR write should be 0x00 (low byte), got {ppu_addr_writes[1][1]:02X}"
+
+        # Verify PPU_DATA sequence: bg_color followed by palette data
+        # NES palette layout: backdrop at $3F00, then 4 palettes of 4 bytes each
+        # But our palette data has 3 colors per palette (12 bytes), and backdrop is repeated at $3F04, $3F08, $3F0C
+        # So we need: bg_color, pal0[0-2], bg_color, pal1[0-2], bg_color, pal2[0-2], bg_color, pal3[0-2]
+        expected_data_writes = []
+        expected_data_writes.append(0x02)  # $3F00: backdrop
+        for i in range(4):  # 4 palettes
+            # Add 3 colors from this palette
+            expected_data_writes.extend(classic_mario_palette[i*3:(i+1)*3])
+            # Add backdrop color at $3F04, $3F08, $3F0C (but not after last palette)
+            if i < 3:
+                expected_data_writes.append(0x02)
+        assert len(ppu_data_writes) >= len(expected_data_writes), (
+            f"Expected at least {len(expected_data_writes)} PPU_DATA writes, got {len(ppu_data_writes)}"
+        )
+
+        # Check exact sequence of the first 13 PPU_DATA writes
+        actual_data_sequence = [value for addr, value in ppu_data_writes[:len(expected_data_writes)]]
+        assert actual_data_sequence == expected_data_writes, (
+            f"PPU_DATA write sequence mismatch.\n"
+            f"Expected: {[f'{b:02X}' for b in expected_data_writes]}\n"
+            f"Actual:   {[f'{b:02X}' for b in actual_data_sequence]}"
+        )

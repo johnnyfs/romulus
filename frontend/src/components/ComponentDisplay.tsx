@@ -19,6 +19,8 @@ interface ComponentDisplayProps {
 interface SceneEdit {
   sceneId: string;
   backgroundColorIndex: number;
+  backgroundPalette: string | null;
+  spritePalette: string | null;
   isDirty: boolean;
 }
 
@@ -70,10 +72,12 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     setScenePalettes(newScenePalettes);
   }, [game]);
 
-  const getSceneEdit = (sceneId: string, originalColorIndex: number): SceneEdit => {
+  const getSceneEdit = (sceneId: string, scene: any): SceneEdit => {
     return editingScenes.get(sceneId) || {
       sceneId,
-      backgroundColorIndex: originalColorIndex,
+      backgroundColorIndex: scene.scene_data.background_color.index,
+      backgroundPalette: scene.scene_data.background_palettes || null,
+      spritePalette: scene.scene_data.sprite_palettes || null,
       isDirty: false,
     };
   };
@@ -87,12 +91,39 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     const scene = game?.scenes.find(s => s.id === sceneId);
     if (!scene) return;
 
+    const currentEdit = getSceneEdit(sceneId, scene);
     const originalColorIndex = scene.scene_data.background_color.index;
+
     const newEditingScenes = new Map(editingScenes);
     newEditingScenes.set(sceneId, {
-      sceneId,
+      ...currentEdit,
       backgroundColorIndex: colorIndex,
-      isDirty: colorIndex !== originalColorIndex,
+      isDirty: colorIndex !== originalColorIndex ||
+               currentEdit.backgroundPalette !== (scene.scene_data.background_palettes || null) ||
+               currentEdit.spritePalette !== (scene.scene_data.sprite_palettes || null),
+    });
+    setEditingScenes(newEditingScenes);
+  };
+
+  const handlePaletteSelect = (sceneId: string, paletteType: 'background' | 'sprite', paletteName: string | null) => {
+    const scene = game?.scenes.find(s => s.id === sceneId);
+    if (!scene) return;
+
+    const currentEdit = getSceneEdit(sceneId, scene);
+    const originalBgPalette = scene.scene_data.background_palettes || null;
+    const originalSpritePalette = scene.scene_data.sprite_palettes || null;
+
+    const newEdit = {
+      ...currentEdit,
+      [paletteType === 'background' ? 'backgroundPalette' : 'spritePalette']: paletteName,
+    };
+
+    const newEditingScenes = new Map(editingScenes);
+    newEditingScenes.set(sceneId, {
+      ...newEdit,
+      isDirty: newEdit.backgroundColorIndex !== scene.scene_data.background_color.index ||
+               newEdit.backgroundPalette !== originalBgPalette ||
+               newEdit.spritePalette !== originalSpritePalette,
     });
     setEditingScenes(newEditingScenes);
   };
@@ -114,6 +145,8 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
           scene_data: {
             ...scene.scene_data,
             background_color: { index: edit.backgroundColorIndex },
+            background_palettes: edit.backgroundPalette,
+            sprite_palettes: edit.spritePalette,
           },
         }
       );
@@ -290,10 +323,15 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
           ) : (
             <ul className={styles.componentDisplayScenesList}>
               {game.scenes.map((scene) => {
-                const edit = getSceneEdit(scene.id, scene.scene_data.background_color.index);
+                const edit = getSceneEdit(scene.id, scene);
                 const currentColorIndex = edit.backgroundColorIndex;
                 const currentColor = getNESColor(currentColorIndex);
                 const isSaving = saving.has(scene.id);
+
+                // Get list of available palettes from components
+                const availablePalettes = game.components
+                  ?.filter(c => c.component_data.type === 'palette')
+                  .map(c => c.name) || [];
 
                 return (
                   <li key={scene.id} className={styles.componentDisplaySceneItem}>
@@ -328,6 +366,34 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                         <span className={styles.sceneColorIndex}>
                           ${currentColorIndex.toString(16).toUpperCase().padStart(2, '0')}
                         </span>
+                      </div>
+
+                      <div className={styles.sceneColorRow}>
+                        <span className={styles.sceneColorLabel}>BG Palette:</span>
+                        <select
+                          className={styles.scenePaletteSelect}
+                          value={edit.backgroundPalette || ''}
+                          onChange={(e) => handlePaletteSelect(scene.id, 'background', e.target.value || null)}
+                        >
+                          <option value="">None</option>
+                          {availablePalettes.map(name => (
+                            <option key={name} value={name}>{name}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className={styles.sceneColorRow}>
+                        <span className={styles.sceneColorLabel}>Sprite Palette:</span>
+                        <select
+                          className={styles.scenePaletteSelect}
+                          value={edit.spritePalette || ''}
+                          onChange={(e) => handlePaletteSelect(scene.id, 'sprite', e.target.value || null)}
+                        >
+                          <option value="">None</option>
+                          {availablePalettes.map(name => (
+                            <option key={name} value={name}>{name}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
 
@@ -368,7 +434,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
       {showColorPicker && (() => {
         const scene = game.scenes.find(s => s.id === showColorPicker);
         if (!scene) return null;
-        const edit = getSceneEdit(scene.id, scene.scene_data.background_color.index);
+        const edit = getSceneEdit(scene.id, scene);
 
         return (
           <ColorPicker

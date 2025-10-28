@@ -147,7 +147,7 @@ class TestSceneData:
         assert scene_data.dependencies == []
 
     def test_scene_data_depends_on_palette_references(self):
-        """Verify scene depends on referenced palettes."""
+        """Verify scene depends on referenced palettes with correct prefix."""
         scene = NESScene(
             background_color=NESColor(index=0x0F),
             background_palettes="bg_palette",
@@ -155,8 +155,8 @@ class TestSceneData:
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
-        assert "bg_palette" in scene_data.dependencies
-        assert "sprite_palette" in scene_data.dependencies
+        assert "palette_data__bg_palette" in scene_data.dependencies
+        assert "palette_data__sprite_palette" in scene_data.dependencies
 
     def test_scene_data_size_is_5_bytes(self):
         """Verify scene is 1 byte (bg color) + 2 bytes (bg pal ptr) + 2 bytes (sprite pal ptr)."""
@@ -185,7 +185,7 @@ class TestSceneData:
         assert rendered.exported_names == {"scene_data__main": 0x9000}
 
     def test_scene_data_renders_with_palette_references(self):
-        """Verify scene renders with palette pointer addresses."""
+        """Verify scene renders with palette pointer addresses using correct palette_data__ prefix."""
         scene = NESScene(
             background_color=NESColor(index=0x21),
             background_palettes="bg_pal",
@@ -196,8 +196,8 @@ class TestSceneData:
         rendered = scene_data.render(
             start_offset=0x9000,
             names={
-                "bg_pal": 0x9100,
-                "sprite_pal": 0x9200,
+                "palette_data__bg_pal": 0x9100,
+                "palette_data__sprite_pal": 0x9200,
             },
         )
 
@@ -219,3 +219,55 @@ class TestSceneData:
 
         # 0F (bg color) + 00 00 (missing -> null) + 00 00 (null sprite pal)
         assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00])
+
+    def test_scene_with_classic_mario_palette(self):
+        """Test the actual Classic Mario Set scenario from the database."""
+        # Create the "Classic Mario Set" palette with 4 sub-palettes
+        classic_mario_palette = PaletteData(
+            _name="Classic Mario Set",
+            _palette_data=NESPaletteData(
+                type=ComponentType.PALETTE,
+                palettes=[
+                    NESPalette(colors=(NESColor(index=22), NESColor(index=39), NESColor(index=24))),
+                    NESPalette(colors=(NESColor(index=26), NESColor(index=42), NESColor(index=25))),
+                    NESPalette(colors=(NESColor(index=17), NESColor(index=33), NESColor(index=49))),
+                    NESPalette(colors=(NESColor(index=40), NESColor(index=56), NESColor(index=22))),
+                ],
+            ),
+        )
+
+        # Create a scene that references this palette
+        scene = NESScene(
+            background_color=NESColor(index=2),
+            background_palettes="Classic Mario Set",
+            sprite_palettes=None,
+        )
+        scene_data = SceneData(_name="main", _scene=scene)
+
+        # Verify dependencies are correct
+        assert scene_data.dependencies == ["palette_data__Classic Mario Set"]
+
+        # First render the palette to get its address
+        palette_rendered = classic_mario_palette.render(start_offset=0x8100, names={})
+
+        # Verify palette exports the correct name
+        assert "palette_data__Classic Mario Set" in palette_rendered.exported_names
+        assert palette_rendered.exported_names["palette_data__Classic Mario Set"] == 0x8100
+
+        # Verify palette data is correct (4 palettes × 3 colors = 12 bytes)
+        assert palette_rendered.code == bytes([
+            22, 39, 24,  # Palette 0
+            26, 42, 25,  # Palette 1
+            17, 33, 49,  # Palette 2
+            40, 56, 22,  # Palette 3
+        ])
+
+        # Now render the scene with the palette in the names dict
+        scene_rendered = scene_data.render(
+            start_offset=0x9000,
+            names=palette_rendered.exported_names,
+        )
+
+        # Scene should be: 02 (bg color) + 00 81 (palette @ 0x8100) + 00 00 (null sprite pal)
+        assert scene_rendered.code == bytes([0x02, 0x00, 0x81, 0x00, 0x00])
+        assert scene_rendered.exported_names == {"scene_data__main": 0x9000}

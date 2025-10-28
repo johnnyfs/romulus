@@ -53,7 +53,6 @@ class LoadSceneSubroutine(CodeBlock):
         PPU_DATA = 0x2007
         PPU_CTRL = 0x2000
         PPU_MASK = 0x2001
-        PALETTE_BASE = 0x3F00
 
         # === Wait for PPU to be ready ===
         # Read PPU status to clear address latch
@@ -92,14 +91,35 @@ class LoadSceneSubroutine(CodeBlock):
         beq_fixup_pos = len(asm) - 1
 
         # === Load 12 bytes of background palette data ===
-        # Y is already at the right index after loading pointer
+        # NES palette layout: 4 palettes × 4 bytes each = 16 bytes total
+        # $3F00 = universal backdrop color (already written)
+        # $3F01-$3F03 = palette 0, colors 1-3
+        # $3F04 = backdrop mirror (write backdrop color again)
+        # $3F05-$3F07 = palette 1, colors 1-3
+        # $3F08 = backdrop mirror (write backdrop color again)
+        # $3F09-$3F0B = palette 2, colors 1-3
+        # $3F0C = backdrop mirror (write backdrop color again)
+        # $3F0D-$3F0F = palette 3, colors 1-3
+        #
+        # Our palette data has 12 bytes (3 colors × 4 palettes), so we need to
+        # interleave the backdrop color at positions 4, 8, 12
+
+        # Store bg color in accumulator for reuse
         asm.ldy_imm(0)
-        # Loop 12 times
-        for i in range(12):
-            asm.lda_ind_y(zp_src2)
-            asm.sta_abs(PPU_DATA)
-            if i < 11:  # Don't increment on last iteration
+        asm.lda_ind_y(zp_src1)  # Load backdrop color
+        asm.tax()  # Save backdrop color in X register
+
+        asm.ldy_imm(0)  # Index for palette data
+        # Load 4 palettes, 3 colors each, with backdrop mirrors
+        for palette_idx in range(4):
+            for _ in range(3):
+                asm.lda_ind_y(zp_src2)
+                asm.sta_abs(PPU_DATA)
                 asm.iny()
+            # Write backdrop mirror at $3F04, $3F08, $3F0C (but not after last palette)
+            if palette_idx < 3:
+                asm.txa()  # Load backdrop color from X
+                asm.sta_abs(PPU_DATA)
 
         # Calculate skip offset for BEQ
         # BEQ offset is relative to the PC of the instruction AFTER the BEQ
@@ -126,12 +146,36 @@ class LoadSceneSubroutine(CodeBlock):
         beq_sprite_fixup_pos = len(asm) - 1
 
         # === Load 12 bytes of sprite palette data ===
-        asm.ldy_imm(0)
-        for i in range(12):
-            asm.lda_ind_y(zp_src2)
-            asm.sta_abs(PPU_DATA)
-            if i < 11:
+        # Sprite palettes follow the same pattern at $3F10-$3F1F
+        # $3F10 = backdrop mirror (write backdrop color)
+        # $3F11-$3F13 = sprite palette 0, colors 1-3
+        # $3F14 = backdrop mirror (write backdrop color again)
+        # ... and so on
+        #
+        # Note: PPU address should be at $3F10 now if we wrote 15 bytes to BG palettes
+        # But to be safe, set it explicitly
+
+        # Set PPU address to sprite palette start ($3F10)
+        asm.lda_imm(0x3F)
+        asm.sta_abs(PPU_ADDR)
+        asm.lda_imm(0x10)
+        asm.sta_abs(PPU_ADDR)
+
+        # Write backdrop color first (mirrors $3F00)
+        asm.txa()  # Backdrop color still in X
+        asm.sta_abs(PPU_DATA)
+
+        asm.ldy_imm(0)  # Index for sprite palette data
+        # Load 4 sprite palettes, 3 colors each, with backdrop mirrors
+        for palette_idx in range(4):
+            for _ in range(3):
+                asm.lda_ind_y(zp_src2)
+                asm.sta_abs(PPU_DATA)
                 asm.iny()
+            # Write backdrop mirror at $3F14, $3F18, $3F1C (but not after last palette)
+            if palette_idx < 3:
+                asm.txa()  # Load backdrop color from X
+                asm.sta_abs(PPU_DATA)
 
         # Fix up sprite palette BEQ
         # Same calculation as BG palette above
