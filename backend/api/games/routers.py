@@ -14,7 +14,7 @@ from dependencies import get_db
 from api.games.models import Game
 from api.games.scenes.models import Scene
 from api.games.entities.models import Entity
-from api.games.scenes.schemas import SceneCreateResponse
+from api.games.scenes.schemas import EntityResponse, SceneCreateResponse
 from api.games.entities.schemas import EntityCreateResponse
 from api.games.components.schemas import ComponentCreateResponse
 from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
@@ -79,7 +79,7 @@ async def get_game(
             name=scene.name,
             scene_data=scene.scene_data,
             entities=[
-                EntityCreateResponse(
+                EntityResponse(
                     id=entity.id,
                     scene_id=entity.scene_id,
                     name=entity.name,

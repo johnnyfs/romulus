@@ -150,13 +150,55 @@ This script:
 - Generates left-aligned YAML metadata
 - Updates manifest.json
 
-## Next Steps
+## Asset Pipeline Integration
 
-1. Classify extracted assets (automatic or manual)
-2. Convert assets to NES-compatible palettes where needed
-3. Organize into refined asset library
-4. Create asset metadata database
+### New API-Based Workflow
+
+The project now includes a complete asset upload and management pipeline using MinIO/S3 storage:
+
+**Backend Endpoints:**
+- `POST /api/v1/assets/upload` - Get presigned upload URL
+- `POST /api/v1/assets` - Finalize upload with metadata
+- `GET /api/v1/assets/{id}` - Retrieve asset details
+- `DELETE /api/v1/assets/{id}` - Remove asset
+
+**Upload Process:**
+1. Client requests upload ticket with filename
+2. Backend generates presigned S3 URL and storage key
+3. Client uploads file directly to MinIO/S3
+4. Client finalizes with metadata POST
+
+**Storage:**
+- MinIO container running on port 9000 (API) and 9001 (Console UI)
+- Data persisted in `.assets/` directory via bind mount
+- Survives `docker compose down -v`
+
+**Asset Types:**
+Currently supports `image` assets with:
+- **State**: `raw` (initial state)
+- **Image Type**: `sprite`, `background`, `map`, `ui`, `icon`, `portrait`, `misc`
+- **Tags**: `outline`, `scifi`, `fantasy`, `contemporary`, `overhead`, `side-view`,
+  `pseudo-overhead`, `hi-res`, `hi-color`, `desaturated`, `deduplicated`, `padded`
+- **Metadata**: `source_url` (nullable), `license` (nullable)
+
+**Database Schema:**
+```sql
+CREATE TABLE assets (
+    id UUID PRIMARY KEY,
+    type AssetType NOT NULL,  -- Indexed
+    storage_key VARCHAR(512) UNIQUE NOT NULL,
+    asset_data JSONB NOT NULL  -- Discriminated union
+);
+```
+
+### Next Steps
+
+1. Migrate existing assets to new pipeline
+2. Build agent to automatically classify and upload raw assets
+3. Add asset processing states (raw → processed → refined)
+4. Create asset search and filtering endpoints
 5. Build composition ranker training data from screenshots
+6. Integrate with frontend asset viewer
 
 ## Asset Quality Criteria
 

@@ -31,5 +31,13 @@ class Settings(BaseSettings):
     # ALGORITHM: str = "HS256"
     # ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # MinIO / S3
+    MINIO_ENDPOINT: str = "minio:9000"  # Internal Docker network endpoint
+    MINIO_EXTERNAL_ENDPOINT: str = "localhost:9000"  # External endpoint for presigned URLs
+    MINIO_ACCESS_KEY: str = "minioadmin"
+    MINIO_SECRET_KEY: str = "minioadmin"
+    MINIO_SECURE: bool = False  # Use HTTPS
+    MINIO_BUCKET: str = "assets"
+
 
 settings = Settings()

@@ -20,7 +20,7 @@ class PydanticType(TypeDecorator):
         if value is None:
             return None
         if isinstance(value, BaseModel):
-            return value.model_dump()
+            return value.model_dump(mode="json")
         return value
 
     def process_result_value(self, value: dict | None, dialect) -> Any:
