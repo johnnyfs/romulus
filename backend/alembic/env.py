@@ -10,8 +10,10 @@ from alembic import context
 # Import your models and config
 from config import settings
 from database import Base
+from api.assets.models import Asset  # noqa
 from api.games.models import Game  # noqa
 from api.games.scenes.models import Scene  # noqa
+from api.games.entities.models import Entity  # noqa
 from api.games.components.models import Component  # noqa
 
 # this is the Alembic Config object, which provides
