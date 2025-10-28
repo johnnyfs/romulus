@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import AssetData, GameAssetData, GameAssetType
+from core.schemas import AssetData
 
 
 class UploadTicketRequest(BaseModel):
@@ -40,21 +40,3 @@ class AssetUpdateRequest(BaseModel):
     """Request to update an asset's metadata."""
 
     asset_data: AssetData
-
-
-class GameAssetCreateRequest(BaseModel):
-    """Request to create a game asset."""
-
-    name: str
-    type: GameAssetType
-    data: GameAssetData
-
-
-class GameAssetResponse(BaseModel):
-    """Response for a game asset."""
-
-    id: uuid.UUID
-    game_id: uuid.UUID
-    name: str
-    type: GameAssetType
-    data: GameAssetData

@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from api.assets.game_asset_models import GameAsset
-from api.assets.schemas import GameAssetCreateRequest, GameAssetResponse
+from api.games.assets.models import GameAsset
+from api.games.assets.schemas import GameAssetCreateRequest, GameAssetResponse
 from dependencies import get_db
 
 router = APIRouter()

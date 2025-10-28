@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.assets.routers import router as asset_router
-from api.assets.game_asset_routers import router as game_asset_router
 from api.games.routers import router as game_router
+from api.games.assets.routers import router as game_asset_router
 from api.games.scenes.routers import router as scene_router
 from api.games.entities.routers import router as entity_router
 from api.games.components.routers import router as component_router
