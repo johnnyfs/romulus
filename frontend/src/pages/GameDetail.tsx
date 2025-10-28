@@ -6,7 +6,7 @@ import type { GameGetResponse } from '../client/models/GameGetResponse';
 import { OpenAPI } from '../client/core/OpenAPI';
 import Chat from '../components/Chat';
 import RomPlayer from '../components/RomPlayer';
-import ComponentDisplay from '../components/ComponentDisplay';
+import AssetDisplay from '../components/AssetDisplay';
 
 function GameDetail() {
   const { id } = useParams<{ id: string }>();
@@ -129,9 +129,9 @@ function GameDetail() {
           )}
         </div>
 
-        {/* Right Column - Component Display */}
+        {/* Right Column - Asset Display */}
         <div className={styles.gameDetailColumn}>
-          <ComponentDisplay
+          <AssetDisplay
             game={game}
             onRebuildROM={handleRebuildROM}
             onSceneUpdated={handleSceneUpdated}
