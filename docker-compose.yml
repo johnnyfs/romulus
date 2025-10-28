@@ -40,17 +40,20 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: romulus-api
-    network_mode: "host"
     entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
-    command: uvicorn main:app --host 0.0.0.0 --port ${BACKEND_PORT:-8000} --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    extra_hosts:
+      - "localhost:host-gateway"
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=postgresql+asyncpg://romulus:romulus@localhost:${POSTGRES_PORT:-5432}/romulus
+      - DATABASE_URL=postgresql+asyncpg://romulus:romulus@postgres:5432/romulus
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - DEBUG=${DEBUG:-false}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - MINIO_ENDPOINT=localhost:9000
+      - MINIO_ENDPOINT=localhost:${MINIO_PORT:-9000}
       - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
       - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
     depends_on:

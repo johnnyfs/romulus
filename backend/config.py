@@ -34,6 +34,7 @@ class Settings(BaseSettings):
     # MinIO / S3
     MINIO_ENDPOINT: str = "minio:9000"  # Internal Docker network endpoint
     MINIO_EXTERNAL_ENDPOINT: str = "localhost:9000"  # External endpoint for presigned URLs
+    MINIO_EXTERNAL_ENDPOINT_FOR_CLIENT: str = "host.docker.internal:9000"  # How API reaches external endpoint
     MINIO_ACCESS_KEY: str = "minioadmin"
     MINIO_SECRET_KEY: str = "minioadmin"
     MINIO_SECURE: bool = False  # Use HTTPS

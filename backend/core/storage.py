@@ -12,6 +12,8 @@ class StorageClient:
     """Client for interacting with MinIO/S3 storage."""
 
     def __init__(self):
+        # Use localhost for both operations and URL generation
+        # Docker extra_hosts maps localhost to host gateway
         self.client = Minio(
             settings.MINIO_ENDPOINT,
             access_key=settings.MINIO_ACCESS_KEY,
