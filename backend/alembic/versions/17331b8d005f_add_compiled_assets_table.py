@@ -1,4 +1,4 @@
-"""add_game_assets_table
+"""add_assets_table
 
 Revision ID: 17331b8d005f
 Revises: f6d0a8cccb2b
@@ -10,7 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 from core.pydantic_type import PydanticType
-from core.schemas import GameAssetData
+from core.schemas import AssetData
 
 
 # revision identifiers, used by Alembic.
@@ -22,19 +22,19 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
-    op.create_table('game_assets',
+    op.create_table('assets',
         sa.Column('game_id', sa.Uuid(), nullable=False),
         sa.Column('name', sa.String(length=255), nullable=False),
-        sa.Column('type', sa.Enum('PALETTE', name='gameassettype'), nullable=False),
-        sa.Column('data', PydanticType(GameAssetData), nullable=False),
+        sa.Column('type', sa.Enum('PALETTE', name='assettype'), nullable=False),
+        sa.Column('data', PydanticType(AssetData), nullable=False),
         sa.Column('id', sa.Uuid(), nullable=False),
-        sa.ForeignKeyConstraint(['game_id'], ['games.id'], name='fk_game_assets_game_id'),
+        sa.ForeignKeyConstraint(['game_id'], ['games.id'], name='fk_assets_game_id'),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('game_id', 'name', 'type', name='uq_game_asset_game_name_type')
+        sa.UniqueConstraint('game_id', 'name', 'type', name='uq_asset_game_name_type')
     )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
-    op.drop_table('game_assets')
-    op.execute('DROP TYPE gameassettype')
+    op.drop_table('assets')
+    op.execute('DROP TYPE assettype')

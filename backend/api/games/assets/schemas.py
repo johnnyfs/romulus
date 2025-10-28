@@ -2,22 +2,22 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import GameAssetData, GameAssetType
+from core.schemas import AssetData, AssetType
 
 
-class GameAssetCreateRequest(BaseModel):
-    """Request to create a game asset."""
+class AssetCreateRequest(BaseModel):
+    """Request to create an asset."""
 
     name: str
-    type: GameAssetType
-    data: GameAssetData
+    type: AssetType
+    data: AssetData
 
 
-class GameAssetResponse(BaseModel):
-    """Response for a game asset."""
+class AssetResponse(BaseModel):
+    """Response for an asset."""
 
     id: uuid.UUID
     game_id: uuid.UUID
     name: str
-    type: GameAssetType
-    data: GameAssetData
+    type: AssetType
+    data: AssetData

@@ -13,13 +13,13 @@ class ComponentType(str, Enum):
     PALETTE = "palette"
 
 
-class AssetType(str, Enum):
-    """Types of assets that can be stored."""
+class ResourceType(str, Enum):
+    """Types of raw resources that can be uploaded."""
 
     IMAGE = "image"
 
 
-class GameAssetType(str, Enum):
+class AssetType(str, Enum):
     """Types of game assets."""
 
     PALETTE = "palette"
@@ -99,34 +99,34 @@ class NESScene(BaseModel):
     components: list[NESRef] = []
 
 
-# Asset data schemas (discriminated union based on type)
+# Resource data schemas (discriminated union based on type)
 
 
-class ImageAssetData(BaseModel):
-    """Data for an image asset."""
+class ImageResourceData(BaseModel):
+    """Data for an image resource."""
 
-    type: Literal[AssetType.IMAGE] = AssetType.IMAGE
+    type: Literal[ResourceType.IMAGE] = ResourceType.IMAGE
     state: ImageState
     image_type: ImageType
     tags: list[ImageTag] = []
-    source_url: str | None = None  # URL to parent asset (for grouped/cleaned stages)
+    source_url: str | None = None  # URL to parent resource (for grouped/cleaned stages)
     license: str | None = None
-    processed: bool = False  # Marks if this asset has been processed to the next stage
+    processed: bool = False  # Marks if this resource has been processed to the next stage
 
 
-# Discriminated union of all asset data types
-AssetData = Annotated[ImageAssetData, Field(discriminator="type")]
+# Discriminated union of all resource data types
+ResourceData = Annotated[ImageResourceData, Field(discriminator="type")]
 
 
-# Game asset data schemas (discriminated union based on type)
+# Asset data schemas (discriminated union based on type)
 
 
-class NESPaletteGameAssetData(BaseModel):
-    """Data for a palette game asset."""
+class NESPaletteAssetData(BaseModel):
+    """Data for a palette asset."""
 
-    type: Literal[GameAssetType.PALETTE] = GameAssetType.PALETTE
+    type: Literal[AssetType.PALETTE] = AssetType.PALETTE
     palettes: list[NESPalette]  # Up to 4 palettes for background or sprites
 
 
-# Discriminated union of all game asset data types
-GameAssetData = Annotated[NESPaletteGameAssetData, Field(discriminator="type")]
+# Discriminated union of all asset data types
+AssetData = Annotated[NESPaletteAssetData, Field(discriminator="type")]
