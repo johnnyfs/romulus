@@ -9,6 +9,7 @@ class UploadTicketRequest(BaseModel):
     """Request to get a presigned upload URL."""
 
     filename: str
+    asset_data: AssetData
 
 
 class UploadTicketResponse(BaseModel):
@@ -16,6 +17,7 @@ class UploadTicketResponse(BaseModel):
 
     upload_url: str
     storage_key: str
+    asset_id: uuid.UUID
 
 
 class AssetCreateRequest(BaseModel):

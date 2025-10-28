@@ -1,11 +1,14 @@
 """MinIO/S3 storage client for managing asset uploads."""
 
+import json
 import uuid
 from datetime import timedelta
+from io import BytesIO
 
 from minio import Minio
 
 from config import settings
+from core.schemas import AssetData, AssetType, ImageState
 
 
 class StorageClient:
@@ -28,16 +31,35 @@ class StorageClient:
         if not self.client.bucket_exists(self.bucket):
             self.client.make_bucket(self.bucket)
 
-    def generate_storage_key(self, filename: str) -> str:
-        """Generate a unique storage key for a file."""
-        # Use UUID to ensure uniqueness
-        file_id = uuid.uuid4()
-        # Preserve the original extension if present
-        extension = ""
-        if "." in filename:
-            extension = filename.rsplit(".", 1)[1]
-            return f"{file_id}.{extension}"
-        return str(file_id)
+    def generate_storage_key(self, filename: str, asset_data: AssetData, asset_id: uuid.UUID) -> str:
+        """Generate a storage key based on asset type and processing state.
+
+        Format: assets/{type}/{state}/{id}/{filename}
+        Example: assets/images/raw/123e4567-e89b-12d3-a456-426614174000/spritesheet.png
+        """
+        if asset_data.type == AssetType.IMAGE:
+            return f"images/{asset_data.state.value}/{asset_id}/{filename}"
+        else:
+            # Fallback for other asset types
+            return f"{asset_data.type.value}/{asset_id}/{filename}"
+
+    def write_metadata(self, storage_key: str, metadata: dict) -> None:
+        """Write metadata.json file alongside the asset."""
+        # Construct metadata file path
+        metadata_key = f"{storage_key}.metadata.json"
+
+        # Serialize metadata to JSON
+        metadata_json = json.dumps(metadata, indent=2, default=str)
+        metadata_bytes = metadata_json.encode('utf-8')
+
+        # Upload to MinIO
+        self.client.put_object(
+            self.bucket,
+            metadata_key,
+            BytesIO(metadata_bytes),
+            length=len(metadata_bytes),
+            content_type='application/json'
+        )
 
     def get_presigned_upload_url(self, storage_key: str, expires: timedelta = timedelta(hours=1)) -> str:
         """Generate a presigned URL for uploading a file."""

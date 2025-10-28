@@ -24,16 +24,20 @@ async def get_upload_ticket(request: UploadTicketRequest):
     Returns an upload ticket containing:
     - upload_url: Presigned URL where the client should PUT the file
     - storage_key: Key to reference this upload when finalizing
+    - asset_id: The UUID that will be assigned to this asset
     """
     storage = get_storage_client()
 
-    # Generate a unique storage key for this file
-    storage_key = storage.generate_storage_key(request.filename)
+    # Generate a unique asset ID
+    asset_id = uuid.uuid4()
+
+    # Generate storage key based on asset metadata and processing state
+    storage_key = storage.generate_storage_key(request.filename, request.asset_data, asset_id)
 
     # Generate presigned upload URL
     upload_url = storage.get_presigned_upload_url(storage_key)
 
-    return UploadTicketResponse(upload_url=upload_url, storage_key=storage_key)
+    return UploadTicketResponse(upload_url=upload_url, storage_key=storage_key, asset_id=asset_id)
 
 
 @router.post("", response_model=AssetCreateResponse)
@@ -46,6 +50,10 @@ async def create_asset(
 
     After the client has uploaded to the presigned URL, they should call this
     endpoint with the storage_key and asset metadata to finalize the upload.
+    This will:
+    1. Verify the file exists in storage
+    2. Create the database record
+    3. Write metadata.json to storage for recovery
     """
     storage = get_storage_client()
 
@@ -64,6 +72,16 @@ async def create_asset(
     )
     db.add(asset)
     await db.flush()  # Flush to generate the UUID
+
+    # Write metadata.json to storage for recovery
+    metadata = {
+        "id": str(asset.id),
+        "type": asset.type.value,
+        "storage_key": asset.storage_key,
+        "asset_data": asset.asset_data.model_dump(mode='json'),
+        "created_at": asset.created_at.isoformat() if hasattr(asset, 'created_at') else None,
+    }
+    storage.write_metadata(asset.storage_key, metadata)
 
     # Generate download URL for the response
     download_url = storage.get_download_url(asset.storage_key)

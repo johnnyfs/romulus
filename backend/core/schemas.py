@@ -23,6 +23,8 @@ class ImageState(str, Enum):
     """Processing state of an image asset."""
 
     RAW = "raw"
+    GROUPED = "grouped"
+    CLEANED = "cleaned"
 
 
 class ImageType(str, Enum):
@@ -101,7 +103,7 @@ class ImageAssetData(BaseModel):
     state: ImageState
     image_type: ImageType
     tags: list[ImageTag] = []
-    source_url: str | None = None
+    source_url: str | None = None  # URL to parent asset (for grouped/cleaned stages)
     license: str | None = None
 
 
