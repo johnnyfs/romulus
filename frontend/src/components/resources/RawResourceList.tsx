@@ -3,12 +3,12 @@ import { ResourceRow } from "./ResourceRow";
 import type { ResourceCreateResponse } from "../../client";
 
 interface RawResourceListProps {
-  assets: ResourceCreateResponse[];
-  onResourceClick?: (asset: ResourceCreateResponse) => void;
+  resources: ResourceCreateResponse[];
+  onResourceClick?: (resource: ResourceCreateResponse) => void;
 }
 
-export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onResourceClick }) => {
-  if (assets.length === 0) {
+export const RawResourceList: React.FC<RawResourceListProps> = ({ resources, onResourceClick }) => {
+  if (resources.length === 0) {
     return (
       <div
         style={{
@@ -19,14 +19,14 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onReso
           borderRadius: "4px",
         }}
       >
-        No raw assets found. Upload some assets to get started!
+        No raw resources found. Upload some resources to get started!
       </div>
     );
   }
 
   // Separate unprocessed and processed resources (already sorted by API)
-  const unprocessedResources = assets.filter((a) => !a.resource_data.processed);
-  const processedResources = assets.filter((a) => a.resource_data.processed);
+  const unprocessedResources = resources.filter((r) => !r.resource_data.processed);
+  const processedResources = resources.filter((r) => r.resource_data.processed);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -44,8 +44,8 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onReso
           >
             Unprocessed ({unprocessedResources.length})
           </div>
-          {unprocessedResources.map((asset) => (
-            <ResourceRow key={asset.id} asset={asset} onClick={onResourceClick} />
+          {unprocessedResources.map((resource) => (
+            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} />
           ))}
         </>
       )}
@@ -64,8 +64,8 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ assets, onReso
           >
             Processed ({processedResources.length})
           </div>
-          {processedResources.map((asset) => (
-            <ResourceRow key={asset.id} asset={asset} onClick={onResourceClick} />
+          {processedResources.map((resource) => (
+            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} />
           ))}
         </>
       )}
