@@ -34,7 +34,6 @@ function GameDetail() {
 
     try {
       setRomLoading(true);
-      console.log('Rendering ROM for game:', id);
 
       // Call the render endpoint directly with fetch (can't use generated client for binary data)
       // The generated client's getResponseBody() always converts to JSON/text, which corrupts binary data
@@ -53,30 +52,10 @@ function GameDetail() {
 
       // Check for NES header magic bytes
       const header = String.fromCharCode(...romBytes.slice(0, 4));
-      console.log('ROM header:', header, 'Length:', romBytes.length);
 
       if (!header.startsWith('NES')) {
         console.error('Invalid NES ROM - first bytes:', Array.from(romBytes.slice(0, 16)));
         throw new Error('Invalid NES ROM format');
-      }
-
-      console.log('✅ ROM rendered successfully:', romBytes.length, 'bytes');
-
-      // Debug: Search for palette data in ROM
-      console.log('=== Searching for palette data in ROM ===');
-      const palettePattern = [22, 39, 24, 26, 42, 25, 17, 33, 49, 40, 56, 22];
-      for (let i = 0; i < romBytes.length - 12; i++) {
-        let match = true;
-        for (let j = 0; j < 12; j++) {
-          if (romBytes[i + j] !== palettePattern[j]) {
-            match = false;
-            break;
-          }
-        }
-        if (match) {
-          console.log(`✅ Found Classic Mario palette at ROM offset 0x${i.toString(16).toUpperCase()} (${i} bytes)`);
-          console.log('  Palette data:', Array.from(romBytes.slice(i, i + 12)).map(b => `$${b.toString(16).padStart(2, '0').toUpperCase()}`).join(', '));
-        }
       }
 
       setRomData(romBytes);
