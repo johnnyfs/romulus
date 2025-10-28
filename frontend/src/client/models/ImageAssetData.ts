@@ -15,5 +15,6 @@ export type ImageAssetData = {
     tags?: Array<ImageTag>;
     source_url?: (string | null);
     license?: (string | null);
+    processed?: boolean;
 };
 

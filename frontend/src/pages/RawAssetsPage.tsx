@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { RawAssetList } from "../components/assets/RawAssetList";
-import { AssetsService } from "../client";
+import { AssetsService, AssetType, ImageState } from "../client";
 import type { AssetCreateResponse } from "../client";
 
 export const RawAssetsPage: React.FC = () => {
@@ -13,7 +13,7 @@ export const RawAssetsPage: React.FC = () => {
     const fetchAssets = async () => {
       try {
         // Fetch all image assets with state=raw
-        const response = await AssetsService.listAssetsAssetsGet("image", "raw");
+        const response = await AssetsService.listAssetsAssetsGet(AssetType.IMAGE, ImageState.RAW);
         setAssets(response);
         setLoading(false);
       } catch (err: any) {

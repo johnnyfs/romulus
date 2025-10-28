@@ -8,5 +8,6 @@
 export type UploadTicketResponse = {
     upload_url: string;
     storage_key: string;
+    asset_id: string;
 };
 

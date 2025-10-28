@@ -3,10 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Processing state of an image asset.
+ * Types of compiled assets that can be used in games.
  */
-export enum ImageState {
-    RAW = 'raw',
-    GROUPED = 'grouped',
-    CLEANED = 'cleaned',
+export enum CompiledAssetType {
+    PALETTE = 'palette',
 }

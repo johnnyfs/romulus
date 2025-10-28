@@ -51,7 +51,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({ asset, onClick }) => {
           {filename}
         </div>
         <div style={{ fontSize: "12px", color: "#666" }}>
-          {asset.asset_data.image_type} • {asset.asset_data.tags.join(", ") || "no tags"}
+          {asset.asset_data.image_type} • {asset.asset_data.tags?.join(", ") || "no tags"}
         </div>
       </div>
 

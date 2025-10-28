@@ -9,6 +9,11 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { AssetCreateRequest } from './models/AssetCreateRequest';
 export type { AssetCreateResponse } from './models/AssetCreateResponse';
+export { AssetType } from './models/AssetType';
+export type { AssetUpdateRequest } from './models/AssetUpdateRequest';
+export type { CompiledAssetCreateRequest } from './models/CompiledAssetCreateRequest';
+export type { CompiledAssetResponse } from './models/CompiledAssetResponse';
+export { CompiledAssetType } from './models/CompiledAssetType';
 export type { ComponentCreateRequest } from './models/ComponentCreateRequest';
 export type { ComponentCreateResponse } from './models/ComponentCreateResponse';
 export type { ComponentUpdateRequest } from './models/ComponentUpdateRequest';
@@ -31,6 +36,8 @@ export { ImageType } from './models/ImageType';
 export type { NESColor } from './models/NESColor';
 export type { NESEntity } from './models/NESEntity';
 export type { NESPalette } from './models/NESPalette';
+export type { NESPaletteCompiledData_Input } from './models/NESPaletteCompiledData_Input';
+export type { NESPaletteCompiledData_Output } from './models/NESPaletteCompiledData_Output';
 export type { NESPaletteData_Input } from './models/NESPaletteData_Input';
 export type { NESPaletteData_Output } from './models/NESPaletteData_Output';
 export type { NESRef } from './models/NESRef';
@@ -45,6 +52,7 @@ export type { UploadTicketResponse } from './models/UploadTicketResponse';
 export type { ValidationError } from './models/ValidationError';
 
 export { AssetsService } from './services/AssetsService';
+export { CompiledAssetsService } from './services/CompiledAssetsService';
 export { ComponentsService } from './services/ComponentsService';
 export { EntitiesService } from './services/EntitiesService';
 export { GamesService } from './services/GamesService';

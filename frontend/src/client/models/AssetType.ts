@@ -3,10 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
- * Processing state of an image asset.
+ * Types of assets that can be stored.
  */
-export enum ImageState {
-    RAW = 'raw',
-    GROUPED = 'grouped',
-    CLEANED = 'cleaned',
+export enum AssetType {
+    IMAGE = 'image',
 }

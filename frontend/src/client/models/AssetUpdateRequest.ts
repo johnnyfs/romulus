@@ -4,10 +4,9 @@
 /* eslint-disable */
 import type { ImageAssetData } from './ImageAssetData';
 /**
- * Request to get a presigned upload URL.
+ * Request to update an asset's metadata.
  */
-export type UploadTicketRequest = {
-    filename: string;
+export type AssetUpdateRequest = {
     asset_data: ImageAssetData;
 };
 
