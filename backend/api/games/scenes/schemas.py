@@ -34,6 +34,7 @@ class SceneUpdateRequest(BaseModel):
 
 class SceneUpdateResponse(SceneCommon):
     id: uuid.UUID
+    entities: list[EntityResponse] = []
 
 
 class SceneDeleteResponse(BaseModel):
