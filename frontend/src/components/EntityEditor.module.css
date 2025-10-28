@@ -1,0 +1,102 @@
+.entityEditor {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  padding: 8px;
+  margin: 4px 0;
+}
+
+.entityHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.entityName {
+  flex: 1;
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+}
+
+.entityName:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.entitySaveButton {
+  background-color: #444;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #888;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.entitySaveButton:hover:not(:disabled) {
+  background-color: #555;
+  border-color: #666;
+}
+
+.entitySaveButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.entitySaveButtonActive {
+  background-color: #0a7ea4;
+  border-color: #0a7ea4;
+  color: #fff;
+}
+
+.entitySaveButtonActive:hover:not(:disabled) {
+  background-color: #0d9ed1;
+  border-color: #0d9ed1;
+}
+
+.entityFields {
+  display: flex;
+  gap: 12px;
+}
+
+.entityField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.entityLabel {
+  font-size: 11px;
+  color: #999;
+  font-weight: 600;
+}
+
+.entityInput {
+  background-color: #1a1a1a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: 'Courier New', monospace;
+  width: 60px;
+}
+
+.entityInput:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.entityInput::-webkit-inner-spin-button,
+.entityInput::-webkit-outer-spin-button {
+  opacity: 1;
+}

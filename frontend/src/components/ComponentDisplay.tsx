@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
-import { Save, RefreshCw } from 'lucide-react';
+import { Save, RefreshCw, Plus } from 'lucide-react';
 import styles from './ComponentDisplay.module.css';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 import { ScenesService } from '../client/services/ScenesService';
 import { ComponentsService } from '../client/services/ComponentsService';
+import { EntitiesService } from '../client/services/EntitiesService';
 import { getNESColor } from '../constants/nesColors';
 import { getDefaultPalette } from '../constants/palettePresets';
 import ColorPicker from './ColorPicker';
 import PaletteEditor, { type PaletteData, type SubPalette } from './PaletteEditor';
+import EntityEditor, { type EntityData } from './EntityEditor';
 import ComponentSelector, { type ComponentType } from './ComponentSelector';
 
 interface ComponentDisplayProps {
@@ -31,6 +33,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
   const [saving, setSaving] = useState<Set<string>>(new Set());
   const [scenePalettes, setScenePalettes] = useState<Map<string, Map<string, PaletteData>>>(new Map());
   const [paletteCounter, setPaletteCounter] = useState(0);
+  const [sceneEntities, setSceneEntities] = useState<Map<string, Map<string, EntityData>>>(new Map());
 
   // Initialize scenePalettes from game.components when game loads
   useEffect(() => {
@@ -65,6 +68,35 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     });
 
     setScenePalettes(newScenePalettes);
+  }, [game]);
+
+  // Initialize sceneEntities from game.scenes when game loads
+  useEffect(() => {
+    if (!game) return;
+
+    const newSceneEntities = new Map<string, Map<string, EntityData>>();
+
+    game.scenes.forEach(scene => {
+      const sceneEntityMap = new Map<string, EntityData>();
+
+      // Add all entities for this scene
+      scene.entities?.forEach(entity => {
+        const entityData: EntityData = {
+          id: entity.id,
+          name: entity.name,
+          x: entity.entity_data.x,
+          y: entity.entity_data.y,
+          isDirty: false,
+        };
+        sceneEntityMap.set(entity.id, entityData);
+      });
+
+      if (sceneEntityMap.size > 0) {
+        newSceneEntities.set(scene.id, sceneEntityMap);
+      }
+    });
+
+    setSceneEntities(newSceneEntities);
   }, [game]);
 
   const getSceneEdit = (sceneId: string, scene: any): SceneEdit => {
@@ -322,6 +354,140 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     }
   };
 
+  const handleAddEntity = (sceneId: string) => {
+    if (!game) return;
+
+    const scene = game.scenes.find(s => s.id === sceneId);
+    if (!scene) return;
+
+    const tempId = `temp-${Date.now()}-${Math.random()}`;
+
+    // Find the next available entity number
+    const currentSceneEntities = sceneEntities.get(sceneId) || new Map();
+    const existingNames = new Set(
+      Array.from(currentSceneEntities.values()).map(e => e.name)
+    );
+
+    let entityNumber = 1;
+    while (existingNames.has(`Entity ${entityNumber}`)) {
+      entityNumber++;
+    }
+
+    const newEntity: EntityData = {
+      name: `Entity ${entityNumber}`,
+      x: 0,
+      y: 0,
+      isDirty: true, // New entity, not saved yet
+    };
+
+    currentSceneEntities.set(tempId, newEntity);
+
+    const newSceneEntities = new Map(sceneEntities);
+    newSceneEntities.set(sceneId, new Map(currentSceneEntities));
+    setSceneEntities(newSceneEntities);
+  };
+
+  const handleEntityUpdate = (sceneId: string, entityId: string, x: number, y: number) => {
+    const currentSceneEntities = sceneEntities.get(sceneId);
+    if (!currentSceneEntities) return;
+
+    const entity = currentSceneEntities.get(entityId);
+    if (!entity) return;
+
+    const updatedEntity: EntityData = {
+      ...entity,
+      x,
+      y,
+      isDirty: true,
+    };
+
+    currentSceneEntities.set(entityId, updatedEntity);
+    const newSceneEntities = new Map(sceneEntities);
+    newSceneEntities.set(sceneId, new Map(currentSceneEntities));
+    setSceneEntities(newSceneEntities);
+  };
+
+  const handleEntityNameChange = (sceneId: string, entityId: string, name: string) => {
+    const currentSceneEntities = sceneEntities.get(sceneId);
+    if (!currentSceneEntities) return;
+
+    const entity = currentSceneEntities.get(entityId);
+    if (!entity) return;
+
+    const updatedEntity: EntityData = {
+      ...entity,
+      name,
+      isDirty: true,
+    };
+
+    currentSceneEntities.set(entityId, updatedEntity);
+    const newSceneEntities = new Map(sceneEntities);
+    newSceneEntities.set(sceneId, new Map(currentSceneEntities));
+    setSceneEntities(newSceneEntities);
+  };
+
+  const handleEntitySave = async (sceneId: string, entityId: string) => {
+    if (!game) return;
+
+    const currentSceneEntities = sceneEntities.get(sceneId);
+    if (!currentSceneEntities) return;
+
+    const entity = currentSceneEntities.get(entityId);
+    if (!entity || !entity.isDirty) return;
+
+    try {
+      const entityData = {
+        name: entity.name,
+        entity_data: {
+          x: entity.x,
+          y: entity.y,
+        },
+      };
+
+      let responseId: string;
+
+      if (entity.id && !entityId.startsWith('temp-')) {
+        // Update existing entity
+        await EntitiesService.updateEntityGamesGameIdScenesSceneIdEntitiesEntityIdPut(
+          sceneId,
+          entity.id,
+          entityData
+        );
+        responseId = entity.id;
+      } else {
+        // Create new entity
+        const response = await EntitiesService.createEntityGamesGameIdScenesSceneIdEntitiesPost(
+          sceneId,
+          entityData
+        );
+        responseId = response.id;
+      }
+
+      // Update the entity with the real ID from the backend
+      const updatedEntity: EntityData = {
+        ...entity,
+        id: responseId,
+        isDirty: false,
+      };
+
+      // Replace the temp ID with the real ID if needed
+      currentSceneEntities.delete(entityId);
+      currentSceneEntities.set(responseId, updatedEntity);
+
+      const newSceneEntities = new Map(sceneEntities);
+      newSceneEntities.set(sceneId, new Map(currentSceneEntities));
+      setSceneEntities(newSceneEntities);
+
+      // Notify parent to refresh game data
+      if (onSceneUpdated) {
+        onSceneUpdated();
+      }
+    } catch (error) {
+      console.error('Failed to save entity:', error);
+      alert('Failed to save entity');
+    }
+  };
+
   if (!game) {
     return (
       <div className={styles.componentDisplayContainer}>
@@ -455,6 +621,33 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
 
                     {/* Component selector */}
                     <ComponentSelector onSelect={(type) => handleAddComponent(scene.id, type)} />
+
+                    {/* Entities section */}
+                    <div className={styles.sceneEntitiesSection}>
+                      <div className={styles.sceneEntitiesHeader}>
+                        <span className={styles.sceneEntitiesTitle}>Entities</span>
+                        <button
+                          className={styles.addEntityButton}
+                          onClick={() => handleAddEntity(scene.id)}
+                          title="Add new entity"
+                        >
+                          <Plus size={14} /> Add Entity
+                        </button>
+                      </div>
+                      {sceneEntities.get(scene.id) && (
+                        <div className={styles.sceneEntities}>
+                          {Array.from(sceneEntities.get(scene.id)!.entries()).map(([entityId, entity]) => (
+                            <EntityEditor
+                              key={entityId}
+                              entity={entity}
+                              onUpdate={(x, y) => handleEntityUpdate(scene.id, entityId, x, y)}
+                              onNameChange={(name) => handleEntityNameChange(scene.id, entityId, name)}
+                              onSave={() => handleEntitySave(scene.id, entityId)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </li>
                 );
               })}
