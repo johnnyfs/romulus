@@ -22,6 +22,22 @@
   color: var(--color-text);
 }
 
+.paletteNameInput {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  border: 1px solid #d0d0d0;
+  border-radius: var(--border-radius-sm);
+  padding: 4px 8px;
+  flex: 1;
+  background: white;
+}
+
+.paletteNameInput:focus {
+  outline: none;
+  border-color: #666;
+}
+
 .paletteSaveButton {
   background: none;
   border: none;

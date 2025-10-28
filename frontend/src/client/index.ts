@@ -9,6 +9,8 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 
 export type { ComponentCreateRequest } from './models/ComponentCreateRequest';
 export type { ComponentCreateResponse } from './models/ComponentCreateResponse';
+export type { ComponentUpdateRequest } from './models/ComponentUpdateRequest';
+export type { ComponentUpdateResponse } from './models/ComponentUpdateResponse';
 export type { GameCreateRequest } from './models/GameCreateRequest';
 export type { GameCreateResponse } from './models/GameCreateResponse';
 export type { GameDeleteResponse } from './models/GameDeleteResponse';

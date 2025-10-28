@@ -16,11 +16,30 @@ services:
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    container_name: romulus-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "${MINIO_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - ./.assets:/data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: romulus-api
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
     command: uvicorn main:app --host 0.0.0.0 --port ${BACKEND_PORT:-8000} --reload
     ports:
       - "${BACKEND_PORT:-8000}:${BACKEND_PORT:-8000}"
@@ -31,8 +50,13 @@ services:
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - DEBUG=${DEBUG:-false}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - MINIO_ENDPOINT=${MINIO_ENDPOINT:-minio:9000}
+      - MINIO_ACCESS_KEY=${MINIO_ROOT_USER:-minioadmin}
+      - MINIO_SECRET_KEY=${MINIO_ROOT_PASSWORD:-minioadmin}
     depends_on:
       postgres:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     develop:
       watch:

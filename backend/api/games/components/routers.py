@@ -5,7 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from dependencies import get_db
 from api.games.components.models import Component
-from api.games.components.schemas import ComponentCreateRequest, ComponentCreateResponse
+from api.games.components.schemas import (
+    ComponentCreateRequest,
+    ComponentCreateResponse,
+    ComponentUpdateRequest,
+    ComponentUpdateResponse,
+)
 
 router = APIRouter()
 
@@ -28,6 +33,31 @@ async def create_component(
     db.add(component)
     await db.flush()  # Flush to generate the UUID
     return ComponentCreateResponse(
+        id=component.id,
+        game_id=component.game_id,
+        name=component.name,
+        component_data=component.component_data,
+    )
+
+
+@router.put("/{component_id}", response_model=ComponentUpdateResponse)
+async def update_component(
+    game_id: uuid.UUID,
+    component_id: uuid.UUID,
+    request: ComponentUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    component = await db.get(Component, component_id)
+    if component is None or component.game_id != game_id:
+        raise HTTPException(status_code=404, detail="Component not found")
+
+    # Update fields
+    component.name = request.name
+    component.type = request.component_data.type
+    component.component_data = request.component_data
+
+    await db.flush()
+    return ComponentUpdateResponse(
         id=component.id,
         game_id=component.game_id,
         name=component.name,

@@ -18,6 +18,7 @@ interface PaletteEditorProps {
   palette: PaletteData;
   backgroundColorIndex: number; // From scene, shown in column 0 for reference
   onUpdate: (subPalettes: [SubPalette, SubPalette, SubPalette, SubPalette]) => void;
+  onNameChange: (name: string) => void;
   onSave: () => void;
   onDelete?: () => void;
   isSaving?: boolean;
@@ -27,6 +28,7 @@ function PaletteEditor({
   palette,
   backgroundColorIndex,
   onUpdate,
+  onNameChange,
   onSave,
   onDelete,
   isSaving = false,
@@ -48,7 +50,13 @@ function PaletteEditor({
   return (
     <div className={styles.paletteEditorContainer}>
       <div className={styles.paletteHeader}>
-        <div className={styles.paletteName}>{palette.name}</div>
+        <input
+          type="text"
+          className={styles.paletteNameInput}
+          value={palette.name}
+          onChange={(e) => onNameChange(e.target.value)}
+          placeholder="Palette name"
+        />
         <button
           className={`${styles.paletteSaveButton} ${
             palette.isDirty ? styles.paletteSaveButtonActive : ''

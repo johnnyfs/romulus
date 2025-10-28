@@ -4,6 +4,8 @@
 /* eslint-disable */
 import type { ComponentCreateRequest } from '../models/ComponentCreateRequest';
 import type { ComponentCreateResponse } from '../models/ComponentCreateResponse';
+import type { ComponentUpdateRequest } from '../models/ComponentUpdateRequest';
+import type { ComponentUpdateResponse } from '../models/ComponentUpdateResponse';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
 import { request as __request } from '../core/request';
@@ -24,6 +26,33 @@ export class ComponentsService {
             url: '/games/{game_id}/components',
             path: {
                 'game_id': gameId,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
+    /**
+     * Update Component
+     * @param gameId
+     * @param componentId
+     * @param requestBody
+     * @returns ComponentUpdateResponse Successful Response
+     * @throws ApiError
+     */
+    public static updateComponentGamesGameIdComponentsComponentIdPut(
+        gameId: string,
+        componentId: string,
+        requestBody: ComponentUpdateRequest,
+    ): CancelablePromise<ComponentUpdateResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/games/{game_id}/components/{component_id}',
+            path: {
+                'game_id': gameId,
+                'component_id': componentId,
             },
             body: requestBody,
             mediaType: 'application/json',

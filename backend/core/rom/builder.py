@@ -35,27 +35,9 @@ class RomBuilder:
         # This is to avoid the need to sort components by dependency order beforehand.
         self.registry.add_components(game.components)
 
-        # Debug logging for components
-        logger.info(f"Building ROM for game {game.name} (ID: {game_id})")
-        logger.info(f"Found {len(game.components)} components:")
-        for component in game.components:
-            logger.info(f"  - Component '{component.name}' (type: {component.type})")
-            if component.component_data.type == "palette":
-                logger.info(f"    Palette data ({len(component.component_data.palettes)} sub-palettes):")
-                for i, palette in enumerate(component.component_data.palettes):
-                    colors = [f"${c.index:02X}" for c in palette.colors]
-                    logger.info(f"      Palette {i}: {', '.join(colors)}")
-
         saw_main = False
         for scene in game.scenes:
             saw_main = saw_main or (scene.name == initial_scene_name)
-
-            # Debug logging for scenes
-            logger.info(f"Adding scene '{scene.name}':")
-            logger.info(f"  Background color: ${scene.scene_data.background_color.index:02X}")
-            logger.info(f"  Background palettes: {scene.scene_data.background_palettes or 'None'}")
-            logger.info(f"  Sprite palettes: {scene.scene_data.sprite_palettes or 'None'}")
-
             scene_block = SceneData(_name=scene.name, _scene=scene.scene_data)
             self._add(rom, scene_block)
 
@@ -67,12 +49,9 @@ class RomBuilder:
 
         for component in game.components:
             for code_block in self.registry.get_code_blocks(component):
-                logger.info(f"Adding code block: {code_block.name} (size: {code_block.size} bytes)")
                 self._add(rom, code_block)
 
-        rom_bytes = rom.render()
-        logger.info(f"ROM build complete: {len(rom_bytes)} bytes")
-        return rom_bytes
+        return rom.render()
 
     def _add(self, rom: Rom, code_block: CodeBlock):
         """

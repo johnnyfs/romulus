@@ -72,15 +72,13 @@ class Rom(BaseModel):
         if zp_offset > 256:
             raise ValueError(f"Zero page allocation exceeds 256 bytes: {zp_offset} bytes used")
 
-        # Step 2: PRG ROM block - add in reverse order
+        # Step 2: PRG ROM block
         # Start at beginning of 16KB PRG ROM ($C000 in second bank)
         prg_rom_start = 0xC000
 
         # Collect all PRG_ROM blocks
+        # NOTE: Do NOT reverse - builder already handles dependency order
         prg_blocks = list(self.code_blocks[RomCodeArea.PRG_ROM].values())
-
-        # Reverse the order to add leaf dependencies first
-        prg_blocks.reverse()
 
         # Start PRG ROM at beginning of PRG ROM area
         prg_offset = prg_rom_start
@@ -186,10 +184,10 @@ class Rom(BaseModel):
         chr_rom[1] = 0b00001111  # Row 1
         chr_rom[2] = 0b00001111  # Row 2
         chr_rom[3] = 0b00001111  # Row 3
-        chr_rom[4] = 0b11111111  # Row 4: color 2 left half, color 3 right half
-        chr_rom[5] = 0b11111111  # Row 5
-        chr_rom[6] = 0b11111111  # Row 6
-        chr_rom[7] = 0b11111111  # Row 7
+        chr_rom[4] = 0b00001111  # Row 4: color 2 left half, color 3 right half
+        chr_rom[5] = 0b00001111  # Row 5
+        chr_rom[6] = 0b00001111  # Row 6
+        chr_rom[7] = 0b00001111  # Row 7
 
         # High bit plane (bit 1 of color)
         chr_rom[8] = 0b00000000   # Row 0: color 0 left half, color 1 right half

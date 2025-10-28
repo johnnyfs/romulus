@@ -24,11 +24,6 @@ interface SceneEdit {
   isDirty: boolean;
 }
 
-interface ScenePalettes {
-  sceneId: string;
-  palettes: Map<string, PaletteData>; // temp ID -> PaletteData
-}
-
 function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDisplayProps) {
   const [editingScenes, setEditingScenes] = useState<Map<string, SceneEdit>>(new Map());
   const [showColorPicker, setShowColorPicker] = useState<string | null>(null);
@@ -196,8 +191,20 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
       const preset = getDefaultPalette(paletteCounter);
       const tempId = `temp-${Date.now()}-${Math.random()}`;
 
+      // Find the next available palette number
+      const existingNames = new Set(
+        Array.from(scenePalettes.values()).flatMap(map =>
+          Array.from(map.values()).map(p => p.name)
+        )
+      );
+
+      let paletteNumber = 1;
+      while (existingNames.has(`Palette ${paletteNumber}`)) {
+        paletteNumber++;
+      }
+
       const newPalette: PaletteData = {
-        name: preset.name,
+        name: `Palette ${paletteNumber}`,
         subPalettes: preset.subPalettes,
         isDirty: true, // New palette, not saved yet
       };
@@ -232,6 +239,25 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     setScenePalettes(newScenePalettes);
   };
 
+  const handlePaletteNameChange = (sceneId: string, paletteId: string, name: string) => {
+    const currentScenePalettes = scenePalettes.get(sceneId);
+    if (!currentScenePalettes) return;
+
+    const palette = currentScenePalettes.get(paletteId);
+    if (!palette) return;
+
+    const updatedPalette: PaletteData = {
+      ...palette,
+      name,
+      isDirty: true,
+    };
+
+    currentScenePalettes.set(paletteId, updatedPalette);
+    const newScenePalettes = new Map(scenePalettes);
+    newScenePalettes.set(sceneId, new Map(currentScenePalettes));
+    setScenePalettes(newScenePalettes);
+  };
+
   const handlePaletteSave = async (sceneId: string, paletteId: string) => {
     if (!game) return;
 
@@ -242,30 +268,45 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     if (!palette || !palette.isDirty) return;
 
     try {
-      // Create the component on the backend with all 4 sub-palettes
-      const response = await ComponentsService.createComponentGamesGameIdComponentsPost(
-        game.id,
-        {
-          name: palette.name,
-          component_data: {
-            type: 'palette',
-            palettes: palette.subPalettes.map(subPalette => ({
-              colors: subPalette.map(index => ({ index })),
-            })),
-          },
-        }
-      );
+      const componentData = {
+        name: palette.name,
+        component_data: {
+          type: 'palette',
+          palettes: palette.subPalettes.map(subPalette => ({
+            colors: subPalette.map(index => ({ index })),
+          })),
+        },
+      };
+
+      let responseId: string;
+
+      if (palette.id && !paletteId.startsWith('temp-')) {
+        // Update existing palette
+        await ComponentsService.updateComponentGamesGameIdComponentsComponentIdPut(
+          game.id,
+          palette.id,
+          componentData
+        );
+        responseId = palette.id;
+      } else {
+        // Create new palette
+        const response = await ComponentsService.createComponentGamesGameIdComponentsPost(
+          game.id,
+          componentData
+        );
+        responseId = response.id;
+      }
 
       // Update the palette with the real ID from the backend
       const updatedPalette: PaletteData = {
         ...palette,
-        id: response.id,
+        id: responseId,
         isDirty: false,
       };
 
-      // Replace the temp ID with the real ID
+      // Replace the temp ID with the real ID if needed
       currentScenePalettes.delete(paletteId);
-      currentScenePalettes.set(response.id, updatedPalette);
+      currentScenePalettes.set(responseId, updatedPalette);
 
       const newScenePalettes = new Map(scenePalettes);
       newScenePalettes.set(sceneId, new Map(currentScenePalettes));
@@ -406,6 +447,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                             palette={palette}
                             backgroundColorIndex={currentColorIndex}
                             onUpdate={(colors) => handlePaletteUpdate(scene.id, paletteId, colors)}
+                            onNameChange={(name) => handlePaletteNameChange(scene.id, paletteId, name)}
                             onSave={() => handlePaletteSave(scene.id, paletteId)}
                           />
                         ))}
