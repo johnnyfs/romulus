@@ -19,8 +19,8 @@ class AssetType(str, Enum):
     IMAGE = "image"
 
 
-class CompiledAssetType(str, Enum):
-    """Types of compiled assets that can be used in games."""
+class GameAssetType(str, Enum):
+    """Types of game assets."""
 
     PALETTE = "palette"
 
@@ -118,15 +118,15 @@ class ImageAssetData(BaseModel):
 AssetData = Annotated[ImageAssetData, Field(discriminator="type")]
 
 
-# Compiled asset data schemas (discriminated union based on type)
+# Game asset data schemas (discriminated union based on type)
 
 
-class NESPaletteCompiledData(BaseModel):
-    """Data for a compiled palette asset."""
+class NESPaletteGameAssetData(BaseModel):
+    """Data for a palette game asset."""
 
-    type: Literal[CompiledAssetType.PALETTE] = CompiledAssetType.PALETTE
+    type: Literal[GameAssetType.PALETTE] = GameAssetType.PALETTE
     palettes: list[NESPalette]  # Up to 4 palettes for background or sprites
 
 
-# Discriminated union of all compiled asset data types
-CompiledAssetData = Annotated[NESPaletteCompiledData, Field(discriminator="type")]
+# Discriminated union of all game asset data types
+GameAssetData = Annotated[NESPaletteGameAssetData, Field(discriminator="type")]
