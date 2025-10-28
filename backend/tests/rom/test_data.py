@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 
 from core.rom.data import AddressData, PaletteData, SceneData
@@ -8,9 +10,10 @@ class TestPaletteData:
     """Tests for PaletteData code block."""
 
     def test_palette_data_name(self):
-        """Verify palette data name is prefixed correctly."""
+        """Verify palette data name is prefixed correctly with component ID."""
+        component_id = str(uuid.uuid4())
         palette_data = PaletteData(
-            _name="test_pal",
+            _component_id=component_id,
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[
@@ -25,7 +28,7 @@ class TestPaletteData:
             ),
         )
 
-        assert palette_data.name == "palette_data__test_pal"
+        assert palette_data.name == f"component__{component_id}"
 
     def test_palette_data_has_no_dependencies(self):
         """Verify palette data has no dependencies."""

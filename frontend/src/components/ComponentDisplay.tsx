@@ -371,8 +371,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
 
                 // Get list of available palettes from components
                 const availablePalettes = game.components
-                  ?.filter(c => c.component_data.type === 'palette')
-                  .map(c => c.name) || [];
+                  ?.filter(c => c.component_data.type === 'palette') || [];
 
                 return (
                   <li key={scene.id} className={styles.componentDisplaySceneItem}>
@@ -417,8 +416,8 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                           onChange={(e) => handlePaletteSelect(scene.id, 'background', e.target.value || null)}
                         >
                           <option value="">None</option>
-                          {availablePalettes.map(name => (
-                            <option key={name} value={name}>{name}</option>
+                          {availablePalettes.map(component => (
+                            <option key={component.id} value={component.id}>{component.name}</option>
                           ))}
                         </select>
                       </div>
@@ -431,8 +430,8 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                           onChange={(e) => handlePaletteSelect(scene.id, 'sprite', e.target.value || null)}
                         >
                           <option value="">None</option>
-                          {availablePalettes.map(name => (
-                            <option key={name} value={name}>{name}</option>
+                          {availablePalettes.map(component => (
+                            <option key={component.id} value={component.id}>{component.name}</option>
                           ))}
                         </select>
                       </div>

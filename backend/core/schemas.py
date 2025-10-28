@@ -1,9 +1,10 @@
+import uuid
 from enum import Enum
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
-type NESRef = str  # name referencing address in NES data
+type NESRef = uuid.UUID  # UUID referencing a component
 
 
 class ComponentType(str, Enum):

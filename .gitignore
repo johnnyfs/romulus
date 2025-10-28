@@ -183,6 +183,9 @@ Thumbs.db
 *.tmp
 *.temp
 
+# MinIO / Assets
+.assets/
+
 # Lock files (keep these commented out if you want to commit them)
 # package-lock.json
 # pnpm-lock.yaml

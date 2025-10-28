@@ -18,7 +18,7 @@ DEFAULT_REGISTRY = {
 
 def _to_code_blocks(component: Component) -> list[CodeBlock]:
     if component.component_data.type == ComponentType.PALETTE:
-        return [PaletteData(_name=component.name, _palette_data=component.component_data)]
+        return [PaletteData(_component_id=str(component.id), _palette_data=component.component_data)]
     else:
         raise ValueError(f"Unsupported component type: {component.component_data.type}")
 

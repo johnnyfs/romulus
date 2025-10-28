@@ -50,12 +50,12 @@ class PaletteData(CodeBlock):
     - contains NES palette data
     """
 
-    _name: str = PrivateAttr()
+    _component_id: str = PrivateAttr()  # UUID as string
     _palette_data: NESPaletteData = PrivateAttr()
 
-    def __init__(self, _name: str, _palette_data: NESPaletteData):
+    def __init__(self, _component_id: str, _palette_data: NESPaletteData):
         super().__init__()
-        self._name = _name
+        self._component_id = _component_id
         self._palette_data = _palette_data
 
     @property
@@ -64,7 +64,7 @@ class PaletteData(CodeBlock):
 
     @property
     def name(self) -> str:
-        return f"palette_data__{self._name}"
+        return f"component__{self._component_id}"
 
     @property
     def dependencies(self) -> list[str]:
@@ -111,9 +111,9 @@ class SceneData(CodeBlock):
     def dependencies(self) -> list[str]:
         dependencies = []
         if (bp := self._scene.background_palettes) is not None:
-            dependencies.append(f"palette_data__{bp}")
+            dependencies.append(f"component__{bp}")
         if (sp := self._scene.sprite_palettes) is not None:
-            dependencies.append(f"palette_data__{sp}")
+            dependencies.append(f"component__{sp}")
         return dependencies
 
     @property
@@ -129,14 +129,14 @@ class SceneData(CodeBlock):
         code.append(scene_data.background_color.index)
 
         # Background palettes address
-        # Look up the exported palette_data name, not the raw palette name
-        bg_pal_name = f"palette_data__{scene_data.background_palettes}" if scene_data.background_palettes else None
+        # Look up the component by UUID
+        bg_pal_name = f"component__{scene_data.background_palettes}" if scene_data.background_palettes else None
         bg_pal_addr = 0 if not bg_pal_name else names.get(bg_pal_name, 0)
         code.extend(bg_pal_addr.to_bytes(2, "little"))
 
         # Sprite palettes address
-        # Look up the exported palette_data name, not the raw palette name
-        sprite_pal_name = f"palette_data__{scene_data.sprite_palettes}" if scene_data.sprite_palettes else None
+        # Look up the component by UUID
+        sprite_pal_name = f"component__{scene_data.sprite_palettes}" if scene_data.sprite_palettes else None
         sprite_pal_addr = 0 if not sprite_pal_name else names.get(sprite_pal_name, 0)
         code.extend(sprite_pal_addr.to_bytes(2, "little"))
 
