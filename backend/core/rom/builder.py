@@ -31,6 +31,7 @@ class RomBuilder:
             options=[
                 selectinload(Game.scenes).selectinload(Scene.entities),
                 selectinload(Game.components),
+                selectinload(Game.assets),
             ],
         )
 
@@ -39,9 +40,10 @@ class RomBuilder:
 
         rom = Rom()
 
-        # Pre-populate the registry with all code blocks yielded by the components.
-        # This is to avoid the need to sort components by dependency order beforehand.
+        # Pre-populate the registry with all code blocks yielded by components and assets.
+        # This is to avoid the need to sort by dependency order beforehand.
         self.registry.add_components(game.components)
+        self.registry.add_assets(game.assets)
 
         saw_main = False
         for scene in game.scenes:
@@ -62,6 +64,10 @@ class RomBuilder:
 
         for component in game.components:
             for code_block in self.registry.get_code_blocks(component):
+                self._add(rom, code_block)
+
+        for asset in game.assets:
+            for code_block in self.registry.get_asset_code_blocks(asset):
                 self._add(rom, code_block)
 
         return rom.render()
