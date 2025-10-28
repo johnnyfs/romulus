@@ -46,7 +46,7 @@ services:
     volumes:
       - ./backend:/app
     environment:
-      - DATABASE_URL=${DATABASE_URL:-postgresql+asyncpg://romulus:romulus@localhost:5432/romulus}
+      - DATABASE_URL=postgresql+asyncpg://romulus:romulus@localhost:${POSTGRES_PORT:-5432}/romulus
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
       - DEBUG=${DEBUG:-false}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
