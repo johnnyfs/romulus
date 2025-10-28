@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AssetResponse } from './AssetResponse';
 import type { ComponentCreateResponse } from './ComponentCreateResponse';
 import type { SceneCreateResponse } from './SceneCreateResponse';
 export type GameGetResponse = {
@@ -9,5 +10,6 @@ export type GameGetResponse = {
     id: string;
     scenes: Array<SceneCreateResponse>;
     components: Array<ComponentCreateResponse>;
+    assets: Array<AssetResponse>;
 };
 

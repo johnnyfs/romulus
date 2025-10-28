@@ -17,6 +17,7 @@ from api.games.entities.models import Entity
 from api.games.scenes.schemas import EntityResponse, SceneCreateResponse
 from api.games.entities.schemas import EntityCreateResponse
 from api.games.components.schemas import ComponentCreateResponse
+from api.games.assets.schemas import AssetResponse
 from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
 
 router = APIRouter()
@@ -60,10 +61,11 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    # Query game with scenes, entities, and components eagerly loaded
+    # Query game with scenes, entities, components, and assets eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
         selectinload(Game.scenes).selectinload(Scene.entities),
-        selectinload(Game.components)
+        selectinload(Game.components),
+        selectinload(Game.assets)
     )
     result = await db.execute(stmt)
     game = result.scalar_one_or_none()
@@ -97,7 +99,13 @@ async def get_game(
         for component in game.components
     ]
 
-    return GameGetResponse(id=game.id, name=game.name, scenes=scenes, components=components)
+    # Convert assets to response format
+    assets = [
+        AssetResponse(id=asset.id, game_id=asset.game_id, name=asset.name, type=asset.type, data=asset.data)
+        for asset in game.assets
+    ]
+
+    return GameGetResponse(id=game.id, name=game.name, scenes=scenes, components=components, assets=assets)
 
 
 @router.delete("/{game_id}", response_model=GameDeleteResponse)
