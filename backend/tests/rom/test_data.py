@@ -33,7 +33,7 @@ class TestPaletteData:
     def test_palette_data_has_no_dependencies(self):
         """Verify palette data has no dependencies."""
         palette_data = PaletteData(
-            _name="test",
+            _component_id=str(uuid.uuid4()),
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))],
@@ -46,7 +46,7 @@ class TestPaletteData:
         """Verify palette data size equals 3 bytes per palette."""
         # 1 palette = 3 colors = 3 bytes
         palette_data_1 = PaletteData(
-            _name="pal1",
+            _component_id=str(uuid.uuid4()),
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[NESPalette(colors=(NESColor(index=1), NESColor(index=2), NESColor(index=3)))],
@@ -56,7 +56,7 @@ class TestPaletteData:
 
         # 2 palettes = 6 colors = 6 bytes
         palette_data_2 = PaletteData(
-            _name="pal2",
+            _component_id=str(uuid.uuid4()),
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[
@@ -69,8 +69,9 @@ class TestPaletteData:
 
     def test_palette_data_renders_color_indices(self):
         """Verify palette renders as sequence of color indices."""
+        component_id = str(uuid.uuid4())
         palette_data = PaletteData(
-            _name="test",
+            _component_id=component_id,
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[
@@ -84,7 +85,7 @@ class TestPaletteData:
 
         # Should be 6 bytes: 01 02 03 14 25 36
         assert rendered.code == bytes([0x01, 0x02, 0x03, 0x14, 0x25, 0x36])
-        assert rendered.exported_names == {"palette_data__test": 0x8000}
+        assert rendered.exported_names == {f"component__{component_id}": 0x8000}
 
 
 class TestAddressData:
@@ -151,15 +152,17 @@ class TestSceneData:
 
     def test_scene_data_depends_on_palette_references(self):
         """Verify scene depends on referenced palettes with correct prefix."""
+        bg_palette_id = uuid.uuid4()
+        sprite_palette_id = uuid.uuid4()
         scene = NESScene(
             background_color=NESColor(index=0x0F),
-            background_palettes="bg_palette",
-            sprite_palettes="sprite_palette",
+            background_palettes=bg_palette_id,
+            sprite_palettes=sprite_palette_id,
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
-        assert "palette_data__bg_palette" in scene_data.dependencies
-        assert "palette_data__sprite_palette" in scene_data.dependencies
+        assert f"component__{bg_palette_id}" in scene_data.dependencies
+        assert f"component__{sprite_palette_id}" in scene_data.dependencies
 
     def test_scene_data_size_is_5_bytes(self):
         """Verify scene is 1 byte (bg color) + 2 bytes (bg pal ptr) + 2 bytes (sprite pal ptr)."""
@@ -188,19 +191,21 @@ class TestSceneData:
         assert rendered.exported_names == {"scene_data__main": 0x9000}
 
     def test_scene_data_renders_with_palette_references(self):
-        """Verify scene renders with palette pointer addresses using correct palette_data__ prefix."""
+        """Verify scene renders with palette pointer addresses using correct component__ prefix."""
+        bg_palette_id = uuid.uuid4()
+        sprite_palette_id = uuid.uuid4()
         scene = NESScene(
             background_color=NESColor(index=0x21),
-            background_palettes="bg_pal",
-            sprite_palettes="sprite_pal",
+            background_palettes=bg_palette_id,
+            sprite_palettes=sprite_palette_id,
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
         rendered = scene_data.render(
             start_offset=0x9000,
             names={
-                "palette_data__bg_pal": 0x9100,
-                "palette_data__sprite_pal": 0x9200,
+                f"component__{bg_palette_id}": 0x9100,
+                f"component__{sprite_palette_id}": 0x9200,
             },
         )
 
@@ -210,9 +215,10 @@ class TestSceneData:
 
     def test_scene_data_with_missing_palette_uses_null(self):
         """Verify scene uses null pointer if palette ref not in names."""
+        missing_palette_id = uuid.uuid4()
         scene = NESScene(
             background_color=NESColor(index=0x0F),
-            background_palettes="missing_palette",
+            background_palettes=missing_palette_id,
             sprite_palettes=None,
         )
         scene_data = SceneData(_name="main", _scene=scene)
@@ -224,10 +230,13 @@ class TestSceneData:
         assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00])
 
     def test_scene_with_classic_mario_palette(self):
-        """Test the actual Classic Mario Set scenario from the database."""
+        """Test the actual Classic Mario Set scenario with UUID-based references."""
+        # Create a component ID for the palette
+        palette_component_id = str(uuid.uuid4())
+
         # Create the "Classic Mario Set" palette with 4 sub-palettes
         classic_mario_palette = PaletteData(
-            _name="Classic Mario Set",
+            _component_id=palette_component_id,
             _palette_data=NESPaletteData(
                 type=ComponentType.PALETTE,
                 palettes=[
@@ -239,23 +248,23 @@ class TestSceneData:
             ),
         )
 
-        # Create a scene that references this palette
+        # Create a scene that references this palette by UUID
         scene = NESScene(
             background_color=NESColor(index=2),
-            background_palettes="Classic Mario Set",
+            background_palettes=uuid.UUID(palette_component_id),
             sprite_palettes=None,
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
         # Verify dependencies are correct
-        assert scene_data.dependencies == ["palette_data__Classic Mario Set"]
+        assert scene_data.dependencies == [f"component__{palette_component_id}"]
 
         # First render the palette to get its address
         palette_rendered = classic_mario_palette.render(start_offset=0x8100, names={})
 
         # Verify palette exports the correct name
-        assert "palette_data__Classic Mario Set" in palette_rendered.exported_names
-        assert palette_rendered.exported_names["palette_data__Classic Mario Set"] == 0x8100
+        assert f"component__{palette_component_id}" in palette_rendered.exported_names
+        assert palette_rendered.exported_names[f"component__{palette_component_id}"] == 0x8100
 
         # Verify palette data is correct (4 palettes × 3 colors = 12 bytes)
         assert palette_rendered.code == bytes([

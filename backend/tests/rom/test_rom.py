@@ -234,9 +234,11 @@ class TestRomRender:
         chr_start = 16 + (16 * 1024)
         chr_rom = rendered[chr_start:]
 
-        # Should be 8KB of zeros
+        # Should be 8KB (now contains test pattern in first tile, rest zeros)
         assert len(chr_rom) == 8 * 1024
-        assert chr_rom == b"\x00" * (8 * 1024)
+        # First 16 bytes are the test pattern tile, rest should be zeros
+        assert chr_rom[:16] == b"\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x0f\x00\x00\x00\x00\xff\xff\xff\xff"
+        assert chr_rom[16:] == b"\x00" * (8 * 1024 - 16)
 
     def test_multiple_prg_blocks_concatenated(self):
         """Verify multiple PRG ROM blocks are placed sequentially."""
@@ -256,9 +258,9 @@ class TestRomRender:
         prg_start = 16
         prg_rom = rendered[prg_start : prg_start + 9]
 
-        # Blocks should be in reverse order (leaf dependencies first)
-        # Since we added them in order, they'll be reversed
-        assert prg_rom == b"\x08\x09\x05\x06\x07\x01\x02\x03\x04"
+        # Blocks should be in the order they were added (dependency order maintained by builder)
+        # We no longer reverse blocks since builder handles dependency order
+        assert prg_rom == b"\x01\x02\x03\x04\x05\x06\x07\x08\x09"
 
     def test_empty_rom_renders_successfully(self):
         """Verify empty ROM (no code blocks) renders valid ROM."""
