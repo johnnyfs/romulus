@@ -19,6 +19,12 @@ class AssetType(str, Enum):
     IMAGE = "image"
 
 
+class CompiledAssetType(str, Enum):
+    """Types of compiled assets that can be used in games."""
+
+    PALETTE = "palette"
+
+
 class ImageState(str, Enum):
     """Processing state of an image asset."""
 
@@ -105,7 +111,22 @@ class ImageAssetData(BaseModel):
     tags: list[ImageTag] = []
     source_url: str | None = None  # URL to parent asset (for grouped/cleaned stages)
     license: str | None = None
+    processed: bool = False  # Marks if this asset has been processed to the next stage
 
 
 # Discriminated union of all asset data types
 AssetData = Annotated[ImageAssetData, Field(discriminator="type")]
+
+
+# Compiled asset data schemas (discriminated union based on type)
+
+
+class NESPaletteCompiledData(BaseModel):
+    """Data for a compiled palette asset."""
+
+    type: Literal[CompiledAssetType.PALETTE] = CompiledAssetType.PALETTE
+    palettes: list[NESPalette]  # Up to 4 palettes for background or sprites
+
+
+# Discriminated union of all compiled asset data types
+CompiledAssetData = Annotated[NESPaletteCompiledData, Field(discriminator="type")]

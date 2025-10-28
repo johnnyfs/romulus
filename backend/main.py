@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from api.assets.routers import router as asset_router
+from api.assets.compiled_routers import router as compiled_asset_router
 from api.games.routers import router as game_router
 from api.games.scenes.routers import router as scene_router
 from api.games.entities.routers import router as entity_router
@@ -30,6 +31,7 @@ v1_app = FastAPI()
 
 # Register routers
 v1_app.include_router(asset_router, prefix="/assets", tags=["assets"])
+v1_app.include_router(compiled_asset_router, prefix="/assets/compiled", tags=["compiled_assets"])
 v1_app.include_router(game_router, prefix="/games", tags=["games"])
 v1_app.include_router(scene_router, prefix="/games/{game_id}/scenes", tags=["scenes"])
 v1_app.include_router(entity_router, prefix="/games/{game_id}/scenes/{scene_id}/entities", tags=["entities"])

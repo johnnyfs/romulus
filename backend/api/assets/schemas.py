@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import AssetData
+from core.schemas import AssetData, CompiledAssetData, CompiledAssetType
 
 
 class UploadTicketRequest(BaseModel):
@@ -34,3 +34,26 @@ class AssetCreateResponse(BaseModel):
     storage_key: str
     asset_data: AssetData
     download_url: str
+
+
+class AssetUpdateRequest(BaseModel):
+    """Request to update an asset's metadata."""
+
+    asset_data: AssetData
+
+
+class CompiledAssetCreateRequest(BaseModel):
+    """Request to create a compiled asset."""
+
+    name: str
+    type: CompiledAssetType
+    data: CompiledAssetData
+
+
+class CompiledAssetResponse(BaseModel):
+    """Response for a compiled asset."""
+
+    id: uuid.UUID
+    name: str
+    type: CompiledAssetType
+    data: CompiledAssetData
