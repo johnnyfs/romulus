@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import select, cast, String
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.resources.models import Resource
@@ -68,11 +68,11 @@ async def list_resources(
     # Access the column directly from the table
     resource_data_col = Resource.__table__.c.resource_data
     if state and resource_type == ResourceType.IMAGE:
-        query = query.where(resource_data_col['state'].astext == state.value)
+        query = query.where(cast(resource_data_col['state'], String) == state.value)
 
     # Order by processed flag (unprocessed first), then by id (oldest first)
     query = query.order_by(
-        resource_data_col['processed'].astext.asc(),  # unprocessed first (false < true)
+        cast(resource_data_col['processed'], String).asc(),  # unprocessed first (false < true)
         Resource.id.asc()
     )
 
