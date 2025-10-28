@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, RefreshCw } from 'lucide-react';
 import styles from './ComponentDisplay.module.css';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
@@ -34,6 +34,41 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
   const [saving, setSaving] = useState<Set<string>>(new Set());
   const [scenePalettes, setScenePalettes] = useState<Map<string, Map<string, PaletteData>>>(new Map());
   const [paletteCounter, setPaletteCounter] = useState(0);
+
+  // Initialize scenePalettes from game.components when game loads
+  useEffect(() => {
+    if (!game || !game.components) return;
+
+    const newScenePalettes = new Map<string, Map<string, PaletteData>>();
+
+    // For each scene, find all palette components
+    game.scenes.forEach(scene => {
+      const scenePaletteMap = new Map<string, PaletteData>();
+
+      // Add all palette components to this scene
+      // Note: Currently components are global, so we show them on all scenes
+      // You might want to filter by scene-specific components later
+      game.components.forEach(component => {
+        if (component.component_data.type === 'palette' && component.component_data.palettes) {
+          const paletteData: PaletteData = {
+            id: component.id,
+            name: component.name,
+            subPalettes: component.component_data.palettes.map(palette =>
+              palette.colors.map(color => color.index) as SubPalette
+            ) as [SubPalette, SubPalette, SubPalette, SubPalette],
+            isDirty: false,
+          };
+          scenePaletteMap.set(component.id, paletteData);
+        }
+      });
+
+      if (scenePaletteMap.size > 0) {
+        newScenePalettes.set(scene.id, scenePaletteMap);
+      }
+    });
+
+    setScenePalettes(newScenePalettes);
+  }, [game]);
 
   const getSceneEdit = (sceneId: string, originalColorIndex: number): SceneEdit => {
     return editingScenes.get(sceneId) || {
