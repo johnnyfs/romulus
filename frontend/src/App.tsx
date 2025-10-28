@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import CreateGame from "./pages/CreateGame";
 import GameDetail from "./pages/GameDetail";
+import RawAssetsPage from "./pages/RawAssetsPage";
 import { GamesService } from "./client/services/GamesService";
 import type { GameListItem } from "./client/models/GameListItem";
 
@@ -46,7 +47,7 @@ function Home() {
           Create New Game
         </Link>
         <Link
-          to="/admin/assets/raw"
+          to="/assets/images/raw"
           style={{
             display: "inline-block",
             padding: "10px 20px",
@@ -127,6 +128,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/games/create" element={<CreateGame />} />
           <Route path="/games/:id" element={<GameDetail />} />
+          <Route path="/assets/images/raw" element={<RawAssetsPage />} />
         </Routes>
       </div>
     </Router>
