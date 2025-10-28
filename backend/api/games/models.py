@@ -17,3 +17,6 @@ class Game(UUIDMixin, Base):
     components: Mapped[list["Component"]] = relationship( # type: ignore
         "Component", back_populates="game", cascade="all, delete-orphan", lazy="raise"
     )  # type: ignore
+    compiled_assets: Mapped[list["CompiledAsset"]] = relationship( # type: ignore
+        "CompiledAsset", back_populates="game", cascade="all, delete-orphan", lazy="raise"
+    )  # type: ignore

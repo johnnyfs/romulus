@@ -23,12 +23,14 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     """Upgrade schema."""
     op.create_table('compiled_assets',
+        sa.Column('game_id', sa.Uuid(), nullable=False),
         sa.Column('name', sa.String(length=255), nullable=False),
         sa.Column('type', sa.Enum('PALETTE', name='compiledassettype'), nullable=False),
         sa.Column('data', PydanticType(CompiledAssetData), nullable=False),
         sa.Column('id', sa.Uuid(), nullable=False),
+        sa.ForeignKeyConstraint(['game_id'], ['games.id'], name='fk_compiled_assets_game_id'),
         sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('name', 'type', name='uq_compiled_asset_name_type')
+        sa.UniqueConstraint('game_id', 'name', 'type', name='uq_compiled_asset_game_name_type')
     )
 
 

@@ -1,6 +1,7 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.assets.models import Asset
@@ -11,6 +12,7 @@ from api.assets.schemas import (
     UploadTicketRequest,
     UploadTicketResponse,
 )
+from core.schemas import AssetType, ImageState
 from core.storage import get_storage_client
 from dependencies import get_db
 
@@ -39,6 +41,56 @@ async def get_upload_ticket(request: UploadTicketRequest):
     upload_url = storage.get_presigned_upload_url(storage_key)
 
     return UploadTicketResponse(upload_url=upload_url, storage_key=storage_key, asset_id=asset_id)
+
+
+@router.get("", response_model=list[AssetCreateResponse])
+async def list_assets(
+    asset_type: AssetType | None = Query(None, description="Filter by asset type"),
+    state: ImageState | None = Query(None, description="Filter by image state (for image assets)"),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    List all assets with optional filtering.
+
+    Query params:
+    - asset_type: Filter by type (e.g., 'image')
+    - state: Filter by processing state (e.g., 'raw', 'grouped', 'cleaned')
+    """
+    storage = get_storage_client()
+
+    # Build query
+    query = select(Asset)
+
+    if asset_type:
+        query = query.where(Asset.type == asset_type)
+
+    # For state filtering, we need to filter on the JSONB column
+    if state and asset_type == AssetType.IMAGE:
+        query = query.where(Asset.asset_data['state'].astext == state.value)
+
+    # Order by processed flag (unprocessed first), then by id (oldest first)
+    query = query.order_by(
+        Asset.asset_data['processed'].astext.asc(),  # unprocessed first (false < true)
+        Asset.id.asc()
+    )
+
+    result = await db.execute(query)
+    assets = result.scalars().all()
+
+    # Generate download URLs for all assets
+    response_list = []
+    for asset in assets:
+        download_url = storage.get_download_url(asset.storage_key)
+        response_list.append(
+            AssetCreateResponse(
+                id=asset.id,
+                storage_key=asset.storage_key,
+                asset_data=asset.asset_data,
+                download_url=download_url,
+            )
+        )
+
+    return response_list
 
 
 @router.post("", response_model=AssetCreateResponse)

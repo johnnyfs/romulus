@@ -13,6 +13,7 @@ router = APIRouter()
 
 @router.post("", response_model=CompiledAssetResponse)
 async def create_compiled_asset(
+    game_id: uuid.UUID,
     request: CompiledAssetCreateRequest,
     db: AsyncSession = Depends(get_db),
 ):
@@ -24,6 +25,7 @@ async def create_compiled_asset(
     """
     # Create compiled asset record
     compiled_asset = CompiledAsset(
+        game_id=game_id,
         name=request.name,
         type=request.type,
         data=request.data,
@@ -33,6 +35,7 @@ async def create_compiled_asset(
 
     return CompiledAssetResponse(
         id=compiled_asset.id,
+        game_id=compiled_asset.game_id,
         name=compiled_asset.name,
         type=compiled_asset.type,
         data=compiled_asset.data,
@@ -41,16 +44,18 @@ async def create_compiled_asset(
 
 @router.get("/{compiled_asset_id}", response_model=CompiledAssetResponse)
 async def get_compiled_asset(
+    game_id: uuid.UUID,
     compiled_asset_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
     """Get a compiled asset by ID."""
     compiled_asset = await db.get(CompiledAsset, compiled_asset_id)
-    if compiled_asset is None:
+    if compiled_asset is None or compiled_asset.game_id != game_id:
         raise HTTPException(status_code=404, detail="Compiled asset not found")
 
     return CompiledAssetResponse(
         id=compiled_asset.id,
+        game_id=compiled_asset.game_id,
         name=compiled_asset.name,
         type=compiled_asset.type,
         data=compiled_asset.data,
@@ -59,15 +64,17 @@ async def get_compiled_asset(
 
 @router.get("/", response_model=list[CompiledAssetResponse])
 async def list_compiled_assets(
+    game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    """List all compiled assets."""
-    result = await db.execute(select(CompiledAsset))
+    """List all compiled assets for a game."""
+    result = await db.execute(select(CompiledAsset).where(CompiledAsset.game_id == game_id))
     compiled_assets = result.scalars().all()
 
     return [
         CompiledAssetResponse(
             id=asset.id,
+            game_id=asset.game_id,
             name=asset.name,
             type=asset.type,
             data=asset.data,
@@ -78,12 +85,13 @@ async def list_compiled_assets(
 
 @router.delete("/{compiled_asset_id}")
 async def delete_compiled_asset(
+    game_id: uuid.UUID,
     compiled_asset_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
     """Delete a compiled asset."""
     compiled_asset = await db.get(CompiledAsset, compiled_asset_id)
-    if compiled_asset is None:
+    if compiled_asset is None or compiled_asset.game_id != game_id:
         raise HTTPException(status_code=404, detail="Compiled asset not found")
 
     # Delete from database

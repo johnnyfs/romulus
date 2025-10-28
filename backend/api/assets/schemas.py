@@ -54,6 +54,7 @@ class CompiledAssetResponse(BaseModel):
     """Response for a compiled asset."""
 
     id: uuid.UUID
+    game_id: uuid.UUID
     name: str
     type: CompiledAssetType
     data: CompiledAssetData
