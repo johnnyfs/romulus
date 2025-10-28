@@ -65,12 +65,14 @@ async def list_resources(
         query = query.where(Resource.type == resource_type)
 
     # For state filtering, we need to filter on the JSONB column
+    # Access the column directly from the table
+    resource_data_col = Resource.__table__.c.resource_data
     if state and resource_type == ResourceType.IMAGE:
-        query = query.where(Resource.resource_data['state'].astext == state.value)
+        query = query.where(resource_data_col['state'].astext == state.value)
 
     # Order by processed flag (unprocessed first), then by id (oldest first)
     query = query.order_by(
-        Resource.resource_data['processed'].astext.asc(),  # unprocessed first (false < true)
+        resource_data_col['processed'].astext.asc(),  # unprocessed first (false < true)
         Resource.id.asc()
     )
 
