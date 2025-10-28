@@ -142,6 +142,78 @@ async def test_render_game_with_component(base_url: str):
 
 
 @pytest.mark.asyncio
+async def test_render_game_with_palette_asset(base_url: str):
+    """Test rendering a game with a palette asset (new paradigm)."""
+    async with httpx.AsyncClient(base_url=base_url) as client:
+        # Create a game with default scene
+        create_response = await client.post(
+            "/api/v1/games",
+            json={"name": "Game with Palette Asset"},
+            params={"default": True},
+        )
+        assert create_response.status_code == 200
+        game_id = create_response.json()["id"]
+        print(f"Created game with ID: {game_id}")
+
+        # Add a palette asset (new paradigm - game-level asset)
+        asset_response = await client.post(
+            f"/api/v1/games/{game_id}/assets",
+            json={
+                "name": "test_palette",
+                "type": "palette",
+                "data": {
+                    "type": "palette",
+                    "palettes": [{"colors": [{"index": 1}, {"index": 2}, {"index": 3}]}],
+                },
+            },
+        )
+        assert asset_response.status_code == 200, f"Failed to create palette asset: {asset_response.text}"
+        palette_asset = asset_response.json()
+        print(f"Added palette asset with ID: {palette_asset['id']}")
+
+        # Get the game with scenes
+        game_response = await client.get(f"/api/v1/games/{game_id}")
+        assert game_response.status_code == 200
+        game = game_response.json()
+        main_scene = next((s for s in game["scenes"] if s["name"] == "main"), None)
+        assert main_scene is not None, "Should have a main scene"
+
+        # Update scene to reference the palette asset
+        update_scene_response = await client.put(
+            f"/api/v1/games/{game_id}/scenes/{main_scene['id']}",
+            json={
+                "name": "main",
+                "scene_data": {
+                    "background_color": {"index": 0},
+                    "background_palettes": palette_asset["id"],  # Reference the asset
+                    "sprite_palettes": None,
+                    "components": [],
+                },
+            },
+        )
+        assert update_scene_response.status_code == 200, f"Failed to update scene: {update_scene_response.text}"
+        print("Updated scene to reference palette asset")
+
+        # Render the game
+        render_response = await client.post(f"/api/v1/games/{game_id}/render")
+        assert render_response.status_code == 200, f"Failed to render game: {render_response.text}"
+
+        # Verify ROM structure
+        rom_bytes = render_response.content
+        assert rom_bytes[0:4] == b"NES\x1a", "ROM should have valid iNES header"
+
+        expected_size = 16 + (16 * 1024) + (8 * 1024)
+        assert len(rom_bytes) == expected_size
+
+        print("Successfully rendered ROM with palette asset (new paradigm)!")
+
+        # Clean up
+        delete_response = await client.delete(f"/api/v1/games/{game_id}")
+        assert delete_response.status_code == 200
+        print(f"Cleaned up game with ID: {game_id}")
+
+
+@pytest.mark.asyncio
 async def test_rendered_rom_has_correct_vector_table(base_url: str):
     """Test that the rendered ROM has a valid interrupt vector table."""
     async with httpx.AsyncClient(base_url=base_url) as client:
