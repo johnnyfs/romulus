@@ -59,7 +59,7 @@ class RomBuilder:
                 if entity is None:
                     logger.warning(f"Scene '{scene.name}' references entity {entity_id} which does not exist")
                     continue
-                entity_block = EntityData(_name=entity.name, _entity=entity.entity_data)
+                entity_block = EntityData(_name=entity.name, _entity=entity.entity_data, _registry=self.registry)
                 self._add(rom, entity_block)
 
         if not saw_main:
@@ -68,9 +68,9 @@ class RomBuilder:
         preamble = PreambleCodeBlock(_main_scene_name=initial_scene_name)
         self._add(rom, preamble)
 
-        for asset in game.assets:
-            for code_block in self.registry.get_asset_code_blocks(asset):
-                self._add(rom, code_block)
+        # Asset code blocks are added automatically via dependencies
+        # (e.g., sprite sets are added when entities reference them)
+        # No need to add them unconditionally here
 
         return rom.render()
 

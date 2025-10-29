@@ -41,6 +41,11 @@ class CodeBlockRegistry:
     def get_asset_code_blocks(self, asset: Asset) -> list[CodeBlock]:
         return self._code_blocks_by_asset_id.get(asset.id, [])
 
+    def get_asset_code_block_names(self, asset_id: uuid.UUID) -> list[str]:
+        """Get code block names for an asset by its ID."""
+        code_blocks = self._code_blocks_by_asset_id.get(asset_id, [])
+        return [block.name for block in code_blocks]
+
     def __init__(self):
         self._code_blocks_by_asset_id: dict[uuid.UUID, list[CodeBlock]] = {}
         self._code_blocks_by_name = DEFAULT_REGISTRY.copy()

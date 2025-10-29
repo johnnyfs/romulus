@@ -1,7 +1,11 @@
+from typing import TYPE_CHECKING
 from pydantic import PrivateAttr
 
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
 from core.schemas import NESEntity, NESSpriteSetAssetData, NESPaletteData, NESScene
+
+if TYPE_CHECKING:
+    from core.rom.registry import CodeBlockRegistry
 
 
 class AddressData(CodeBlock):
@@ -170,11 +174,13 @@ class EntityData(CodeBlock):
 
     _name: str = PrivateAttr()
     _entity: NESEntity = PrivateAttr()
+    _registry: "CodeBlockRegistry | None" = PrivateAttr()
 
-    def __init__(self, _name: str, _entity: NESEntity):
+    def __init__(self, _name: str, _entity: NESEntity, _registry: "CodeBlockRegistry | None" = None):
         super().__init__()
         self._name = _name
         self._entity = _entity
+        self._registry = _registry
 
     @property
     def type(self) -> CodeBlockType:
@@ -186,7 +192,20 @@ class EntityData(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        return []
+        """Entity depends on sprite sets referenced by its sprite components."""
+        deps = []
+        if not self._registry:
+            return deps
+
+        for component in self._entity.components:
+            if component.type == 'sprite' and component.sprite_set:
+                # Sprite component references a sprite set asset
+                # Look up the code block names for this asset ID
+                import uuid
+                asset_id = uuid.UUID(component.sprite_set) if isinstance(component.sprite_set, str) else component.sprite_set
+                code_block_names = self._registry.get_asset_code_block_names(asset_id)
+                deps.extend(code_block_names)
+        return deps
 
     @property
     def size(self) -> int:
