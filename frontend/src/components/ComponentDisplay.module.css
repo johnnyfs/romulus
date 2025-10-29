@@ -251,4 +251,6 @@
   font-size: 12px;
   overflow: auto;
   border: var(--border-width) solid var(--border-color);
+  text-align: left;
+  white-space: pre;
 }

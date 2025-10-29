@@ -15,4 +15,4 @@ async def db_session() -> AsyncSession:
 @pytest.fixture
 def base_url() -> str:
     """Base URL for the running API server."""
-    return "http://localhost:8001"
+    return "http://localhost:8000"
