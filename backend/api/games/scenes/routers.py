@@ -5,7 +5,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from dependencies import get_db
 from api.games.scenes.models import Scene
 from api.games.scenes.schemas import (
     EntityResponse,
@@ -15,6 +14,7 @@ from api.games.scenes.schemas import (
     SceneUpdateRequest,
     SceneUpdateResponse,
 )
+from dependencies import get_db
 
 router = APIRouter()
 

@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import NESScene, NESEntity
+from core.schemas import NESEntity, NESScene
 
 
 class EntityResponse(BaseModel):

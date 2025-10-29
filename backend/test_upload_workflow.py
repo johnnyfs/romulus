@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Test the complete asset upload workflow."""
 
-import requests
 from pathlib import Path
+
+import requests
 
 # Configuration
 API_BASE = "http://localhost:8000/api/v1"
@@ -23,7 +24,7 @@ def test_workflow():
     ticket_response.raise_for_status()
     ticket = ticket_response.json()
 
-    print(f"✓ Got upload ticket")
+    print("✓ Got upload ticket")
     print(f"  - Storage key: {ticket['storage_key']}")
     print(f"  - Upload URL: {ticket['upload_url'][:80]}...")
 
@@ -38,7 +39,7 @@ def test_workflow():
         )
         upload_response.raise_for_status()
 
-    print(f"✓ File uploaded successfully")
+    print("✓ File uploaded successfully")
 
     # Step 3: Finalize asset with metadata
     print("\n[Step 3] Finalizing asset with metadata...")
@@ -59,7 +60,7 @@ def test_workflow():
     asset_response.raise_for_status()
     asset = asset_response.json()
 
-    print(f"✓ Asset created")
+    print("✓ Asset created")
     print(f"  - Asset ID: {asset['id']}")
     print(f"  - Storage key: {asset['storage_key']}")
     print(f"  - Type: {asset['asset_data']['image_type']}")
@@ -68,32 +69,32 @@ def test_workflow():
     print(f"  - Download URL: {asset['download_url'][:80]}...")
 
     # Step 4: Retrieve asset by ID
-    print(f"\n[Step 4] Retrieving asset by ID...")
+    print("\n[Step 4] Retrieving asset by ID...")
     get_response = requests.get(f"{API_BASE}/assets/{asset['id']}")
     get_response.raise_for_status()
     retrieved_asset = get_response.json()
 
-    print(f"✓ Asset retrieved")
+    print("✓ Asset retrieved")
     print(f"  - Matches created asset: {retrieved_asset['id'] == asset['id']}")
     print(f"  - Has download URL: {bool(retrieved_asset.get('download_url'))}")
 
     # Step 5: Download the file using the download URL
-    print(f"\n[Step 5] Testing download URL...")
+    print("\n[Step 5] Testing download URL...")
     download_response = requests.get(retrieved_asset['download_url'])
     download_response.raise_for_status()
     downloaded_data = download_response.content
 
-    print(f"✓ File downloaded")
+    print("✓ File downloaded")
     print(f"  - Downloaded size: {len(downloaded_data)} bytes")
     print(f"  - Original size: {len(file_data)} bytes")
     print(f"  - Data matches: {downloaded_data == file_data}")
 
     # Step 6: Clean up - delete the asset
-    print(f"\n[Step 6] Cleaning up - deleting asset...")
+    print("\n[Step 6] Cleaning up - deleting asset...")
     delete_response = requests.delete(f"{API_BASE}/assets/{asset['id']}")
     delete_response.raise_for_status()
 
-    print(f"✓ Asset deleted")
+    print("✓ Asset deleted")
 
     # Verify deletion
     verify_response = requests.get(f"{API_BASE}/assets/{asset['id']}")

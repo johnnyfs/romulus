@@ -2,9 +2,8 @@ import uuid
 
 from pydantic import BaseModel
 
-from api.games.scenes.schemas import SceneCreateResponse
-from api.games.components.schemas import ComponentCreateResponse
 from api.games.assets.schemas import AssetResponse
+from api.games.scenes.schemas import SceneCreateResponse
 
 
 class GameCommon(BaseModel):
@@ -26,7 +25,6 @@ class GameListItem(GameCommon):
 class GameGetResponse(GameCommon):
     id: uuid.UUID
     scenes: list[SceneCreateResponse]
-    components: list[ComponentCreateResponse]
     assets: list[AssetResponse]
 
 

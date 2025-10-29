@@ -161,8 +161,8 @@ class TestSceneData:
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
-        assert f"component__{bg_palette_id}" in scene_data.dependencies
-        assert f"component__{sprite_palette_id}" in scene_data.dependencies
+        assert f"asset__palette__{bg_palette_id}" in scene_data.dependencies
+        assert f"asset__palette__{sprite_palette_id}" in scene_data.dependencies
 
     def test_scene_data_size_is_5_bytes(self):
         """Verify scene is 1 byte (bg color) + 2 bytes (bg pal ptr) + 2 bytes (sprite pal ptr)."""
@@ -257,7 +257,7 @@ class TestSceneData:
         scene_data = SceneData(_name="main", _scene=scene)
 
         # Verify dependencies are correct
-        assert scene_data.dependencies == [f"component__{palette_component_id}"]
+        assert scene_data.dependencies == [f"asset__palette__{palette_component_id}"]
 
         # First render the palette to get its address
         palette_rendered = classic_mario_palette.render(start_offset=0x8100, names={})

@@ -6,19 +6,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.games.assets.schemas import AssetResponse
+from api.games.models import Game
+from api.games.scenes.models import Scene
+from api.games.scenes.schemas import EntityResponse, SceneCreateResponse
+from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
 from core.rom.builder import RomBuilder
 from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom
 from core.schemas import NESColor, NESScene
 from dependencies import get_db
-from api.games.models import Game
-from api.games.scenes.models import Scene
-from api.games.entities.models import Entity
-from api.games.scenes.schemas import EntityResponse, SceneCreateResponse
-from api.games.entities.schemas import EntityCreateResponse
-from api.games.components.schemas import ComponentCreateResponse
-from api.games.assets.schemas import AssetResponse
-from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
 
 router = APIRouter()
 
@@ -61,10 +58,9 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    # Query game with scenes, entities, components, and assets eagerly loaded
+    # Query game with scenes, entities, and assets eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
         selectinload(Game.scenes).selectinload(Scene.entities),
-        selectinload(Game.components),
         selectinload(Game.assets)
     )
     result = await db.execute(stmt)
@@ -93,19 +89,13 @@ async def get_game(
         for scene in game.scenes
     ]
 
-    # Convert components to response format
-    components = [
-        ComponentCreateResponse(id=component.id, game_id=component.game_id, name=component.name, component_data=component.component_data)
-        for component in game.components
-    ]
-
     # Convert assets to response format
     assets = [
         AssetResponse(id=asset.id, game_id=asset.game_id, name=asset.name, type=asset.type, data=asset.data)
         for asset in game.assets
     ]
 
-    return GameGetResponse(id=game.id, name=game.name, scenes=scenes, components=components, assets=assets)
+    return GameGetResponse(id=game.id, name=game.name, scenes=scenes, assets=assets)
 
 
 @router.delete("/{game_id}", response_model=GameDeleteResponse)

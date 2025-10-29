@@ -8,8 +8,14 @@ type NESRef = uuid.UUID  # UUID referencing a component
 
 
 class ComponentType(str, Enum):
-    """Types of components that can be attached to a game."""
+    """Types of components that can be attached to a game.
 
+    Note: Components will eventually attach to entities to define behavior.
+    Currently, only PALETTE exists as a placeholder until real components are implemented.
+    """
+
+    # DEPRECATED: Palette components have been migrated to palette assets.
+    # This exists only to keep the enum non-empty. Will be removed when real components are added.
     PALETTE = "palette"
 
 

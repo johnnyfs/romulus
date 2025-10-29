@@ -3,7 +3,6 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from dependencies import get_db
 from api.games.entities.models import Entity
 from api.games.entities.schemas import (
     EntityCreateRequest,
@@ -11,6 +10,7 @@ from api.games.entities.schemas import (
     EntityUpdateRequest,
     EntityUpdateResponse,
 )
+from dependencies import get_db
 
 router = APIRouter()
 

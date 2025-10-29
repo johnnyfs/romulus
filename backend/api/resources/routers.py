@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select, cast, String
+from sqlalchemy import String, cast, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.resources.models import Resource
@@ -12,7 +12,7 @@ from api.resources.schemas import (
     UploadTicketRequest,
     UploadTicketResponse,
 )
-from core.schemas import ResourceType, ImageState
+from core.schemas import ImageState, ResourceType
 from core.storage import get_storage_client
 from dependencies import get_db
 

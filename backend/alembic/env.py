@@ -6,16 +6,16 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
+from api.games.assets.models import Asset  # noqa
+from api.games.components.models import Component  # noqa
+from api.games.entities.models import Entity  # noqa
+from api.games.models import Game  # noqa
+from api.games.scenes.models import Scene  # noqa
+from api.resources.models import Resource  # noqa
 
 # Import your models and config
 from config import settings
 from database import Base
-from api.resources.models import Resource  # noqa
-from api.games.models import Game  # noqa
-from api.games.assets.models import Asset  # noqa
-from api.games.scenes.models import Scene  # noqa
-from api.games.entities.models import Entity  # noqa
-from api.games.components.models import Component  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

@@ -6,14 +6,14 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.games.models import Game
+from api.games.scenes.models import Scene
 from core.rom.code_block import CodeBlock
 from core.rom.data import EntityData, SceneData
 from core.rom.preamble import PreambleCodeBlock
 from core.rom.registry import CodeBlockRegistry, get_new_registry
 from core.rom.rom import Rom, get_empty_rom
 from dependencies import get_db
-from api.games.models import Game
-from api.games.scenes.models import Scene
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,6 @@ class RomBuilder:
             game_id,
             options=[
                 selectinload(Game.scenes).selectinload(Scene.entities),
-                selectinload(Game.components),
                 selectinload(Game.assets),
             ],
         )
@@ -40,9 +39,8 @@ class RomBuilder:
 
         rom = Rom()
 
-        # Pre-populate the registry with all code blocks yielded by components and assets.
+        # Pre-populate the registry with all code blocks yielded by assets.
         # This is to avoid the need to sort by dependency order beforehand.
-        self.registry.add_components(game.components)
         self.registry.add_assets(game.assets)
 
         saw_main = False
@@ -61,10 +59,6 @@ class RomBuilder:
 
         preamble = PreambleCodeBlock(_main_scene_name=initial_scene_name)
         self._add(rom, preamble)
-
-        for component in game.components:
-            for code_block in self.registry.get_code_blocks(component):
-                self._add(rom, code_block)
 
         for asset in game.assets:
             for code_block in self.registry.get_asset_code_blocks(asset):

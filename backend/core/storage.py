@@ -8,7 +8,7 @@ from io import BytesIO
 from minio import Minio
 
 from config import settings
-from core.schemas import AssetData, AssetType, ImageState
+from core.schemas import AssetData, AssetType
 
 
 class StorageClient:
