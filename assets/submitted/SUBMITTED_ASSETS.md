@@ -144,3 +144,23 @@ These raw assets are now ready for:
 
 Complete upload manifest with all resource IDs, storage keys, and download URLs available at:
 [/tmp/upload_manifest.json](/tmp/upload_manifest.json)
+
+---
+
+# Batch 2: NES/Game Boy Focused Assets
+
+**Date:** October 29, 2025
+**Assets:** 16 additional NES/Game Boy constrained assets
+**Status:** ✓ All uploaded successfully
+
+See [BATCH2_SUBMITTED.md](BATCH2_SUBMITTED.md) for complete batch 2 details.
+
+## Batch 2 Highlights:
+- 3 authentic NES-constrained tilesets
+- 5 monochrome 8x8 tiles (perfect for CHR conversion)
+- 1 Game Boy 4-color tileset
+- 3 low-color enemy sprites
+- 3 collectible icons
+- 1 UI element
+
+**Total Assets Across All Batches: 32**
