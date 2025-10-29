@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { ResourcesService, ImageType, ImageState } from "../../client";
+import { ResourcesService, ImageType, ImageState, ImageTag } from "../../client";
 
 interface Group {
   id: string;
@@ -9,7 +9,7 @@ interface Group {
   width: number;
   height: number;
   imageType: ImageType;
-  tags: string[];
+  tags: ImageTag[];
 }
 
 interface ImageGroupingToolProps {
@@ -791,15 +791,59 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
                     </div>
                     <div style={{ marginTop: "8px" }}>
                       <label style={{ fontSize: "11px", color: "#666", display: "block", marginBottom: "4px" }}>
-                        Tags (comma-separated):
+                        Tags:
                       </label>
-                      <input
-                        type="text"
-                        value={group.tags.join(', ')}
+                      {/* Tag pills */}
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginBottom: "6px" }}>
+                        {group.tags.map((tag, idx) => (
+                          <div
+                            key={idx}
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "4px",
+                              padding: "3px 8px",
+                              backgroundColor: "#e7f3ff",
+                              border: "1px solid #b3d9ff",
+                              borderRadius: "12px",
+                              fontSize: "11px",
+                              fontWeight: "500",
+                              color: "#0066cc",
+                            }}
+                          >
+                            {tag}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const newTags = group.tags.filter((_, i) => i !== idx);
+                                handleUpdateGroup(group.id, { tags: newTags });
+                              }}
+                              style={{
+                                border: "none",
+                                background: "none",
+                                cursor: "pointer",
+                                padding: 0,
+                                display: "flex",
+                                alignItems: "center",
+                                color: "#0066cc",
+                                fontSize: "14px",
+                                lineHeight: 1,
+                              }}
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      {/* Dropdown to add tags */}
+                      <select
+                        value=""
                         onChange={(e) => {
                           e.stopPropagation();
-                          const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
-                          handleUpdateGroup(group.id, { tags });
+                          const newTag = e.target.value as ImageTag;
+                          if (newTag && !group.tags.includes(newTag)) {
+                            handleUpdateGroup(group.id, { tags: [...group.tags, newTag] });
+                          }
                         }}
                         onClick={(e) => e.stopPropagation()}
                         style={{
@@ -807,10 +851,19 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
                           padding: "4px",
                           border: "1px solid #ddd",
                           borderRadius: "3px",
-                          fontSize: "13px",
+                          fontSize: "11px",
+                          color: "#666",
                         }}
-                        placeholder="e.g., character, enemy, item"
-                      />
+                      >
+                        <option value="">+ Add tag...</option>
+                        {Object.values(ImageTag)
+                          .filter(tag => !group.tags.includes(tag))
+                          .map((tag) => (
+                            <option key={tag} value={tag}>
+                              {tag}
+                            </option>
+                          ))}
+                      </select>
                     </div>
                   </div>
                   <button

@@ -97,3 +97,18 @@ All assets are now in the backend system and ready for:
 **Generated:** October 29, 2025
 **Source Collection:** 6,338+ images (~200MB) in [assets/art/raw/](../art/raw/)
 **Curated & Uploaded:** 32 premium NES-compatible assets
+
+---
+
+## Batch 3: Collectibles & More Tiles (16 assets)
+
+**Date:** October 29, 2025
+See [BATCH3_SUBMITTED.md](BATCH3_SUBMITTED.md) for details.
+
+### Batch 3 Highlights:
+- Complete collectible sets (coins, gems, keys)
+- 4 more monochrome 8x8 assets
+- Castle, cave, and simple tilesets
+- Completes heart set (full, half, empty)
+
+**GRAND TOTAL: 48 ASSETS SUBMITTED!** 🎉

@@ -1,0 +1,294 @@
+[
+  {
+    "file": "01_castle_8bit.png",
+    "original_path": "tiles/castle_8bit.png",
+    "description": "8-bit castle tileset",
+    "resource_id": "deabe5e7-7e1a-4154-afc4-d560a7d56508",
+    "storage_key": "resources/images/raw/deabe5e7-7e1a-4154-afc4-d560a7d56508/01_castle_8bit.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/deabe5e7-7e1a-4154-afc4-d560a7d56508/01_castle_8bit.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c27c5c54010408fdef22d5fbf23343cbf40d8617b5d7b2c85870097ad88839be",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "fantasy"
+      ],
+      "source_url": null,
+      "license": "Unknown",
+      "processed": false
+    }
+  },
+  {
+    "file": "02_cave_tiles.png",
+    "original_path": "tiles/cave.png",
+    "description": "Cave dungeon tileset",
+    "resource_id": "5552e411-a0f6-4bb0-a93f-5d9ac97ceb9b",
+    "storage_key": "resources/images/raw/5552e411-a0f6-4bb0-a93f-5d9ac97ceb9b/02_cave_tiles.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/5552e411-a0f6-4bb0-a93f-5d9ac97ceb9b/02_cave_tiles.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=7ec5dfc7113a93cdbc3661d4b39a800d22f72d810b3360075bf3539eb84d4a90",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "Unknown",
+      "processed": false
+    }
+  },
+  {
+    "file": "03_simples_pimples.png",
+    "original_path": "tiles/simples_pimples.png",
+    "description": "Simple pixel tileset collection",
+    "resource_id": "343d7efc-79e8-44b0-9c00-d54f107ef7b0",
+    "storage_key": "resources/images/raw/343d7efc-79e8-44b0-9c00-d54f107ef7b0/03_simples_pimples.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/343d7efc-79e8-44b0-9c00-d54f107ef7b0/03_simples_pimples.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=81c53f305f3ca13c61d9a18852cfe01cdfef196b7c6fc1c18a1401da15d2ec04",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "Unknown",
+      "processed": false
+    }
+  },
+  {
+    "file": "04_mono_tilemap.png",
+    "original_path": "sprites/kenney_micro-roguelike/tilemap/monochrome_tilemap.png",
+    "description": "Monochrome 8x8 dungeon tilemap example",
+    "resource_id": "3be8af2d-0ea1-48d7-9ee9-1aafd971ad5a",
+    "storage_key": "resources/images/raw/3be8af2d-0ea1-48d7-9ee9-1aafd971ad5a/04_mono_tilemap.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/3be8af2d-0ea1-48d7-9ee9-1aafd971ad5a/04_mono_tilemap.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dcaed18d4329872b0931f581280070ffcf17fe5d850f5d4277c3b8f66a86954b",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "05_mono_chest.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0020.png",
+    "description": "Monochrome 8x8 treasure chest",
+    "resource_id": "3cd1289f-2562-4a4d-b708-f3a9ef245f13",
+    "storage_key": "resources/images/raw/3cd1289f-2562-4a4d-b708-f3a9ef245f13/05_mono_chest.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/3cd1289f-2562-4a4d-b708-f3a9ef245f13/05_mono_chest.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d67d3577d50c565fec2caaf4cc31669d488b8780eac85254b00c4c23258ceb92",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "06_mono_water.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0050.png",
+    "description": "Monochrome 8x8 water tile",
+    "resource_id": "4b835b1e-2497-4e11-8d24-ae630516f6ab",
+    "storage_key": "resources/images/raw/4b835b1e-2497-4e11-8d24-ae630516f6ab/06_mono_water.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/4b835b1e-2497-4e11-8d24-ae630516f6ab/06_mono_water.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dbf4a26d9116b26de41eaf3f6c0a2fc0c5881d21a779606cf07290065133aa89",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "07_mono_skeleton.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0060.png",
+    "description": "Monochrome 8x8 skeleton enemy",
+    "resource_id": "dd8aa087-802b-4d24-8d0d-09feb1b01e39",
+    "storage_key": "resources/images/raw/dd8aa087-802b-4d24-8d0d-09feb1b01e39/07_mono_skeleton.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/dd8aa087-802b-4d24-8d0d-09feb1b01e39/07_mono_skeleton.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=cfbd93984655cd57a3c0f9788bcf38c512fda8822194a776fee8654b9b4f057c",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "08_mono_coin.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0070.png",
+    "description": "Monochrome 8x8 coin collectible",
+    "resource_id": "a9a2e61d-9f40-4474-bc13-30b87efe0b92",
+    "storage_key": "resources/images/raw/a9a2e61d-9f40-4474-bc13-30b87efe0b92/08_mono_coin.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/a9a2e61d-9f40-4474-bc13-30b87efe0b92/08_mono_coin.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=182e313e2df5bd5bcbf64c2bf4078a5cbb0736a1e44c14f9229e9dfeb4c5f638",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "09_coin_bronze.png",
+    "original_path": "sprites/platformer/items/coinBronze.png",
+    "description": "Bronze coin collectible",
+    "resource_id": "07c9dc6d-4e34-4baa-88ed-12d700b8f248",
+    "storage_key": "resources/images/raw/07c9dc6d-4e34-4baa-88ed-12d700b8f248/09_coin_bronze.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/07c9dc6d-4e34-4baa-88ed-12d700b8f248/09_coin_bronze.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f4189bee6f47ca934b67d8cac2bb7ce73fa7af2335f70974a7ea32df8cf0688e",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "10_coin_silver.png",
+    "original_path": "sprites/platformer/items/coinSilver.png",
+    "description": "Silver coin collectible",
+    "resource_id": "d4766d69-7eba-48ae-a5e9-3c339eedcd05",
+    "storage_key": "resources/images/raw/d4766d69-7eba-48ae-a5e9-3c339eedcd05/10_coin_silver.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/d4766d69-7eba-48ae-a5e9-3c339eedcd05/10_coin_silver.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=869bfbd904ef1d8f4d664511586a7df33b3847fccd431160e41a74a505af70cd",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "11_gem_green.png",
+    "original_path": "sprites/platformer/items/gemGreen.png",
+    "description": "Green gem collectible",
+    "resource_id": "5bcbbc67-65bb-450c-bfb3-a2892344c003",
+    "storage_key": "resources/images/raw/5bcbbc67-65bb-450c-bfb3-a2892344c003/11_gem_green.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/5bcbbc67-65bb-450c-bfb3-a2892344c003/11_gem_green.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ba2c1e39934c4ad95685bc75fd30f1063447918c4dec09a554549e2ae96b00da",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "12_gem_red.png",
+    "original_path": "sprites/platformer/items/gemRed.png",
+    "description": "Red gem collectible (item sprite)",
+    "resource_id": "9bbce465-c37b-45ae-89d8-c9316b58f188",
+    "storage_key": "resources/images/raw/9bbce465-c37b-45ae-89d8-c9316b58f188/12_gem_red.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/9bbce465-c37b-45ae-89d8-c9316b58f188/12_gem_red.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c408c3050b4b1833dc4d6f803d81639bd7c9891b5fbacc36398127b81e0ec019",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "13_key_red.png",
+    "original_path": "sprites/platformer/items/keyRed.png",
+    "description": "Red key collectible",
+    "resource_id": "9e8c2693-5490-49e8-a75c-601782f874c9",
+    "storage_key": "resources/images/raw/9e8c2693-5490-49e8-a75c-601782f874c9/13_key_red.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/9e8c2693-5490-49e8-a75c-601782f874c9/13_key_red.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f7448f66bd83c82b5dd782f9f04d86bb84ea2f1ed5c628cfa983e4f3ed1fc8db",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "14_key_green.png",
+    "original_path": "sprites/platformer/items/keyGreen.png",
+    "description": "Green key collectible",
+    "resource_id": "bf9b21a5-48b0-4514-ae44-12f085c7a111",
+    "storage_key": "resources/images/raw/bf9b21a5-48b0-4514-ae44-12f085c7a111/14_key_green.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/bf9b21a5-48b0-4514-ae44-12f085c7a111/14_key_green.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d07bfc4fcec57a73c8889309bc4bb7ea6b2fb2e2f11a0ed517b74e4a6326201d",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "15_key_yellow.png",
+    "original_path": "sprites/platformer/items/keyYellow.png",
+    "description": "Yellow key collectible",
+    "resource_id": "aa1e55b9-02fe-4bc7-9bd3-ff3469216ba8",
+    "storage_key": "resources/images/raw/aa1e55b9-02fe-4bc7-9bd3-ff3469216ba8/15_key_yellow.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/aa1e55b9-02fe-4bc7-9bd3-ff3469216ba8/15_key_yellow.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5d25484369050aed8da39491e39abf930a1bd151b02a088fb5646e95cfa8566d",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "16_heart_half.png",
+    "original_path": "sprites/hud/hud_heartHalf.png",
+    "description": "Half heart HUD element",
+    "resource_id": "3d437831-5729-4531-9dc0-b10969f85f97",
+    "storage_key": "resources/images/raw/3d437831-5729-4531-9dc0-b10969f85f97/16_heart_half.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/3d437831-5729-4531-9dc0-b10969f85f97/16_heart_half.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T045155Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8be7b73f41690fb75d504f448402c22faf3fd514c19df6c2ba1897559cd13261",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  }
+]
