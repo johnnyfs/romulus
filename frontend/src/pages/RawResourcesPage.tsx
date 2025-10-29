@@ -71,13 +71,7 @@ export const RawResourcesPage: React.FC = () => {
       )}
 
       {!loading && !error && (
-        <RawResourceList
-          resources={resources}
-          onResourceClick={(resource) => {
-            console.log("Clicked resource:", resource);
-            // TODO: Navigate to detail page when we add routing
-          }}
-        />
+        <RawResourceList resources={resources} />
       )}
     </div>
   );

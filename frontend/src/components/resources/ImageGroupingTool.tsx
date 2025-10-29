@@ -14,6 +14,8 @@ interface ImageGroupingToolProps {
   isProcessed: boolean;
 }
 
+type DragMode = 'none' | 'draw' | 'move' | 'resize-tl' | 'resize-tr' | 'resize-bl' | 'resize-br';
+
 export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
   imageUrl,
   resourceId,
@@ -21,8 +23,9 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
 }) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<string | null>(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
+  const [dragMode, setDragMode] = useState<DragMode>('none');
+  const [dragStart, setDragStart] = useState<{ x: number; y: number } | null>(null);
+  const [draggedGroupStart, setDraggedGroupStart] = useState<Group | null>(null);
   const [currentDraw, setCurrentDraw] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
   const [scale, setScale] = useState(1);
@@ -145,10 +148,45 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
     };
   };
 
+  const getHandleAtPosition = (coords: { x: number; y: number }, group: Group): DragMode => {
+    const handleSize = 6 / scale;
+    const tolerance = handleSize * 2; // Make handles easier to click
+
+    // Check corners
+    if (Math.abs(coords.x - group.x) <= tolerance && Math.abs(coords.y - group.y) <= tolerance) {
+      return 'resize-tl';
+    }
+    if (Math.abs(coords.x - (group.x + group.width)) <= tolerance && Math.abs(coords.y - group.y) <= tolerance) {
+      return 'resize-tr';
+    }
+    if (Math.abs(coords.x - group.x) <= tolerance && Math.abs(coords.y - (group.y + group.height)) <= tolerance) {
+      return 'resize-bl';
+    }
+    if (Math.abs(coords.x - (group.x + group.width)) <= tolerance && Math.abs(coords.y - (group.y + group.height)) <= tolerance) {
+      return 'resize-br';
+    }
+
+    return 'none';
+  };
+
   const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const coords = getCanvasCoordinates(e.clientX, e.clientY);
 
-    // Check if clicking on an existing group
+    // Check if clicking on the selected group's handles
+    if (selectedGroupId) {
+      const selectedGroup = groups.find(g => g.id === selectedGroupId);
+      if (selectedGroup) {
+        const handleMode = getHandleAtPosition(coords, selectedGroup);
+        if (handleMode !== 'none') {
+          setDragMode(handleMode);
+          setDragStart(coords);
+          setDraggedGroupStart({ ...selectedGroup });
+          return;
+        }
+      }
+    }
+
+    // Check if clicking inside an existing group
     const clickedGroup = groups.find(
       (g) =>
         coords.x >= g.x &&
@@ -159,30 +197,74 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
 
     if (clickedGroup) {
       setSelectedGroupId(clickedGroup.id);
+      setDragMode('move');
+      setDragStart(coords);
+      setDraggedGroupStart({ ...clickedGroup });
       return;
     }
 
     // Start drawing new group
     setSelectedGroupId(null);
-    setIsDrawing(true);
-    setDrawStart(coords);
+    setDragMode('draw');
+    setDragStart(coords);
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDrawing || !drawStart) return;
+    if (!dragStart || dragMode === 'none') return;
 
     const coords = getCanvasCoordinates(e.clientX, e.clientY);
+    const dx = coords.x - dragStart.x;
+    const dy = coords.y - dragStart.y;
 
-    const x = Math.min(drawStart.x, coords.x);
-    const y = Math.min(drawStart.y, coords.y);
-    const width = Math.abs(coords.x - drawStart.x);
-    const height = Math.abs(coords.y - drawStart.y);
+    if (dragMode === 'draw') {
+      const x = Math.min(dragStart.x, coords.x);
+      const y = Math.min(dragStart.y, coords.y);
+      const width = Math.abs(coords.x - dragStart.x);
+      const height = Math.abs(coords.y - dragStart.y);
+      setCurrentDraw({ x, y, width, height });
+    } else if (dragMode === 'move' && selectedGroupId && draggedGroupStart) {
+      setGroups(groups.map(g =>
+        g.id === selectedGroupId
+          ? { ...g, x: snapToPixel(draggedGroupStart.x + dx), y: snapToPixel(draggedGroupStart.y + dy) }
+          : g
+      ));
+    } else if (dragMode.startsWith('resize-') && selectedGroupId && draggedGroupStart) {
+      setGroups(groups.map(g => {
+        if (g.id !== selectedGroupId) return g;
 
-    setCurrentDraw({ x, y, width, height });
+        let newX = draggedGroupStart.x;
+        let newY = draggedGroupStart.y;
+        let newWidth = draggedGroupStart.width;
+        let newHeight = draggedGroupStart.height;
+
+        if (dragMode === 'resize-tl') {
+          newX = snapToPixel(draggedGroupStart.x + dx);
+          newY = snapToPixel(draggedGroupStart.y + dy);
+          newWidth = snapToPixel(draggedGroupStart.width - dx);
+          newHeight = snapToPixel(draggedGroupStart.height - dy);
+        } else if (dragMode === 'resize-tr') {
+          newY = snapToPixel(draggedGroupStart.y + dy);
+          newWidth = snapToPixel(draggedGroupStart.width + dx);
+          newHeight = snapToPixel(draggedGroupStart.height - dy);
+        } else if (dragMode === 'resize-bl') {
+          newX = snapToPixel(draggedGroupStart.x + dx);
+          newWidth = snapToPixel(draggedGroupStart.width - dx);
+          newHeight = snapToPixel(draggedGroupStart.height + dy);
+        } else if (dragMode === 'resize-br') {
+          newWidth = snapToPixel(draggedGroupStart.width + dx);
+          newHeight = snapToPixel(draggedGroupStart.height + dy);
+        }
+
+        // Prevent negative dimensions
+        if (newWidth < 1 || newHeight < 1) return g;
+
+        return { ...g, x: newX, y: newY, width: newWidth, height: newHeight };
+      }));
+    }
   };
 
   const handleMouseUp = () => {
-    if (isDrawing && currentDraw && currentDraw.width > 0 && currentDraw.height > 0) {
+    if (dragMode === 'draw' && currentDraw && currentDraw.width > 0 && currentDraw.height > 0) {
       const newGroup: Group = {
         id: `group-${Date.now()}`,
         ...currentDraw,
@@ -191,8 +273,9 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
       setSelectedGroupId(newGroup.id);
     }
 
-    setIsDrawing(false);
-    setDrawStart(null);
+    setDragMode('none');
+    setDragStart(null);
+    setDraggedGroupStart(null);
     setCurrentDraw(null);
   };
 
@@ -306,7 +389,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
           onMouseLeave={handleMouseUp}
           style={{
             display: "block",
-            cursor: isDrawing ? "crosshair" : "default",
+            cursor: dragMode === 'draw' ? "crosshair" : dragMode === 'move' ? "move" : dragMode.startsWith('resize-') ? "nwse-resize" : "default",
             imageRendering: scale > 2 ? "pixelated" : "auto",
             transform: `scale(${scale})`,
             transformOrigin: "top left",

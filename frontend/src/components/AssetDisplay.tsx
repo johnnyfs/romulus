@@ -341,10 +341,10 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
 
     const tempId = `temp-${Date.now()}-${Math.random()}`;
 
-    // Find the next available entity number
-    const currentSceneEntities = sceneEntities.get(sceneId) || new Map();
+    // Find the next available entity number by checking ALL game entities
+    // (not just the current scene) to avoid conflicts with the unique constraint
     const existingNames = new Set(
-      Array.from(currentSceneEntities.values()).map(e => e.name)
+      game.entities?.map(e => e.name) || []
     );
 
     let entityNumber = 1;
@@ -359,6 +359,7 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
       isDirty: true, // New entity, not saved yet
     };
 
+    const currentSceneEntities = sceneEntities.get(sceneId) || new Map();
     currentSceneEntities.set(tempId, newEntity);
 
     const newSceneEntities = new Map(sceneEntities);

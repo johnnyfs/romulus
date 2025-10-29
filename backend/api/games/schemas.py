@@ -3,6 +3,7 @@ import uuid
 from pydantic import BaseModel
 
 from api.games.assets.schemas import AssetResponse
+from api.games.components.schemas import ComponentCreateResponse
 from api.games.entities.schemas import EntityResponse
 from api.games.scenes.schemas import SceneCreateResponse
 from core.schemas import GameData
@@ -42,6 +43,7 @@ class GameGetResponse(GameCommon):
     scenes: list[SceneCreateResponse]
     assets: list[AssetResponse]
     entities: list[EntityResponse]
+    components: list[ComponentCreateResponse]
 
 
 class GameDeleteResponse(BaseModel):

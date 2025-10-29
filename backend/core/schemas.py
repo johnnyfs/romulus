@@ -15,15 +15,15 @@ class GameType(str, Enum):
 
 
 class ComponentType(str, Enum):
-    """Types of components that can be attached to a game.
+    """Types of components that can be attached to entities.
 
-    Note: Components will eventually attach to entities to define behavior.
-    Currently, only PALETTE exists as a placeholder until real components are implemented.
+    Components define visual and behavioral aspects of entities.
     """
 
     # DEPRECATED: Palette components have been migrated to palette assets.
     # This exists only to keep the enum non-empty. Will be removed when real components are added.
     PALETTE = "palette"
+    SPRITE = "sprite"
 
 
 class ResourceType(str, Enum):
@@ -94,8 +94,22 @@ class NESPaletteData(BaseModel):
     palettes: list[NESPalette]  # Up to 4 palettes for background or sprites
 
 
+class NESSpriteData(BaseModel):
+    """Data for a sprite component.
+
+    Sprite dimensions are in sprite units:
+    - For 8x8 mode: 1 unit = 8 pixels
+    - For 8x16 mode: 1 unit = 8x16 pixels
+    """
+
+    type: Literal[ComponentType.SPRITE] = ComponentType.SPRITE
+    width: int  # Width in sprite units (e.g., 2 = 16px in 8x8 mode, 2 = 16px wide in 8x16 mode)
+    height: int  # Height in sprite units (e.g., 2 = 16px in 8x8 mode, 2 = 2 sprites tall in 8x16 mode)
+    sprite_set: NESRef | None = None  # Reference to a sprite set asset (not implemented yet)
+
+
 # Discriminated union of all component data types
-ComponentData = Annotated[NESPaletteData, Field(discriminator="type")]
+ComponentData = Annotated[NESPaletteData | NESSpriteData, Field(discriminator="type")]
 
 
 class NESEntity(BaseModel):
