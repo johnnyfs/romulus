@@ -68,12 +68,11 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    # Query game with scenes, entities, assets, and components eagerly loaded
+    # Query game with scenes, entities, and assets eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
         selectinload(Game.scenes),
         selectinload(Game.assets),
-        selectinload(Game.entities),
-        selectinload(Game.components)
+        selectinload(Game.entities)
     )
     result = await db.execute(stmt)
     game = result.scalar_one_or_none()
@@ -98,7 +97,7 @@ async def get_game(
         for asset in game.assets
     ]
 
-    # Convert entities to response format
+    # Convert entities to response format (components are embedded in entity_data)
     entities = [
         EntityResponse(
             id=entity.id,
@@ -109,26 +108,13 @@ async def get_game(
         for entity in game.entities
     ]
 
-    # Convert components to response format
-    from api.games.components.schemas import ComponentCreateResponse
-    components = [
-        ComponentCreateResponse(
-            id=component.id,
-            game_id=component.game_id,
-            name=component.name,
-            component_data=component.component_data,
-        )
-        for component in game.components
-    ]
-
     return GameGetResponse(
         id=game.id,
         name=game.name,
         game_data=game.game_data,
         scenes=scenes,
         assets=assets,
-        entities=entities,
-        components=components
+        entities=entities
     )
 
 

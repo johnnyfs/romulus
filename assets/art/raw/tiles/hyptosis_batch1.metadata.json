@@ -1,0 +1,21 @@
+{
+  "source_url": "https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis",
+  "download_url": "https://opengameart.org/sites/default/files/hyptosis_tile-art-batch-1.png",
+  "license": "CC-BY 3.0",
+  "author": "Hyptosis",
+  "asset_type": "tiles",
+  "style_hints": [
+    "32x32",
+    "rpg",
+    "fantasy",
+    "dungeon",
+    "zelda-like",
+    "detailed",
+    "tile sheet"
+  ],
+  "description": "Large collection of 32x32 tiles mostly for Zelda-like RPGs, batch 1",
+  "format": "PNG",
+  "tile_size": "32x32",
+  "attribution_required": true,
+  "downloaded_at": "2025-10-28T20:16:00Z"
+}

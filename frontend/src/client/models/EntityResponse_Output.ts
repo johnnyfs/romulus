@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NESEntity } from './NESEntity';
-export type EntityResponse = {
+import type { NESEntity_Output } from './NESEntity_Output';
+export type EntityResponse_Output = {
     id: string;
     game_id: string;
     name: string;
-    entity_data: NESEntity;
+    entity_data: NESEntity_Output;
 };
 

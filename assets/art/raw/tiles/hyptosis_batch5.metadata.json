@@ -1,0 +1,21 @@
+{
+  "source_url": "https://opengameart.org/content/lots-of-free-2d-tiles-and-sprites-by-hyptosis",
+  "download_url": "https://opengameart.org/sites/default/files/hyptosis_tile-art-batch-5.png",
+  "license": "CC-BY 3.0",
+  "author": "Hyptosis",
+  "asset_type": "tiles",
+  "style_hints": [
+    "16x16",
+    "rpg",
+    "fantasy",
+    "tile sheet",
+    "nes-compatible",
+    "small tiles"
+  ],
+  "description": "16x16 pixel format tiles - ideal for NES-style games",
+  "format": "PNG",
+  "tile_size": "16x16",
+  "attribution_required": true,
+  "nes_compatible": true,
+  "downloaded_at": "2025-10-28T20:16:00Z"
+}

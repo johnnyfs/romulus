@@ -3,8 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { AssetResponse } from './AssetResponse';
-import type { ComponentCreateResponse } from './ComponentCreateResponse';
-import type { EntityResponse } from './EntityResponse';
+import type { EntityResponse_Output } from './EntityResponse_Output';
 import type { NESGameData } from './NESGameData';
 import type { SceneCreateResponse } from './SceneCreateResponse';
 export type GameGetResponse = {
@@ -13,7 +12,6 @@ export type GameGetResponse = {
     game_data: NESGameData;
     scenes: Array<SceneCreateResponse>;
     assets: Array<AssetResponse>;
-    entities: Array<EntityResponse>;
-    components: Array<ComponentCreateResponse>;
+    entities: Array<EntityResponse_Output>;
 };
 

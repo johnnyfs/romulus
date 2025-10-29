@@ -4,8 +4,12 @@
 /* eslint-disable */
 import type { NESPaletteData_Input } from './NESPaletteData_Input';
 import type { NESSpriteData } from './NESSpriteData';
-export type ComponentCreateRequest = {
-    name: string;
-    component_data: (NESPaletteData_Input | NESSpriteData);
+/**
+ * An entity with position data and attached components.
+ */
+export type NESEntity_Input = {
+    'x': number;
+    'y': number;
+    components?: Array<(NESPaletteData_Input | NESSpriteData)>;
 };
 

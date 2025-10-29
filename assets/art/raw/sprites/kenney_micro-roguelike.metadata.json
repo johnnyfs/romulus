@@ -1,0 +1,21 @@
+{
+  "source_url": "https://kenney.nl/assets/micro-roguelike",
+  "download_url": "https://kenney.nl/media/pages/assets/micro-roguelike/df5bdec5fc-1677578239/kenney_micro-roguelike.zip",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "sprites",
+  "style_hints": [
+    "roguelike",
+    "dungeon",
+    "fantasy",
+    "rpg",
+    "pixel art",
+    "tiny",
+    "retro",
+    "nes-style"
+  ],
+  "description": "Micro roguelike tileset and sprites for dungeon crawler games",
+  "format": "PNG",
+  "extracted_to": "kenney_micro-roguelike",
+  "downloaded_at": "2025-10-28T20:15:00Z"
+}

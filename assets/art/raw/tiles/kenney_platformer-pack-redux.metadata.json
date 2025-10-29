@@ -1,0 +1,23 @@
+{
+  "source_url": "https://kenney.nl/assets/platformer-pack-redux",
+  "download_url": "https://kenney.nl/media/pages/assets/platformer-pack-redux/baf4110f33-1677696200/kenney_platformer-pack-redux.zip",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "tiles",
+  "style_hints": [
+    "platformer",
+    "tiles",
+    "terrain",
+    "grass",
+    "dirt",
+    "stone",
+    "castle",
+    "retro",
+    "pixel art",
+    "nes-style"
+  ],
+  "description": "Redux version of the classic platformer tile pack with terrain, platforms, and environmental assets",
+  "format": "PNG",
+  "extracted_to": "kenney_platformer-pack-redux",
+  "downloaded_at": "2025-10-28T20:15:00Z"
+}

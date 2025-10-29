@@ -1,0 +1,21 @@
+{
+  "source_url": "https://kenney.nl/assets/pixel-platformer",
+  "download_url": "https://kenney.nl/media/pages/assets/pixel-platformer/bef991136c-1696667883/kenney_pixel-platformer.zip",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "tiles",
+  "style_hints": [
+    "platformer",
+    "18x18",
+    "pixel art",
+    "retro",
+    "tiles",
+    "terrain",
+    "nes-style"
+  ],
+  "description": "200 files with 18x18 tile sizes, featuring platformer and pixel art assets",
+  "format": "PNG",
+  "tile_size": "18x18",
+  "extracted_to": "kenney_pixel-platformer",
+  "downloaded_at": "2025-10-28T20:16:00Z"
+}

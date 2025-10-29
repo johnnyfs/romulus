@@ -29,10 +29,14 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
   const [currentDraw, setCurrentDraw] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [imageDimensions, setImageDimensions] = useState<{ width: number; height: number } | null>(null);
   const [scale, setScale] = useState(1);
+  const [showGrid, setShowGrid] = useState(false);
+  const [snapToGrid, setSnapToGrid] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const GRID_SIZE = 8; // 8x8 pixel grid
 
   // Load the image and get its dimensions
   useEffect(() => {
@@ -72,8 +76,28 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
     // Draw image
     ctx.drawImage(imageRef.current, 0, 0);
 
-    // Draw pixel grid (only when zoomed in)
-    if (scale > 1.5) {
+    // Draw 8x8 grid when enabled
+    if (showGrid) {
+      ctx.strokeStyle = "rgba(0, 123, 255, 0.3)";
+      ctx.lineWidth = 1 / scale;
+
+      for (let x = 0; x <= imageDimensions.width; x += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, imageDimensions.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y <= imageDimensions.height; y += GRID_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(imageDimensions.width, y);
+        ctx.stroke();
+      }
+    }
+
+    // Draw pixel grid (only when zoomed in and 8x8 grid not shown)
+    if (!showGrid && scale > 1.5) {
       ctx.strokeStyle = "rgba(150, 150, 150, 0.2)";
       ctx.lineWidth = 1 / scale;
 
@@ -132,6 +156,9 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
   }, [groups, selectedGroupId, currentDraw, imageDimensions, scale]);
 
   const snapToPixel = (value: number): number => {
+    if (snapToGrid) {
+      return Math.round(value / GRID_SIZE) * GRID_SIZE;
+    }
     return Math.round(value);
   };
 

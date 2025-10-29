@@ -1,0 +1,23 @@
+{
+  "source_url": "https://opengameart.org/content/zelda-like-tilesets-and-sprites",
+  "download_url": "https://opengameart.org/sites/default/files/gfx_3.zip",
+  "license": "CC0",
+  "author": "ArMM1998",
+  "asset_type": "tiles",
+  "style_hints": [
+    "zelda-like",
+    "16x16",
+    "rpg",
+    "top-down",
+    "overworld",
+    "dungeon",
+    "fantasy",
+    "nes-style",
+    "retro"
+  ],
+  "description": "16x16 tileset including overworld (castle, houses, decoration), cave tileset, indoor tileset, character with sword animation, effects, objects and UI",
+  "format": "PNG",
+  "tile_size": "16x16",
+  "extracted_to": "zelda-like-tileset",
+  "downloaded_at": "2025-10-28T20:16:00Z"
+}

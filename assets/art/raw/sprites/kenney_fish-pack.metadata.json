@@ -1,0 +1,20 @@
+{
+  "source_url": "https://kenney.nl/assets/fish-pack",
+  "download_url": "https://kenney.nl/media/pages/assets/fish-pack/6a96d27fb2-1747237960/kenney_fish-pack_2.zip",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "sprites",
+  "style_hints": [
+    "2d",
+    "fish",
+    "underwater",
+    "sea creatures",
+    "pixel art",
+    "casual",
+    "colorful"
+  ],
+  "description": "120 fish-related graphics for 2D games",
+  "format": "PNG",
+  "extracted_to": "kenney_fish-pack",
+  "downloaded_at": "2025-10-28T20:15:00Z"
+}

@@ -1,0 +1,26 @@
+{
+  "source_url": "https://opengameart.org/content/rpg-assets-tile-set-nes",
+  "download_url": "https://opengameart.org/sites/default/files/NES%20Tile%20Set%20Files.zip",
+  "license": "CC0",
+  "author": "Chasersgaming",
+  "asset_type": "tiles",
+  "style_hints": [
+    "nes",
+    "chr",
+    "rpg",
+    "tiles",
+    "grass",
+    "stone",
+    "plains",
+    "fences",
+    "trees",
+    "water",
+    "authentic nes"
+  ],
+  "description": "RPG tile set assets in both PNG and .CHR formats for NES homebrew development, including grass and stone plains, fences, trees and water",
+  "format": "PNG, CHR",
+  "tile_size": "8x8",
+  "includes_chr_files": true,
+  "extracted_to": "nes-tileset-files",
+  "downloaded_at": "2025-10-28T20:16:00Z"
+}

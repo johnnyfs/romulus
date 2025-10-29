@@ -4,10 +4,12 @@
 /* eslint-disable */
 import type { NESPaletteData_Output } from './NESPaletteData_Output';
 import type { NESSpriteData } from './NESSpriteData';
-export type ComponentUpdateResponse = {
-    id: string;
-    game_id: string;
-    name: string;
-    component_data: (NESPaletteData_Output | NESSpriteData);
+/**
+ * An entity with position data and attached components.
+ */
+export type NESEntity_Output = {
+    'x': number;
+    'y': number;
+    components?: Array<(NESPaletteData_Output | NESSpriteData)>;
 };
 

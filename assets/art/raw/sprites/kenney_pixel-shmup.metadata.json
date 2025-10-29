@@ -1,0 +1,22 @@
+{
+  "source_url": "https://kenney.nl/assets/pixel-shmup",
+  "download_url": "https://kenney.nl/media/pages/assets/pixel-shmup/899a89fc6e-1677495782/kenney_pixel-shmup.zip",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "sprites",
+  "style_hints": [
+    "shmup",
+    "shoot-em-up",
+    "space shooter",
+    "pixel art",
+    "retro",
+    "arcade",
+    "vertical scroller",
+    "spaceships",
+    "enemies"
+  ],
+  "description": "Pixel art shoot-em-up sprites including ships and enemies",
+  "format": "PNG",
+  "extracted_to": "kenney_pixel-shmup",
+  "downloaded_at": "2025-10-28T20:15:00Z"
+}
