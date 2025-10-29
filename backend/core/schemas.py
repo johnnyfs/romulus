@@ -7,6 +7,13 @@ from pydantic import BaseModel, Field
 type NESRef = uuid.UUID  # UUID referencing a component
 
 
+class GameType(str, Enum):
+    """Types of games/platforms supported."""
+
+    NES = "nes"
+    # Future: GAMEBOY = "gameboy", SNES = "snes", etc.
+
+
 class ComponentType(str, Enum):
     """Types of components that can be attached to a game.
 
@@ -103,6 +110,7 @@ class NESScene(BaseModel):
     background_palettes: NESRef | None = None
     sprite_palettes: NESRef | None = None
     components: list[NESRef] = []
+    entities: list[NESRef] = []  # References to game-level entities
 
 
 # Resource data schemas (discriminated union based on type)
@@ -136,3 +144,24 @@ class NESPaletteAssetData(BaseModel):
 
 # Discriminated union of all asset data types
 AssetData = Annotated[NESPaletteAssetData, Field(discriminator="type")]
+
+
+# Game data schemas (discriminated union based on game type)
+
+
+class NESSpriteSize(str, Enum):
+    """Sprite sizes supported by the NES."""
+
+    SIZE_8X8 = "8x8"
+    SIZE_8X16 = "8x16"
+
+
+class NESGameData(BaseModel):
+    """Data specific to NES games."""
+
+    type: Literal[GameType.NES] = GameType.NES
+    sprite_size: NESSpriteSize = NESSpriteSize.SIZE_8X8
+
+
+# Discriminated union of all game data types
+GameData = Annotated[NESGameData, Field(discriminator="type")]

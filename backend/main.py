@@ -33,7 +33,7 @@ v1_app.include_router(resource_router, prefix="/resources", tags=["resources"])
 v1_app.include_router(game_router, prefix="/games", tags=["games"])
 v1_app.include_router(asset_router, prefix="/games/{game_id}/assets", tags=["assets"])
 v1_app.include_router(scene_router, prefix="/games/{game_id}/scenes", tags=["scenes"])
-v1_app.include_router(entity_router, prefix="/games/{game_id}/scenes/{scene_id}/entities", tags=["entities"])
+v1_app.include_router(entity_router, prefix="/games/{game_id}/entities", tags=["entities"])
 
 app = FastAPI()
 

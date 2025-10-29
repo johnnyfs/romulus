@@ -5,7 +5,7 @@
 import type { NESEntity } from './NESEntity';
 export type EntityResponse = {
     id: string;
-    scene_id: string;
+    game_id: string;
     name: string;
     entity_data: NESEntity;
 };

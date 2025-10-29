@@ -4,11 +4,12 @@ import "./App.css";
 import CreateGame from "./pages/CreateGame";
 import GameDetail from "./pages/GameDetail";
 import RawResourcesPage from "./pages/RawResourcesPage";
+import ResourceDetailPage from "./pages/ResourceDetailPage";
 import { GamesService } from "./client/services/GamesService";
-import type { GameListItem } from "./client/models/GameListItem";
+import type { GameListItem_Output } from "./client/models/GameListItem_Output";
 
 function Home() {
-  const [games, setGames] = useState<GameListItem[]>([]);
+  const [games, setGames] = useState<GameListItem_Output[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -129,6 +130,7 @@ function App() {
           <Route path="/games/create" element={<CreateGame />} />
           <Route path="/games/:id" element={<GameDetail />} />
           <Route path="/resources/images/raw" element={<RawResourcesPage />} />
+          <Route path="/resources/images/:id" element={<ResourceDetailPage />} />
         </Routes>
       </div>
     </Router>

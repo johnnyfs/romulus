@@ -9,5 +9,6 @@ export type NESScene = {
     background_palettes?: (NESRef | null);
     sprite_palettes?: (NESRef | null);
     components?: Array<NESRef>;
+    entities?: Array<NESRef>;
 };
 

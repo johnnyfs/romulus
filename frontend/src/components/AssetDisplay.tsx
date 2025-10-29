@@ -59,25 +59,34 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
     setGamePalettes(newGamePalettes);
   }, [game]);
 
-  // Initialize sceneEntities from game.scenes when game loads
+  // Initialize sceneEntities from game.entities when game loads
   useEffect(() => {
     if (!game) return;
 
     const newSceneEntities = new Map<string, Map<string, EntityData>>();
 
+    // Create a map of all game entities by ID for quick lookup
+    const entitiesById = new Map(
+      game.entities?.map(entity => [entity.id, entity]) || []
+    );
+
+    // For each scene, build a map of its referenced entities
     game.scenes.forEach(scene => {
       const sceneEntityMap = new Map<string, EntityData>();
 
-      // Add all entities for this scene
-      scene.entities?.forEach(entity => {
-        const entityData: EntityData = {
-          id: entity.id,
-          name: entity.name,
-          x: entity.entity_data.x,
-          y: entity.entity_data.y,
-          isDirty: false,
-        };
-        sceneEntityMap.set(entity.id, entityData);
+      // scene.scene_data.entities is an array of entity UUIDs
+      scene.scene_data.entities?.forEach(entityId => {
+        const entity = entitiesById.get(entityId);
+        if (entity) {
+          const entityData: EntityData = {
+            id: entity.id,
+            name: entity.name,
+            x: entity.entity_data.x,
+            y: entity.entity_data.y,
+            isDirty: false,
+          };
+          sceneEntityMap.set(entity.id, entityData);
+        }
       });
 
       if (sceneEntityMap.size > 0) {
@@ -418,16 +427,16 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
 
       if (entity.id && !entityId.startsWith('temp-')) {
         // Update existing entity
-        await EntitiesService.updateEntityGamesGameIdScenesSceneIdEntitiesEntityIdPut(
-          sceneId,
+        await EntitiesService.updateEntityGamesGameIdEntitiesEntityIdPut(
+          game.id,
           entity.id,
           entityData
         );
         responseId = entity.id;
       } else {
         // Create new entity
-        const response = await EntitiesService.createEntityGamesGameIdScenesSceneIdEntitiesPost(
-          sceneId,
+        const response = await EntitiesService.createEntityGamesGameIdEntitiesPost(
+          game.id,
           entityData
         );
         responseId = response.id;

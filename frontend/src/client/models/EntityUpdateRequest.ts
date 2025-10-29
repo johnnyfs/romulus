@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { NESEntity } from './NESEntity';
 export type EntityUpdateRequest = {
-    name: string;
-    entity_data: NESEntity;
+    name?: (string | null);
+    entity_data?: (NESEntity | null);
 };
 

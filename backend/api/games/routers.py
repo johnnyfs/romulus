@@ -7,10 +7,20 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from api.games.assets.schemas import AssetResponse
+from api.games.entities.models import Entity
+from api.games.entities.schemas import EntityResponse
 from api.games.models import Game
 from api.games.scenes.models import Scene
-from api.games.scenes.schemas import EntityResponse, SceneCreateResponse
-from api.games.schemas import GameCreateRequest, GameCreateResponse, GameDeleteResponse, GameGetResponse, GameListItem
+from api.games.scenes.schemas import SceneCreateResponse
+from api.games.schemas import (
+    GameCreateRequest,
+    GameCreateResponse,
+    GameDeleteResponse,
+    GameGetResponse,
+    GameListItem,
+    GameUpdateRequest,
+    GameUpdateResponse,
+)
 from core.rom.builder import RomBuilder
 from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom
@@ -31,7 +41,7 @@ async def list_games(
 
     games = result.scalars().all()
 
-    return [GameListItem(id=game.id, name=game.name) for game in games]
+    return [GameListItem(id=game.id, name=game.name, game_data=game.game_data) for game in games]
 
 
 @router.post("", response_model=GameCreateResponse)
@@ -40,7 +50,7 @@ async def create_game(
     default_: bool = Query(False, alias="default"),
     db: AsyncSession = Depends(get_db),
 ):
-    game = Game(name=request.name)
+    game = Game(name=request.name, game_data=request.game_data)
 
     if default_:
         # Default game has a single scene called main, dark blue background, no palettes.
@@ -50,7 +60,7 @@ async def create_game(
 
     db.add(game)
     await db.flush()  # Flush to generate the UUID
-    return GameCreateResponse(id=game.id, name=game.name)
+    return GameCreateResponse(id=game.id, name=game.name, game_data=game.game_data)
 
 
 @router.get("/{game_id}", response_model=GameGetResponse)
@@ -60,8 +70,9 @@ async def get_game(
 ):
     # Query game with scenes, entities, and assets eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
-        selectinload(Game.scenes).selectinload(Scene.entities),
-        selectinload(Game.assets)
+        selectinload(Game.scenes),
+        selectinload(Game.assets),
+        selectinload(Game.entities)
     )
     result = await db.execute(stmt)
     game = result.scalar_one_or_none()
@@ -69,22 +80,13 @@ async def get_game(
     if game is None:
         raise HTTPException(status_code=404, detail="Game not found")
 
-    # Convert scenes to response format (with entities)
+    # Convert scenes to response format
     scenes = [
         SceneCreateResponse(
             id=scene.id,
             game_id=scene.game_id,
             name=scene.name,
             scene_data=scene.scene_data,
-            entities=[
-                EntityResponse(
-                    id=entity.id,
-                    scene_id=entity.scene_id,
-                    name=entity.name,
-                    entity_data=entity.entity_data,
-                )
-                for entity in scene.entities
-            ]
         )
         for scene in game.scenes
     ]
@@ -95,7 +97,44 @@ async def get_game(
         for asset in game.assets
     ]
 
-    return GameGetResponse(id=game.id, name=game.name, scenes=scenes, assets=assets)
+    # Convert entities to response format
+    entities = [
+        EntityResponse(
+            id=entity.id,
+            game_id=entity.game_id,
+            name=entity.name,
+            entity_data=entity.entity_data,
+        )
+        for entity in game.entities
+    ]
+
+    return GameGetResponse(
+        id=game.id,
+        name=game.name,
+        game_data=game.game_data,
+        scenes=scenes,
+        assets=assets,
+        entities=entities
+    )
+
+
+@router.put("/{game_id}", response_model=GameUpdateResponse)
+async def update_game(
+    game_id: uuid.UUID,
+    request: GameUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    game = await db.get(Game, game_id)
+    if game is None:
+        raise HTTPException(status_code=404, detail="Game not found")
+
+    if request.name is not None:
+        game.name = request.name
+    if request.game_data is not None:
+        game.game_data = request.game_data
+
+    await db.flush()
+    return GameUpdateResponse(id=game.id, name=game.name, game_data=game.game_data)
 
 
 @router.delete("/{game_id}", response_model=GameDeleteResponse)

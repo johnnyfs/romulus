@@ -8,7 +8,7 @@ from io import BytesIO
 from minio import Minio
 
 from config import settings
-from core.schemas import AssetData, AssetType
+from core.schemas import AssetData, AssetType, ResourceData, ResourceType
 
 
 class StorageClient:
@@ -31,17 +31,27 @@ class StorageClient:
         if not self.client.bucket_exists(self.bucket):
             self.client.make_bucket(self.bucket)
 
-    def generate_storage_key(self, filename: str, asset_data: AssetData, asset_id: uuid.UUID) -> str:
-        """Generate a storage key based on asset type and processing state.
+    def generate_storage_key(self, filename: str, data: AssetData | ResourceData, data_id: uuid.UUID) -> str:
+        """Generate a storage key based on asset/resource type and processing state.
 
-        Format: assets/{type}/{state}/{id}/{filename}
-        Example: assets/images/raw/123e4567-e89b-12d3-a456-426614174000/spritesheet.png
+        For resources: resources/{type}/{state}/{id}/{filename}
+        For assets: assets/{type}/{id}/{filename}
+        Example: resources/images/raw/123e4567-e89b-12d3-a456-426614174000/fish.png
+        Example: assets/palettes/123e4567-e89b-12d3-a456-426614174000/palette.json
         """
-        if asset_data.type == AssetType.IMAGE:
-            return f"images/{asset_data.state.value}/{asset_id}/{filename}"
+        # Check if this is a resource (has state attribute) vs asset (no state)
+        if hasattr(data, 'state'):
+            # Resources have a processing state
+            if data.type == ResourceType.IMAGE:
+                return f"resources/images/{data.state.value}/{data_id}/{filename}"
+            else:
+                return f"resources/{data.type.value}/{data_id}/{filename}"
         else:
-            # Fallback for other asset types
-            return f"{asset_data.type.value}/{asset_id}/{filename}"
+            # Assets don't have a processing state
+            if data.type == AssetType.PALETTE:
+                return f"assets/palettes/{data_id}/{filename}"
+            else:
+                return f"assets/{data.type.value}/{data_id}/{filename}"
 
     def write_metadata(self, storage_key: str, metadata: dict) -> None:
         """Write metadata.json file alongside the asset."""

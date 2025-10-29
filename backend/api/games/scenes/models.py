@@ -19,4 +19,3 @@ class Scene(UUIDMixin, Base):
 
     # Relationships
     game: Mapped["Game"] = relationship("Game", back_populates="scenes")  # type: ignore
-    entities: Mapped[list["Entity"]] = relationship("Entity", back_populates="scene", cascade="all, delete-orphan")  # type: ignore

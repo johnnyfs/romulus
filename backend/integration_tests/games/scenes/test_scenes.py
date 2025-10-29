@@ -14,7 +14,10 @@ async def test_create_and_delete_scene(base_url: str):
         # First, create a game
         game_response = await client.post(
             "/api/v1/games",
-            json={"name": "Test Game for Scenes"},
+            json={
+                "name": "Test Game for Scenes",
+                "game_data": {"type": "nes", "sprite_size": "8x8"}
+            },
         )
         assert game_response.status_code == 200, f"Failed to create game: {game_response.text}"
         game = game_response.json()
@@ -80,7 +83,10 @@ async def test_scene_validates_nesscene_schema(base_url: str):
         # Create a game first
         game_response = await client.post(
             "/api/v1/games",
-            json={"name": "Test Game"},
+            json={
+                "name": "Test Game",
+                "game_data": {"type": "nes", "sprite_size": "8x8"}
+            },
         )
         game_id = game_response.json()["id"]
 
@@ -114,7 +120,10 @@ async def test_update_scene(base_url: str):
         # Create a game
         game_response = await client.post(
             "/api/v1/games",
-            json={"name": "Test Game for Scene Update"},
+            json={
+                "name": "Test Game for Scene Update",
+                "game_data": {"type": "nes", "sprite_size": "8x8"}
+            },
         )
         assert game_response.status_code == 200
         game_id = game_response.json()["id"]

@@ -3,7 +3,7 @@ import { Save, RefreshCw, Plus } from 'lucide-react';
 import styles from './ComponentDisplay.module.css';
 import type { GameGetResponse } from '../client/models/GameGetResponse';
 import { ScenesService } from '../client/services/ScenesService';
-import { ComponentsService } from '../client/services/ComponentsService';
+// import { ComponentsService } from '../client/services/ComponentsService'; // DEPRECATED: Components replaced by Assets
 import { EntitiesService } from '../client/services/EntitiesService';
 import { getNESColor } from '../constants/nesColors';
 import { getDefaultPalette } from '../constants/palettePresets';
@@ -35,30 +35,29 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
   const [paletteCounter, setPaletteCounter] = useState(0);
   const [sceneEntities, setSceneEntities] = useState<Map<string, Map<string, EntityData>>>(new Map());
 
-  // Initialize scenePalettes from game.components when game loads
+  // Initialize scenePalettes from game.assets when game loads
   useEffect(() => {
-    if (!game || !game.components) return;
+    if (!game || !game.assets) return;
 
     const newScenePalettes = new Map<string, Map<string, PaletteData>>();
 
-    // For each scene, find all palette components
+    // For each scene, find all palette assets
     game.scenes.forEach(scene => {
       const scenePaletteMap = new Map<string, PaletteData>();
 
-      // Add all palette components to this scene
-      // Note: Currently components are global, so we show them on all scenes
-      // You might want to filter by scene-specific components later
-      game.components.forEach(component => {
-        if (component.component_data.type === 'palette' && component.component_data.palettes) {
+      // Add all palette assets to this scene
+      // Note: Currently assets are global, so we show them on all scenes
+      game.assets.forEach(asset => {
+        if (asset.type === 'palette' && asset.data.type === 'palette' && asset.data.palettes) {
           const paletteData: PaletteData = {
-            id: component.id,
-            name: component.name,
-            subPalettes: component.component_data.palettes.map(palette =>
+            id: asset.id,
+            name: asset.name,
+            subPalettes: asset.data.palettes.map(palette =>
               palette.colors.map(color => color.index) as SubPalette
             ) as [SubPalette, SubPalette, SubPalette, SubPalette],
             isDirty: false,
           };
-          scenePaletteMap.set(component.id, paletteData);
+          scenePaletteMap.set(asset.id, paletteData);
         }
       });
 
@@ -70,25 +69,34 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     setScenePalettes(newScenePalettes);
   }, [game]);
 
-  // Initialize sceneEntities from game.scenes when game loads
+  // Initialize sceneEntities from game.entities when game loads
   useEffect(() => {
     if (!game) return;
 
     const newSceneEntities = new Map<string, Map<string, EntityData>>();
 
+    // Create a map of all game entities by ID for quick lookup
+    const entitiesById = new Map(
+      game.entities?.map(entity => [entity.id, entity]) || []
+    );
+
+    // For each scene, build a map of its referenced entities
     game.scenes.forEach(scene => {
       const sceneEntityMap = new Map<string, EntityData>();
 
-      // Add all entities for this scene
-      scene.entities?.forEach(entity => {
-        const entityData: EntityData = {
-          id: entity.id,
-          name: entity.name,
-          x: entity.entity_data.x,
-          y: entity.entity_data.y,
-          isDirty: false,
-        };
-        sceneEntityMap.set(entity.id, entityData);
+      // scene.scene_data.entities is an array of entity UUIDs
+      scene.scene_data.entities?.forEach(entityId => {
+        const entity = entitiesById.get(entityId);
+        if (entity) {
+          const entityData: EntityData = {
+            id: entity.id,
+            name: entity.name,
+            x: entity.entity_data.x,
+            y: entity.entity_data.y,
+            isDirty: false,
+          };
+          sceneEntityMap.set(entity.id, entityData);
+        }
       });
 
       if (sceneEntityMap.size > 0) {
@@ -291,67 +299,9 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
   };
 
   const handlePaletteSave = async (sceneId: string, paletteId: string) => {
-    if (!game) return;
-
-    const currentScenePalettes = scenePalettes.get(sceneId);
-    if (!currentScenePalettes) return;
-
-    const palette = currentScenePalettes.get(paletteId);
-    if (!palette || !palette.isDirty) return;
-
-    try {
-      const componentData = {
-        name: palette.name,
-        component_data: {
-          type: 'palette',
-          palettes: palette.subPalettes.map(subPalette => ({
-            colors: subPalette.map(index => ({ index })),
-          })),
-        },
-      };
-
-      let responseId: string;
-
-      if (palette.id && !paletteId.startsWith('temp-')) {
-        // Update existing palette
-        await ComponentsService.updateComponentGamesGameIdComponentsComponentIdPut(
-          game.id,
-          palette.id,
-          componentData
-        );
-        responseId = palette.id;
-      } else {
-        // Create new palette
-        const response = await ComponentsService.createComponentGamesGameIdComponentsPost(
-          game.id,
-          componentData
-        );
-        responseId = response.id;
-      }
-
-      // Update the palette with the real ID from the backend
-      const updatedPalette: PaletteData = {
-        ...palette,
-        id: responseId,
-        isDirty: false,
-      };
-
-      // Replace the temp ID with the real ID if needed
-      currentScenePalettes.delete(paletteId);
-      currentScenePalettes.set(responseId, updatedPalette);
-
-      const newScenePalettes = new Map(scenePalettes);
-      newScenePalettes.set(sceneId, new Map(currentScenePalettes));
-      setScenePalettes(newScenePalettes);
-
-      // Notify parent to refresh game data
-      if (onSceneUpdated) {
-        onSceneUpdated();
-      }
-    } catch (error) {
-      console.error('Failed to save palette:', error);
-      alert('Failed to save palette');
-    }
+    // DEPRECATED: Components replaced by Assets. This component is not in use.
+    // Use AssetDisplay instead for palette management.
+    console.warn('ComponentDisplay is deprecated. Use AssetDisplay for palette management.');
   };
 
   const handleAddEntity = (sceneId: string) => {
@@ -448,16 +398,16 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
 
       if (entity.id && !entityId.startsWith('temp-')) {
         // Update existing entity
-        await EntitiesService.updateEntityGamesGameIdScenesSceneIdEntitiesEntityIdPut(
-          sceneId,
+        await EntitiesService.updateEntityGamesGameIdEntitiesEntityIdPut(
+          game.id,
           entity.id,
           entityData
         );
         responseId = entity.id;
       } else {
         // Create new entity
-        const response = await EntitiesService.createEntityGamesGameIdScenesSceneIdEntitiesPost(
-          sceneId,
+        const response = await EntitiesService.createEntityGamesGameIdEntitiesPost(
+          game.id,
           entityData
         );
         responseId = response.id;
@@ -535,9 +485,9 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                 const currentColor = getNESColor(currentColorIndex);
                 const isSaving = saving.has(scene.id);
 
-                // Get list of available palettes from components
-                const availablePalettes = game.components
-                  ?.filter(c => c.component_data.type === 'palette') || [];
+                // Get list of available palettes from assets
+                const availablePalettes = game.assets
+                  ?.filter(a => a.type === 'palette') || [];
 
                 return (
                   <li key={scene.id} className={styles.componentDisplaySceneItem}>
@@ -582,8 +532,8 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                           onChange={(e) => handlePaletteSelect(scene.id, 'background', e.target.value || null)}
                         >
                           <option value="">None</option>
-                          {availablePalettes.map(component => (
-                            <option key={component.id} value={component.id}>{component.name}</option>
+                          {availablePalettes.map(asset => (
+                            <option key={asset.id} value={asset.id}>{asset.name}</option>
                           ))}
                         </select>
                       </div>
@@ -596,8 +546,8 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                           onChange={(e) => handlePaletteSelect(scene.id, 'sprite', e.target.value || null)}
                         >
                           <option value="">None</option>
-                          {availablePalettes.map(component => (
-                            <option key={component.id} value={component.id}>{component.name}</option>
+                          {availablePalettes.map(asset => (
+                            <option key={asset.id} value={asset.id}>{asset.name}</option>
                           ))}
                         </select>
                       </div>

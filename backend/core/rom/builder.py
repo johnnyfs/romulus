@@ -29,8 +29,9 @@ class RomBuilder:
             Game,
             game_id,
             options=[
-                selectinload(Game.scenes).selectinload(Scene.entities),
+                selectinload(Game.scenes),
                 selectinload(Game.assets),
+                selectinload(Game.entities),
             ],
         )
 
@@ -43,14 +44,21 @@ class RomBuilder:
         # This is to avoid the need to sort by dependency order beforehand.
         self.registry.add_assets(game.assets)
 
+        # Build a map of entity ID to entity for quick lookup
+        entity_map = {entity.id: entity for entity in game.entities}
+
         saw_main = False
         for scene in game.scenes:
             saw_main = saw_main or (scene.name == initial_scene_name)
             scene_block = SceneData(_name=scene.name, _scene=scene.scene_data)
             self._add(rom, scene_block)
 
-            # Add entities for this scene
-            for entity in scene.entities:
+            # Add entities referenced by this scene
+            for entity_id in scene.scene_data.entities:
+                entity = entity_map.get(entity_id)
+                if entity is None:
+                    logger.warning(f"Scene '{scene.name}' references entity {entity_id} which does not exist")
+                    continue
                 entity_block = EntityData(_name=entity.name, _entity=entity.entity_data)
                 self._add(rom, entity_block)
 

@@ -1,13 +1,10 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
 
 from api.games.scenes.models import Scene
 from api.games.scenes.schemas import (
-    EntityResponse,
     SceneCreateRequest,
     SceneCreateResponse,
     SceneDeleteResponse,
@@ -51,10 +48,7 @@ async def update_scene(
     request: SceneUpdateRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    # Load scene with entities
-    stmt = select(Scene).where(Scene.id == scene_id).options(selectinload(Scene.entities))
-    result = await db.execute(stmt)
-    scene = result.scalar_one_or_none()
+    scene = await db.get(Scene, scene_id)
 
     if scene is None or scene.game_id != game_id:
         raise HTTPException(status_code=404, detail="Scene not found")
@@ -66,21 +60,9 @@ async def update_scene(
 
     await db.flush()
 
-    # Convert entities to response format
-    entities = [
-        EntityResponse(
-            id=entity.id,
-            scene_id=entity.scene_id,
-            name=entity.name,
-            entity_data=entity.entity_data,
-        )
-        for entity in scene.entities
-    ]
-
     return SceneUpdateResponse(
         id=scene.id,
         game_id=scene.game_id,
         name=scene.name,
         scene_data=scene.scene_data,
-        entities=entities,
     )

@@ -11,16 +11,21 @@ async def test_create_and_delete_game(base_url: str):
     Make sure the server is running at localhost:8000 before running this test.
     """
     async with httpx.AsyncClient(base_url=base_url) as client:
-        # Create a game
+        # Create a game with game_data
         create_response = await client.post(
             "/api/v1/games",
-            json={"name": "Test Game"},
+            json={
+                "name": "Test Game",
+                "game_data": {"type": "nes", "sprite_size": "8x8"}
+            },
         )
         assert create_response.status_code == 200, f"Failed to create game: {create_response.text}"
 
         created_game = create_response.json()
         assert "id" in created_game
         assert created_game["name"] == "Test Game"
+        assert "game_data" in created_game
+        assert created_game["game_data"]["type"] == "nes"
 
         game_id = created_game["id"]
         print(f"Created game with ID: {game_id}")
@@ -53,10 +58,13 @@ async def test_create_game_with_default_flag(base_url: str):
     Test that creating a game with default_=True creates a game with at least one scene.
     """
     async with httpx.AsyncClient(base_url=base_url) as client:
-        # Create a game with default flag
+        # Create a game with default flag and game_data
         create_response = await client.post(
             "/api/v1/games",
-            json={"name": "Default Game Test"},
+            json={
+                "name": "Default Game Test",
+                "game_data": {"type": "nes", "sprite_size": "8x16"}
+            },
             params={"default": True},
         )
         assert create_response.status_code == 200, f"Failed to create game: {create_response.text}"
@@ -72,6 +80,8 @@ async def test_create_game_with_default_flag(base_url: str):
         game_data = get_response.json()
         assert "scenes" in game_data, "Game should have scenes field"
         assert len(game_data["scenes"]) >= 1, "Game created with default flag should have at least one scene"
+        assert "game_data" in game_data, "Game should have game_data field"
+        assert game_data["game_data"]["sprite_size"] == "8x16", "Game should have the correct sprite size"
 
         # Verify the default scene has expected properties
         default_scene = game_data["scenes"][0]

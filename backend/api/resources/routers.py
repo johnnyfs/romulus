@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import String, cast, select
+from sqlalchemy import String, cast, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from api.resources.models import Resource
@@ -65,14 +65,15 @@ async def list_resources(
         query = query.where(Resource.type == resource_type)
 
     # For state filtering, we need to filter on the JSONB column
-    # Access the column directly from the table
+    # The ['state'] operator uses -> which returns JSON, we need ->> for text
+    # So we cast the result to String to compare
     resource_data_col = Resource.__table__.c.resource_data
     if state and resource_type == ResourceType.IMAGE:
-        query = query.where(cast(resource_data_col['state'], String) == state.value)
+        query = query.where(cast(resource_data_col['state'], String) == f'"{state.value}"')
 
     # Order by processed flag (unprocessed first), then by id (oldest first)
     query = query.order_by(
-        cast(resource_data_col['processed'], String).asc(),  # unprocessed first (false < true)
+        cast(resource_data_col['processed'], String).asc(),  # unprocessed first (false < true in text)
         Resource.id.asc()
     )
 

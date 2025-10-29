@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { ResourceImage } from "./ResourceImage";
 import type { ResourceCreateResponse } from "../../client";
 
@@ -8,8 +9,17 @@ interface ResourceRowProps {
 }
 
 export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
+  const navigate = useNavigate();
   const filename = asset.storage_key.split("/").pop() || "unknown";
-  const isProcessed = asset.resource_data.processed;
+  const isProcessed = asset.resource_data.processed ?? false;
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(asset);
+    } else {
+      navigate(`/resources/images/${asset.id}`);
+    }
+  };
 
   return (
     <div
@@ -21,17 +31,18 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
         border: "1px solid #ddd",
         borderRadius: "4px",
         backgroundColor: isProcessed ? "#f9f9f9" : "#fff",
-        cursor: onClick ? "pointer" : "default",
-        transition: "background-color 0.2s",
+        cursor: "pointer",
+        transition: "all 0.2s",
+        opacity: isProcessed ? 0.6 : 1,
       }}
-      onClick={() => onClick?.(asset)}
+      onClick={handleClick}
       onMouseEnter={(e) => {
-        if (onClick) {
-          e.currentTarget.style.backgroundColor = isProcessed ? "#f0f0f0" : "#f9f9f9";
-        }
+        e.currentTarget.style.backgroundColor = isProcessed ? "#f0f0f0" : "#f9f9f9";
+        e.currentTarget.style.opacity = isProcessed ? "0.8" : "1";
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = isProcessed ? "#f9f9f9" : "#fff";
+        e.currentTarget.style.opacity = isProcessed ? "0.6" : "1";
       }}
     >
       <ResourceImage url={asset.download_url} alt={filename} size={64} />
