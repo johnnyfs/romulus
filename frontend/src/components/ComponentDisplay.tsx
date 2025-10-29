@@ -385,6 +385,9 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     const entity = currentSceneEntities.get(entityId);
     if (!entity || !entity.isDirty) return;
 
+    const scene = game.scenes.find(s => s.id === sceneId);
+    if (!scene) return;
+
     try {
       const entityData = {
         name: entity.name,
@@ -411,6 +414,24 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
           entityData
         );
         responseId = response.id;
+      }
+
+      // Add entity to scene's entity list if it's not already there
+      const currentSceneEntityIds = scene.scene_data.entities || [];
+      if (!currentSceneEntityIds.includes(responseId)) {
+        const updatedEntityIds = [...currentSceneEntityIds, responseId];
+
+        // Update the scene to include this entity
+        await ScenesService.updateSceneGamesGameIdScenesSceneIdPut(
+          game.id,
+          sceneId,
+          {
+            scene_data: {
+              ...scene.scene_data,
+              entities: updatedEntityIds,
+            },
+          }
+        );
       }
 
       // Update the entity with the real ID from the backend
