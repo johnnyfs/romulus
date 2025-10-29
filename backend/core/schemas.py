@@ -106,7 +106,8 @@ class NESSpriteData(BaseModel):
     type: Literal[ComponentType.SPRITE] = ComponentType.SPRITE
     width: int  # Width in sprite units (e.g., 2 = 16px in 8x8 mode, 2 = 16px wide in 8x16 mode)
     height: int  # Height in sprite units (e.g., 2 = 16px in 8x8 mode, 2 = 2 sprites tall in 8x16 mode)
-    sprite_set: NESRef | None = None  # Reference to a sprite set asset (not implemented yet)
+    sprite_set: NESRef | None = None  # Reference to a sprite set asset
+    palette_index: int = 0  # Palette index (0-3) for colorizing the sprite
 
 
 # Discriminated union of all component data types

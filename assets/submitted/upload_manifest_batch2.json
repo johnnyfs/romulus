@@ -1,0 +1,305 @@
+[
+  {
+    "file": "01_nestor_nes_tileset.png",
+    "original_path": "tiles/nestor-tileset.png",
+    "description": "Nestor NES-constrained tileset - 3 palettes of 4 colors",
+    "resource_id": "14fcb647-803d-4005-9f79-861557cf027e",
+    "storage_key": "resources/images/raw/14fcb647-803d-4005-9f79-861557cf027e/01_nestor_nes_tileset.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/14fcb647-803d-4005-9f79-861557cf027e/01_nestor_nes_tileset.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043609Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=dc3aace0872d8676d723bbba34520a5df5b225478263e68a66147a24ff04f9c8",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "hi-res"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "02_nes_village_tiles.png",
+    "original_path": "tiles/nes-village-tiles.png",
+    "description": "Simple NES-like village tiles - CC0",
+    "resource_id": "2703beab-1940-49e0-a492-a19cbf229ac2",
+    "storage_key": "resources/images/raw/2703beab-1940-49e0-a492-a19cbf229ac2/02_nes_village_tiles.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/2703beab-1940-49e0-a492-a19cbf229ac2/02_nes_village_tiles.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043609Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=bdfb3a4b0c45ff2766fc6868742f0ba5f6d4cad43428e39b3533a16991ffbb61",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "03_nes_platformer_tiles.png",
+    "original_path": "tiles/nes-platformer-tiles.png",
+    "description": "Simple NES-like platformer tiles - large collection",
+    "resource_id": "9fea80e8-c090-4b96-a283-64d9af481cb9",
+    "storage_key": "resources/images/raw/9fea80e8-c090-4b96-a283-64d9af481cb9/03_nes_platformer_tiles.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/9fea80e8-c090-4b96-a283-64d9af481cb9/03_nes_platformer_tiles.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043609Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=275906ee7810dabd3e0cad7bff476e6ec93590f86b249d24c0563c0008169388",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "04_mono_floor.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0000.png",
+    "description": "Monochrome 8x8 dungeon floor tile",
+    "resource_id": "af3fca70-dc16-4107-acee-e90c62938e86",
+    "storage_key": "resources/images/raw/af3fca70-dc16-4107-acee-e90c62938e86/04_mono_floor.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/af3fca70-dc16-4107-acee-e90c62938e86/04_mono_floor.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043609Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ac11324e1a2d5ff998bc2038a820deb584513dbaf54427c5e4ea90f9e9795d78",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "05_mono_wall1.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0001.png",
+    "description": "Monochrome 8x8 dungeon wall tile variant 1",
+    "resource_id": "69343761-c075-4814-9f0f-19cf8ea7faec",
+    "storage_key": "resources/images/raw/69343761-c075-4814-9f0f-19cf8ea7faec/05_mono_wall1.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/69343761-c075-4814-9f0f-19cf8ea7faec/05_mono_wall1.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043609Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=004af29fc9f9da064b0a8e02421ea8f185300cdec2ef6216c8a146698c67342c",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "06_mono_wall2.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0015.png",
+    "description": "Monochrome 8x8 dungeon wall tile variant 2",
+    "resource_id": "49eb290d-05ca-49de-8e9e-c145b7d9a577",
+    "storage_key": "resources/images/raw/49eb290d-05ca-49de-8e9e-c145b7d9a577/06_mono_wall2.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/49eb290d-05ca-49de-8e9e-c145b7d9a577/06_mono_wall2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f24df684298800b9b9508458a3dde41facda1e8975a60309ba78ed74ae709fdc",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "07_mono_door.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0024.png",
+    "description": "Monochrome 8x8 dungeon door tile",
+    "resource_id": "b7442800-f155-4534-8f87-ba5742388dca",
+    "storage_key": "resources/images/raw/b7442800-f155-4534-8f87-ba5742388dca/07_mono_door.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/b7442800-f155-4534-8f87-ba5742388dca/07_mono_door.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=edde54c371b4362e097fa41d926b22bede47fe74c3ecceb5f09bbb0a7709449d",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "08_mono_stairs.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/monochrome/tile_0030.png",
+    "description": "Monochrome 8x8 dungeon stairs tile",
+    "resource_id": "5cef211b-8bd6-4173-81c2-32a2974e4245",
+    "storage_key": "resources/images/raw/5cef211b-8bd6-4173-81c2-32a2974e4245/08_mono_stairs.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/5cef211b-8bd6-4173-81c2-32a2974e4245/08_mono_stairs.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5395cbf3a33c20b7688e29aafbe7c4ea32bcb7abd0cfc44759bc902d8e2dcaf2",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "09_gameboy_tileset2.png",
+    "original_path": "tiles/gameboy-tileset-2.png",
+    "description": "Game Boy platformer tileset 2 - 4 color grayscale",
+    "resource_id": "c007f933-78f6-43ea-9c88-a5094dadf122",
+    "storage_key": "resources/images/raw/c007f933-78f6-43ea-9c88-a5094dadf122/09_gameboy_tileset2.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/c007f933-78f6-43ea-9c88-a5094dadf122/09_gameboy_tileset2.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8f02d657a3b5c3b8be9b62f3e1fa965bb502e4ece16db662bf8252e6a2b89374",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "side-view",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "10_slime_enemy.png",
+    "original_path": "sprites/platformer/enemies/slime.png",
+    "description": "Slime enemy sprite - simple low-color design",
+    "resource_id": "7397726f-190e-4371-9b13-d7b06c2f8229",
+    "storage_key": "resources/images/raw/7397726f-190e-4371-9b13-d7b06c2f8229/10_slime_enemy.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/7397726f-190e-4371-9b13-d7b06c2f8229/10_slime_enemy.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=174a02d969264afed3d74b5448981008de78235b9be1a92e80dbc3aaa58e0375",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "11_bat_enemy.png",
+    "original_path": "sprites/platformer/enemies/bat.png",
+    "description": "Bat enemy sprite - flying enemy",
+    "resource_id": "735271da-51c2-4a60-ae40-d4c019eab4b6",
+    "storage_key": "resources/images/raw/735271da-51c2-4a60-ae40-d4c019eab4b6/11_bat_enemy.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/735271da-51c2-4a60-ae40-d4c019eab4b6/11_bat_enemy.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=c81157bde2d4f8e2f098e8ddc0b8793c65a11fda0657e74899e29e55cec047ea",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "12_fly_enemy.png",
+    "original_path": "sprites/platformer/enemies/fly.png",
+    "description": "Fly enemy sprite - small flying insect",
+    "resource_id": "fa8b3541-74ac-4346-9e2e-47e39eeed083",
+    "storage_key": "resources/images/raw/fa8b3541-74ac-4346-9e2e-47e39eeed083/12_fly_enemy.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/fa8b3541-74ac-4346-9e2e-47e39eeed083/12_fly_enemy.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=e89453a1b06b1c69ae08b0461878aaac0684fbf8bb586645a2f5493f74b32ed6",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "13_coin_gold.png",
+    "original_path": "sprites/platformer/items/coinGold.png",
+    "description": "Gold coin collectible item",
+    "resource_id": "9295526e-85ae-495a-b6f0-15c6fb7e0eb1",
+    "storage_key": "resources/images/raw/9295526e-85ae-495a-b6f0-15c6fb7e0eb1/13_coin_gold.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/9295526e-85ae-495a-b6f0-15c6fb7e0eb1/13_coin_gold.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4f9daf61a542ead41838c692fae713601a001f38bc3f52d6cfc272c549b381db",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "14_gem_blue.png",
+    "original_path": "sprites/platformer/items/gemBlue.png",
+    "description": "Blue gem collectible item",
+    "resource_id": "7c444076-9654-4525-b5fe-31ea9712fbd1",
+    "storage_key": "resources/images/raw/7c444076-9654-4525-b5fe-31ea9712fbd1/14_gem_blue.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/7c444076-9654-4525-b5fe-31ea9712fbd1/14_gem_blue.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=fb0cec8ae2199a7a59359a33732704aba8dfd3b194464fbb06f7f612a2118eea",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "15_star.png",
+    "original_path": "sprites/platformer/items/star.png",
+    "description": "Star collectible item",
+    "resource_id": "1bf282f1-50a2-4494-a01f-9373f2bc7dad",
+    "storage_key": "resources/images/raw/1bf282f1-50a2-4494-a01f-9373f2bc7dad/15_star.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/1bf282f1-50a2-4494-a01f-9373f2bc7dad/15_star.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=92e914ed6321589d5b399b7c9c88dd6d9f5b9c2b97e02eab212803f84a59fa2c",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "icon",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "16_heart_empty.png",
+    "original_path": "sprites/hud/hud_heartEmpty.png",
+    "description": "Empty heart HUD element",
+    "resource_id": "f329b40c-9316-4ba7-84b8-cdca7d0e5322",
+    "storage_key": "resources/images/raw/f329b40c-9316-4ba7-84b8-cdca7d0e5322/16_heart_empty.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/f329b40c-9316-4ba7-84b8-cdca7d0e5322/16_heart_empty.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T043610Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ad0a5283701e37f0ae4f0a1db12d7cf336fa01cd5cc9be1ce46ccbae64b0ed00",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  }
+]

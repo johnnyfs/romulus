@@ -70,7 +70,7 @@ export default function GroupedResourceDetailPage() {
   const filename = resource.storage_key.split("/").pop() || "unknown";
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", height: "calc(100vh - 40px)", display: "flex", flexDirection: "column" }}>
       <div style={{ marginBottom: "20px" }}>
         <Link
           to="/resources/images/grouped"
@@ -86,16 +86,19 @@ export default function GroupedResourceDetailPage() {
 
       <h1 style={{ margin: 0, fontSize: "24px", marginBottom: "24px" }}>{filename}</h1>
 
-      <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
+      <div style={{ display: "flex", gap: "24px", flex: 1, minHeight: 0 }}>
         {/* Image Display */}
         <div
           style={{
-            flex: "0 0 auto",
-            maxWidth: "600px",
+            flex: 1,
             border: "1px solid #ddd",
             borderRadius: "4px",
             padding: "16px",
             backgroundColor: "#f9f9f9",
+            overflow: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
           <img
@@ -103,6 +106,7 @@ export default function GroupedResourceDetailPage() {
             alt={filename}
             style={{
               maxWidth: "100%",
+              maxHeight: "100%",
               height: "auto",
               imageRendering: "pixelated",
               display: "block",
@@ -113,7 +117,7 @@ export default function GroupedResourceDetailPage() {
         {/* Metadata Sidebar */}
         <div
           style={{
-            flex: "1",
+            flex: "0 0 250px",
             padding: "16px",
             border: "1px solid #ddd",
             borderRadius: "4px",

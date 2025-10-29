@@ -643,6 +643,9 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                               onComponentsChange={(components) => handleEntityComponentsChange(scene.id, entityId, components)}
                               onSave={() => handleEntitySave(scene.id, entityId)}
                               spriteSize={game?.game_data.sprite_size || '8x8'}
+                              spriteSets={game?.assets?.filter(a => a.type === 'sprite_set') || []}
+                              palettes={game?.assets?.filter(a => a.type === 'palette') || []}
+                              backgroundColor={scene.scene_data.background_color.index}
                             />
                           ))}
                         </div>

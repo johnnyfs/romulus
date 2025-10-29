@@ -238,3 +238,41 @@
   color: #666;
   font-family: 'Courier New', monospace;
 }
+
+.componentField select {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #fff;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  flex: 1;
+}
+
+.componentField select:focus {
+  outline: none;
+  border-color: #666;
+}
+
+.paletteSelector {
+  display: flex;
+  gap: 8px;
+}
+
+.paletteOption {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #999;
+  cursor: pointer;
+}
+
+.paletteOption input[type="radio"] {
+  cursor: pointer;
+}
+
+.paletteOption:hover {
+  color: #fff;
+}

@@ -15,5 +15,6 @@ export type NESSpriteData = {
     width: number;
     height: number;
     sprite_set?: (NESRef | null);
+    palette_index?: number;
 };
 

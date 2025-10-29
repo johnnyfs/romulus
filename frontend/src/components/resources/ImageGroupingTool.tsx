@@ -379,30 +379,23 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
 
   const handleSubmit = async () => {
     if (!imageRef.current || !canvasRef.current) return;
+    if (groups.length === 0) {
+      console.warn('No groups to submit');
+      return;
+    }
 
     setIsUploading(true);
 
     try {
-      // If no groups, use entire image as one group
-      const groupsToProcess = groups.length === 0 ? [{
-        id: 'full-image',
-        name: 'Full Image',
-        x: 0,
-        y: 0,
-        width: imageDimensions!.width,
-        height: imageDimensions!.height,
-        imageType: ImageType.SPRITE
-      }] : groups;
+      setUploadProgress({ current: 0, total: groups.length, status: 'Starting...' });
 
-      setUploadProgress({ current: 0, total: groupsToProcess.length, status: 'Starting...' });
-
-      for (let i = 0; i < groupsToProcess.length; i++) {
-        const group = groupsToProcess[i];
+      for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
 
         setUploadProgress({
           current: i,
-          total: groupsToProcess.length,
-          status: `Processing group ${i + 1}/${groupsToProcess.length}...`
+          total: groups.length,
+          status: `Uploading ${group.name} (${i + 1}/${groups.length})...`
         });
 
         // Step 1: Slice the image
@@ -428,12 +421,6 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
         if (!blob) continue;
 
         // Step 3: Get upload ticket
-        setUploadProgress({
-          current: i,
-          total: groupsToProcess.length,
-          status: `Uploading ${group.name} (${i + 1}/${groupsToProcess.length})...`
-        });
-
         // Sanitize the group name for use in filename
         const safeName = group.name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
         const filename = `${safeName}_${group.width}x${group.height}.png`;
@@ -444,7 +431,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
             type: 'image',
             state: ImageState.GROUPED,
             image_type: group.imageType,
-            tags: [],
+            tags: group.tags,
             source_url: resourceId, // Reference to the original raw resource
           }
         });
@@ -469,7 +456,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
             type: 'image',
             state: ImageState.GROUPED,
             image_type: group.imageType,
-            tags: [],
+            tags: group.tags,
             source_url: resourceId, // Reference to the original raw resource
           }
         });
@@ -477,8 +464,8 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
 
       // Mark the original resource as processed
       setUploadProgress({
-        current: groupsToProcess.length,
-        total: groupsToProcess.length,
+        current: groups.length,
+        total: groups.length,
         status: 'Marking original as processed...'
       });
 
@@ -492,8 +479,8 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
       });
 
       setUploadProgress({
-        current: groupsToProcess.length,
-        total: groupsToProcess.length,
+        current: groups.length,
+        total: groups.length,
         status: 'Complete!'
       });
 
@@ -514,7 +501,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
   };
 
   return (
-    <div style={{ opacity: isProcessed ? 0.5 : 1 }}>
+    <div style={{ opacity: isProcessed ? 0.5 : 1, display: "flex", flexDirection: "column", height: "100%" }}>
       <div
         style={{
           display: "flex",
@@ -577,12 +564,13 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
       <div
         ref={containerRef}
         style={{
+          flex: 1,
           border: "2px solid #ddd",
           borderRadius: "4px",
           padding: "20px",
           backgroundColor: "#f5f5f5",
           overflow: "auto",
-          maxHeight: "700px",
+          minHeight: "400px",
         }}
       >
         <canvas
@@ -621,29 +609,45 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
           <h4 style={{ margin: 0, fontSize: "16px" }}>
             Groups ({groups.length})
           </h4>
-          <button
-            onClick={handleAddGroup}
-            disabled={!imageDimensions}
-            style={{
-              padding: "6px 12px",
-              fontSize: "14px",
-              border: "1px solid #007bff",
-              borderRadius: "4px",
-              backgroundColor: "#007bff",
-              color: "white",
-              cursor: imageDimensions ? "pointer" : "not-allowed",
-              fontWeight: "500",
-            }}
-          >
-            + Add Group
-          </button>
+          <div style={{ display: "flex", gap: "8px" }}>
+            <button
+              onClick={handleSelectAll}
+              disabled={!imageDimensions}
+              style={{
+                padding: "6px 12px",
+                fontSize: "14px",
+                border: "1px solid #28a745",
+                borderRadius: "4px",
+                backgroundColor: "#28a745",
+                color: "white",
+                cursor: imageDimensions ? "pointer" : "not-allowed",
+                fontWeight: "500",
+              }}
+            >
+              Select All
+            </button>
+            <button
+              onClick={handleAddGroup}
+              disabled={!imageDimensions}
+              style={{
+                padding: "6px 12px",
+                fontSize: "14px",
+                border: "1px solid #007bff",
+                borderRadius: "4px",
+                backgroundColor: "#007bff",
+                color: "white",
+                cursor: imageDimensions ? "pointer" : "not-allowed",
+                fontWeight: "500",
+              }}
+            >
+              + Add Group
+            </button>
+          </div>
         </div>
 
         {groups.length === 0 ? (
           <div style={{ fontSize: "14px", color: "#666", fontStyle: "italic" }}>
-            No groups defined. The entire image will be processed as one group.
-            <br />
-            Draw on the image or click "+ Add Group" to create groups.
+            No groups defined. Draw on the image or click "Select All" to select the entire image, or "+ Add Group" to create a custom group.
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
@@ -784,6 +788,29 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
                           </option>
                         ))}
                       </select>
+                    </div>
+                    <div style={{ marginTop: "8px" }}>
+                      <label style={{ fontSize: "11px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        Tags (comma-separated):
+                      </label>
+                      <input
+                        type="text"
+                        value={group.tags.join(', ')}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          const tags = e.target.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
+                          handleUpdateGroup(group.id, { tags });
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          width: "100%",
+                          padding: "4px",
+                          border: "1px solid #ddd",
+                          borderRadius: "3px",
+                          fontSize: "13px",
+                        }}
+                        placeholder="e.g., character, enemy, item"
+                      />
                     </div>
                   </div>
                   <button

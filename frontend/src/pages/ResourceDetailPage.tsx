@@ -72,7 +72,7 @@ export default function ResourceDetailPage() {
   const isProcessed = resource.resource_data.processed ?? false;
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", height: "calc(100vh - 40px)", display: "flex", flexDirection: "column" }}>
       <div style={{ marginBottom: "20px", display: "flex", justifyContent: "space-between" }}>
         <Link
           to="/resources/images/raw"
@@ -126,6 +126,8 @@ export default function ResourceDetailPage() {
           display: "grid",
           gridTemplateColumns: "250px 1fr",
           gap: "24px",
+          flex: 1,
+          minHeight: 0,
         }}
       >
         <div>
@@ -171,7 +173,7 @@ export default function ResourceDetailPage() {
           </div>
         </div>
 
-        <div>
+        <div style={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
           <ImageGroupingTool
             imageUrl={resource.download_url}
             resourceId={resource.id}

@@ -1,5 +1,6 @@
 import uuid
 
+from dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import Response
 from sqlalchemy import select
