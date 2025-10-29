@@ -1,0 +1,21 @@
+{
+  "source_url": "https://opengameart.org/content/game-boy-platformer-tileset-character",
+  "download_url": "https://opengameart.org/sites/default/files/Gameboy%20Tileset_6.png",
+  "license": "CC0",
+  "author": "chayed-creates",
+  "asset_type": "tiles",
+  "style_hints": [
+    "gameboy",
+    "platformer",
+    "4-color",
+    "grayscale",
+    "retro",
+    "authentic gameboy palette",
+    "nes-compatible"
+  ],
+  "description": "Game Boy platformer tileset using authentic Game Boy color palette",
+  "format": "PNG",
+  "color_count": 4,
+  "nes_compatible": true,
+  "downloaded_at": "2025-10-28T20:20:00Z"
+}

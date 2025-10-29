@@ -36,6 +36,7 @@ class AssetType(str, Enum):
     """Types of game assets."""
 
     PALETTE = "palette"
+    SPRITE_SET = "sprite_set"
 
 
 class ImageState(str, Enum):
@@ -157,8 +158,29 @@ class NESPaletteAssetData(BaseModel):
     palettes: list[NESPalette]  # Up to 4 palettes for background or sprites
 
 
+class SpriteSetType(str, Enum):
+    """Types of sprite set animations."""
+
+    STATIC = "static"  # A single static sprite (no animation)
+    # Future: WALK, RUN, IDLE, etc.
+
+
+class NESSpriteSetAssetData(BaseModel):
+    """Data for a sprite set asset.
+
+    A sprite set is a collection of CHR tiles that form animation frames.
+    The type determines the animation pattern and tile layout requirements.
+    """
+
+    type: Literal[AssetType.SPRITE_SET] = AssetType.SPRITE_SET
+    sprite_set_type: SpriteSetType  # Animation pattern type
+    # Future: Add CHR data, dimensions, etc.
+
+
 # Discriminated union of all asset data types
-AssetData = Annotated[NESPaletteAssetData, Field(discriminator="type")]
+AssetData = Annotated[
+    NESPaletteAssetData | NESSpriteSetAssetData, Field(discriminator="type")
+]
 
 
 # Game data schemas (discriminated union based on game type)

@@ -6,9 +6,10 @@ import type { ResourceCreateResponse } from "../../client";
 interface ResourceRowProps {
   asset: ResourceCreateResponse;
   onClick?: (asset: ResourceCreateResponse) => void;
+  basePath?: string;
 }
 
-export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
+export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick, basePath = "/resources/images" }) => {
   const navigate = useNavigate();
   const filename = asset.storage_key.split("/").pop() || "unknown";
   const isProcessed = asset.resource_data.processed ?? false;
@@ -17,7 +18,7 @@ export const ResourceRow: React.FC<ResourceRowProps> = ({ asset, onClick }) => {
     if (onClick) {
       onClick(asset);
     } else {
-      navigate(`/resources/images/${asset.id}`);
+      navigate(`${basePath}/${asset.id}`);
     }
   };
 

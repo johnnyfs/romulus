@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
+import { ResourcesService, ImageType, ImageState } from "../../client";
 
 interface Group {
   id: string;
+  name: string;
   x: number;
   y: number;
   width: number;
   height: number;
+  imageType: ImageType;
 }
 
 interface ImageGroupingToolProps {
@@ -31,6 +34,8 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
   const [scale, setScale] = useState(1);
   const [showGrid, setShowGrid] = useState(false);
   const [snapToGrid, setSnapToGrid] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0, status: '' });
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -153,7 +158,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
       ctx.fillStyle = "rgba(255, 107, 107, 0.1)";
       ctx.fillRect(currentDraw.x, currentDraw.y, currentDraw.width, currentDraw.height);
     }
-  }, [groups, selectedGroupId, currentDraw, imageDimensions, scale]);
+  }, [groups, selectedGroupId, currentDraw, imageDimensions, scale, showGrid]);
 
   const snapToPixel = (value: number): number => {
     if (snapToGrid) {
@@ -294,7 +299,9 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
     if (dragMode === 'draw' && currentDraw && currentDraw.width > 0 && currentDraw.height > 0) {
       const newGroup: Group = {
         id: `group-${Date.now()}`,
+        name: `Group ${groups.length + 1}`,
         ...currentDraw,
+        imageType: ImageType.SPRITE, // Default to sprite
       };
       setGroups([...groups, newGroup]);
       setSelectedGroupId(newGroup.id);
@@ -313,10 +320,12 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
     const size = Math.min(imageDimensions.width, imageDimensions.height) / 4;
     const newGroup: Group = {
       id: `group-${Date.now()}`,
+      name: `Group ${groups.length + 1}`,
       x: snapToPixel((imageDimensions.width - size) / 2),
       y: snapToPixel((imageDimensions.height - size) / 2),
       width: snapToPixel(size),
       height: snapToPixel(size),
+      imageType: ImageType.SPRITE, // Default to sprite
     };
 
     setGroups([...groups, newGroup]);
@@ -347,10 +356,124 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
     );
   };
 
-  const handleSubmit = () => {
-    // TODO: Implement submission to backend
-    console.log("Submitting groups:", groups.length === 0 ? "entire image" : groups);
-    alert(`Groups ready for processing:\n${groups.length === 0 ? "Entire image (no groups defined)" : `${groups.length} groups defined`}`);
+  const handleSubmit = async () => {
+    if (!imageRef.current || !canvasRef.current) return;
+
+    setIsUploading(true);
+
+    try {
+      // If no groups, use entire image as one group
+      const groupsToProcess = groups.length === 0 ? [{
+        id: 'full-image',
+        name: 'Full Image',
+        x: 0,
+        y: 0,
+        width: imageDimensions!.width,
+        height: imageDimensions!.height,
+        imageType: ImageType.SPRITE
+      }] : groups;
+
+      setUploadProgress({ current: 0, total: groupsToProcess.length, status: 'Starting...' });
+
+      for (let i = 0; i < groupsToProcess.length; i++) {
+        const group = groupsToProcess[i];
+
+        setUploadProgress({
+          current: i,
+          total: groupsToProcess.length,
+          status: `Processing group ${i + 1}/${groupsToProcess.length}...`
+        });
+
+        // Step 1: Slice the image
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width = group.width;
+        sliceCanvas.height = group.height;
+        const sliceCtx = sliceCanvas.getContext('2d');
+
+        if (!sliceCtx) continue;
+
+        // Draw the sliced portion of the image
+        sliceCtx.drawImage(
+          imageRef.current,
+          group.x, group.y, group.width, group.height,
+          0, 0, group.width, group.height
+        );
+
+        // Step 2: Convert to blob
+        const blob = await new Promise<Blob | null>((resolve) => {
+          sliceCanvas.toBlob(resolve, 'image/png');
+        });
+
+        if (!blob) continue;
+
+        // Step 3: Get upload ticket
+        setUploadProgress({
+          current: i,
+          total: groupsToProcess.length,
+          status: `Uploading ${group.name} (${i + 1}/${groupsToProcess.length})...`
+        });
+
+        // Sanitize the group name for use in filename
+        const safeName = group.name.replace(/[^a-z0-9_-]/gi, '_').toLowerCase();
+        const filename = `${safeName}_${group.width}x${group.height}.png`;
+
+        const ticketResponse = await ResourcesService.getUploadTicketResourcesUploadPost({
+          filename,
+          resource_data: {
+            type: 'image',
+            state: ImageState.GROUPED,
+            image_type: group.imageType,
+            tags: [],
+            source_url: resourceId, // Reference to the original raw resource
+          }
+        });
+
+        // Step 4: Upload to MinIO
+        const uploadResponse = await fetch(ticketResponse.upload_url, {
+          method: 'PUT',
+          body: blob,
+          headers: {
+            'Content-Type': 'image/png',
+          },
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error(`Upload failed for group ${i + 1}`);
+        }
+
+        // Step 5: Finalize the resource
+        await ResourcesService.createResourceResourcesPost({
+          storage_key: ticketResponse.storage_key,
+          resource_data: {
+            type: 'image',
+            state: ImageState.GROUPED,
+            image_type: group.imageType,
+            tags: [],
+            source_url: resourceId, // Reference to the original raw resource
+          }
+        });
+      }
+
+      setUploadProgress({
+        current: groupsToProcess.length,
+        total: groupsToProcess.length,
+        status: 'Complete!'
+      });
+
+      // Reset after a moment
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress({ current: 0, total: 0, status: '' });
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      setUploadProgress({ current: 0, total: 0, status: `Error: ${error.message || 'Unknown error'}` });
+      setTimeout(() => {
+        setIsUploading(false);
+        setUploadProgress({ current: 0, total: 0, status: '' });
+      }, 3000);
+    }
   };
 
   return (
@@ -364,7 +487,24 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
         }}
       >
         <h3 style={{ margin: 0, fontSize: "18px" }}>Image Grouping</h3>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px" }}>
+            <input
+              type="checkbox"
+              checked={showGrid}
+              onChange={(e) => setShowGrid(e.target.checked)}
+            />
+            Show 8x8 Grid
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: "4px", fontSize: "14px" }}>
+            <input
+              type="checkbox"
+              checked={snapToGrid}
+              onChange={(e) => setSnapToGrid(e.target.checked)}
+            />
+            Snap to Grid
+          </label>
+          <div style={{ width: "1px", height: "24px", backgroundColor: "#ddd", margin: "0 4px" }} />
           <button
             onClick={() => setScale(Math.max(0.5, scale - 0.25))}
             style={{
@@ -490,9 +630,25 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
                   }}
                 >
                   <div style={{ fontSize: "14px", flex: 1 }}>
-                    <div style={{ fontWeight: "500", marginBottom: "8px" }}>
-                      {group.id}
-                    </div>
+                    <input
+                      type="text"
+                      value={group.name}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        handleUpdateGroup(group.id, { name: e.target.value });
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      style={{
+                        width: "100%",
+                        fontWeight: "500",
+                        marginBottom: "8px",
+                        padding: "4px 8px",
+                        border: "1px solid #ddd",
+                        borderRadius: "4px",
+                        fontSize: "14px",
+                      }}
+                      placeholder="Group name"
+                    />
                     <div
                       style={{
                         display: "grid",
@@ -566,6 +722,32 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
                         />
                       </div>
                     </div>
+                    <div style={{ marginTop: "8px" }}>
+                      <label style={{ fontSize: "11px", color: "#666", display: "block", marginBottom: "4px" }}>
+                        Image Type:
+                      </label>
+                      <select
+                        value={group.imageType}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleUpdateGroup(group.id, { imageType: e.target.value as ImageType });
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        style={{
+                          width: "100%",
+                          padding: "4px",
+                          border: "1px solid #ddd",
+                          borderRadius: "3px",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {Object.values(ImageType).map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                   <button
                     onClick={(e) => {
@@ -591,9 +773,39 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
           </div>
         )}
 
+        {isUploading && (
+          <div style={{ marginTop: "16px" }}>
+            <div style={{ marginBottom: "8px", fontSize: "14px", color: "#666" }}>
+              {uploadProgress.status}
+            </div>
+            <div style={{
+              width: "100%",
+              height: "24px",
+              backgroundColor: "#e9ecef",
+              borderRadius: "4px",
+              overflow: "hidden"
+            }}>
+              <div style={{
+                height: "100%",
+                width: uploadProgress.total > 0 ? `${(uploadProgress.current / uploadProgress.total) * 100}%` : "0%",
+                backgroundColor: "#28a745",
+                transition: "width 0.3s ease",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "white",
+                fontSize: "12px",
+                fontWeight: "600"
+              }}>
+                {uploadProgress.total > 0 && `${uploadProgress.current}/${uploadProgress.total}`}
+              </div>
+            </div>
+          </div>
+        )}
+
         <button
           onClick={handleSubmit}
-          disabled={isProcessed}
+          disabled={isProcessed || isUploading}
           style={{
             marginTop: "16px",
             width: "100%",
@@ -602,12 +814,12 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
             fontWeight: "600",
             border: "none",
             borderRadius: "4px",
-            backgroundColor: isProcessed ? "#6c757d" : "#28a745",
+            backgroundColor: isProcessed || isUploading ? "#6c757d" : "#28a745",
             color: "white",
-            cursor: isProcessed ? "not-allowed" : "pointer",
+            cursor: isProcessed || isUploading ? "not-allowed" : "pointer",
           }}
         >
-          {isProcessed ? "Already Processed" : "Submit Groups for Processing"}
+          {isProcessed ? "Already Processed" : isUploading ? "Processing..." : "Submit Groups for Processing"}
         </button>
       </div>
     </div>

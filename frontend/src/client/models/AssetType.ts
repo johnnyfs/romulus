@@ -7,4 +7,5 @@
  */
 export enum AssetType {
     PALETTE = 'palette',
+    SPRITE_SET = 'sprite_set',
 }

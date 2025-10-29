@@ -2,7 +2,7 @@ import uuid
 
 from api.games.assets.models import Asset
 from core.rom.code_block import CodeBlock
-from core.rom.data import PaletteData
+from core.rom.data import PaletteData, SpriteSetCHRData
 from core.rom.subroutines import LoadSceneSubroutine
 from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
 from core.schemas import AssetType
@@ -20,6 +20,8 @@ def _asset_to_code_blocks(asset: Asset) -> list[CodeBlock]:
     """Convert an asset to code blocks (data blocks)."""
     if asset.type == AssetType.PALETTE:
         return [PaletteData(_component_id=str(asset.id), _palette_data=asset.data, _is_asset=True)]
+    elif asset.type == AssetType.SPRITE_SET:
+        return [SpriteSetCHRData(_asset_id=str(asset.id), _name=asset.name, _sprite_set_data=asset.data)]
     else:
         raise ValueError(f"Unsupported asset type: {asset.type}")
 

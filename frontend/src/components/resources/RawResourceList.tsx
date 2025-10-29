@@ -5,9 +5,10 @@ import type { ResourceCreateResponse } from "../../client";
 interface RawResourceListProps {
   resources: ResourceCreateResponse[];
   onResourceClick?: (resource: ResourceCreateResponse) => void;
+  basePath?: string;
 }
 
-export const RawResourceList: React.FC<RawResourceListProps> = ({ resources, onResourceClick }) => {
+export const RawResourceList: React.FC<RawResourceListProps> = ({ resources, onResourceClick, basePath }) => {
   if (resources.length === 0) {
     return (
       <div
@@ -45,7 +46,7 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ resources, onR
             Unprocessed ({unprocessedResources.length})
           </div>
           {unprocessedResources.map((resource) => (
-            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} />
+            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} basePath={basePath} />
           ))}
         </>
       )}
@@ -65,7 +66,7 @@ export const RawResourceList: React.FC<RawResourceListProps> = ({ resources, onR
             Processed ({processedResources.length})
           </div>
           {processedResources.map((resource) => (
-            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} />
+            <ResourceRow key={resource.id} asset={resource} onClick={onResourceClick} basePath={basePath} />
           ))}
         </>
       )}

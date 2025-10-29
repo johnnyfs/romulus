@@ -1,0 +1,20 @@
+{
+  "source_url": "https://kenney.nl/assets/space-shooter-redux",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "sprites",
+  "style_hints": [
+    "space shooter",
+    "shmup",
+    "spaceships",
+    "enemies",
+    "lasers",
+    "pixel art",
+    "retro",
+    "arcade"
+  ],
+  "description": "Space shooter redux pack with ships, enemies, projectiles and effects",
+  "format": "PNG",
+  "extracted_to": "kenney_space-shooter-redux",
+  "downloaded_at": "2025-10-28T20:30:00Z"
+}

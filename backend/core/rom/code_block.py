@@ -13,6 +13,7 @@ class CodeBlockType(enum.Enum):
     update: code that runs every frame
     subroutine: a callable subroutine
     data: raw data to be included in the ROM
+    chr: CHR-ROM tile data (sprite/background graphics)
     """
 
     ZEROPAGE = "ZEROPAGE"
@@ -21,6 +22,7 @@ class CodeBlockType(enum.Enum):
     UPDATE = "UPDATE"
     SUBROUTINE = "SUBROUTINE"
     DATA = "DATA"
+    CHR = "CHR"
 
 
 @dataclass

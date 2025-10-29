@@ -48,16 +48,20 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
       // Add all palette assets to this scene
       // Note: Currently assets are global, so we show them on all scenes
       game.assets.forEach(asset => {
-        if (asset.type === 'palette' && asset.data.type === 'palette' && asset.data.palettes) {
-          const paletteData: PaletteData = {
-            id: asset.id,
-            name: asset.name,
-            subPalettes: asset.data.palettes.map(palette =>
-              palette.colors.map(color => color.index) as SubPalette
-            ) as [SubPalette, SubPalette, SubPalette, SubPalette],
-            isDirty: false,
-          };
-          scenePaletteMap.set(asset.id, paletteData);
+        if (asset.type === 'palette') {
+          // Type assertion: we know this is a palette asset
+          const data = asset.data as any;
+          if (data.palettes) {
+            const paletteData: PaletteData = {
+              id: asset.id,
+              name: asset.name,
+              subPalettes: data.palettes.map((palette: any) =>
+                palette.colors.map((color: any) => color.index) as SubPalette
+              ) as [SubPalette, SubPalette, SubPalette, SubPalette],
+              isDirty: false,
+            };
+            scenePaletteMap.set(asset.id, paletteData);
+          }
         }
       });
 
@@ -93,6 +97,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
             name: entity.name,
             x: entity.entity_data.x,
             y: entity.entity_data.y,
+            components: entity.entity_data.components || [],
             isDirty: false,
           };
           sceneEntityMap.set(entity.id, entityData);
@@ -327,6 +332,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
       name: `Entity ${entityNumber}`,
       x: 0,
       y: 0,
+      components: [],
       isDirty: true, // New entity, not saved yet
     };
 
@@ -377,6 +383,25 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
     setSceneEntities(newSceneEntities);
   };
 
+  const handleEntityComponentsChange = (sceneId: string, entityId: string, components: any[]) => {
+    const currentSceneEntities = sceneEntities.get(sceneId);
+    if (!currentSceneEntities) return;
+
+    const entity = currentSceneEntities.get(entityId);
+    if (!entity) return;
+
+    const updatedEntity: EntityData = {
+      ...entity,
+      components,
+      isDirty: true,
+    };
+
+    currentSceneEntities.set(entityId, updatedEntity);
+    const newSceneEntities = new Map(sceneEntities);
+    newSceneEntities.set(sceneId, new Map(currentSceneEntities));
+    setSceneEntities(newSceneEntities);
+  };
+
   const handleEntitySave = async (sceneId: string, entityId: string) => {
     if (!game) return;
 
@@ -395,6 +420,7 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
         entity_data: {
           x: entity.x,
           y: entity.y,
+          components: entity.components || [],
         },
       };
 
@@ -614,7 +640,9 @@ function ComponentDisplay({ game, onRebuildROM, onSceneUpdated }: ComponentDispl
                               entity={entity}
                               onUpdate={(x, y) => handleEntityUpdate(scene.id, entityId, x, y)}
                               onNameChange={(name) => handleEntityNameChange(scene.id, entityId, name)}
+                              onComponentsChange={(components) => handleEntityComponentsChange(scene.id, entityId, components)}
                               onSave={() => handleEntitySave(scene.id, entityId)}
+                              spriteSize={game?.game_data.sprite_size || '8x8'}
                             />
                           ))}
                         </div>

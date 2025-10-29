@@ -1,7 +1,7 @@
 from pydantic import PrivateAttr
 
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESEntity, NESPaletteData, NESScene
+from core.schemas import NESEntity, NESSpriteSetAssetData, NESPaletteData, NESScene
 
 
 class AddressData(CodeBlock):
@@ -204,3 +204,47 @@ class EntityData(CodeBlock):
         code.append(entity_data.y & 0xFF)
 
         return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
+
+
+class SpriteSetCHRData(CodeBlock):
+    """
+    A CHR-ROM data block for sprite sets.
+
+    - contains CHR tile data for sprites
+    - exports a name that references the starting CHR index
+    """
+
+    _id: str = PrivateAttr()  # UUID as string
+    _name: str = PrivateAttr()  # Asset name
+    _sprite_set_data: NESSpriteSetAssetData = PrivateAttr()
+
+    def __init__(self, _asset_id: str, _name: str, _sprite_set_data: NESSpriteSetAssetData):
+        super().__init__()
+        self._id = _asset_id
+        self._name = _name
+        self._sprite_set_data = _sprite_set_data
+
+    @property
+    def type(self) -> CodeBlockType:
+        return CodeBlockType.CHR
+
+    @property
+    def name(self) -> str:
+        return f"spriteset_chr__{self._name}"
+
+    @property
+    def dependencies(self) -> list[str]:
+        return []
+
+    @property
+    def size(self) -> int:
+        # TODO: Calculate size based on sprite set type and actual CHR data
+        # For now, return 0 (placeholder until Claude 2 implements the asset pipeline)
+        return 0
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        # TODO: Render actual CHR data based on sprite set type
+        # For now, return empty bytes (placeholder until Claude 2 implements the asset pipeline)
+        # The exported name will be the CHR index (start_offset in CHR-ROM space)
+        code = bytes()
+        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})

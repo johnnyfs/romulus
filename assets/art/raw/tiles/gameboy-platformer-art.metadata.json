@@ -1,0 +1,24 @@
+{
+  "source_url": "https://opengameart.org/content/gameboy-platformer-art",
+  "download_url": "https://opengameart.org/sites/default/files/Ningriptzu%20Art.zip",
+  "license": "CC0",
+  "author": "Ningriptzu",
+  "asset_type": "tiles",
+  "style_hints": [
+    "gameboy",
+    "16x16",
+    "4-color",
+    "platformer",
+    "ninja",
+    "retro",
+    "authentic gameboy",
+    "nes-compatible"
+  ],
+  "description": "GameBoy Jam 4 art pack including tileset and ninja sprite (16x16, 4 colors only), plus shuriken, cannon, sensei, smoke effects",
+  "format": "PNG",
+  "tile_size": "16x16",
+  "color_count": 4,
+  "nes_compatible": true,
+  "extracted_to": "gameboy-platformer-art",
+  "downloaded_at": "2025-10-28T20:20:00Z"
+}

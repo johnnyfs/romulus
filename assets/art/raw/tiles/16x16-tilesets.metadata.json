@@ -1,0 +1,21 @@
+{
+  "source_url": "https://opengameart.org/content/16x16-game-assets",
+  "download_url": "https://opengameart.org/sites/default/files/tilesets_0.zip",
+  "license": "CC-BY 4.0",
+  "author": "George Bailey",
+  "asset_type": "tiles",
+  "style_hints": [
+    "16x16",
+    "rpg",
+    "fantasy",
+    "retro",
+    "nes-compatible"
+  ],
+  "description": "16x16 game tilesets for RPG and fantasy games",
+  "format": "PNG",
+  "tile_size": "16x16",
+  "attribution_required": true,
+  "nes_compatible": true,
+  "extracted_to": "16x16-tilesets",
+  "downloaded_at": "2025-10-28T20:20:00Z"
+}

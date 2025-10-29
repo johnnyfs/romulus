@@ -1,0 +1,19 @@
+{
+  "source_url": "https://kenney.nl/assets/topdown-shooter",
+  "license": "CC0",
+  "author": "Kenney",
+  "asset_type": "sprites",
+  "style_hints": [
+    "top-down",
+    "shooter",
+    "weapons",
+    "characters",
+    "tiles",
+    "modern",
+    "tactical"
+  ],
+  "description": "Top-down shooter pack with characters, weapons, tiles and effects",
+  "format": "PNG",
+  "extracted_to": "kenney_top-down-shooter",
+  "downloaded_at": "2025-10-28T20:30:00Z"
+}

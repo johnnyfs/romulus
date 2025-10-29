@@ -1,0 +1,27 @@
+{
+  "source_url": "https://opengameart.org/content/pixel-art-parallax-background",
+  "download_urls": [
+    "https://opengameart.org/sites/default/files/1_188.png",
+    "https://opengameart.org/sites/default/files/2_109.png",
+    "https://opengameart.org/sites/default/files/3_84.png",
+    "https://opengameart.org/sites/default/files/4_52.png",
+    "https://opengameart.org/sites/default/files/5_49.png",
+    "https://opengameart.org/sites/default/files/6_33.png"
+  ],
+  "license": "CC-BY 4.0 and GPL 3.0",
+  "author": "OlegKrylov",
+  "asset_type": "backgrounds",
+  "style_hints": [
+    "parallax",
+    "layered",
+    "pixel art",
+    "scrolling background",
+    "low-res",
+    "simple colors"
+  ],
+  "description": "6 layered pixel art images suitable for implementing parallax scrolling effects",
+  "format": "PNG",
+  "layer_count": 6,
+  "potentially_nes_compatible": true,
+  "downloaded_at": "2025-10-28T20:25:00Z"
+}

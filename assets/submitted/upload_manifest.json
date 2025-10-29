@@ -1,0 +1,296 @@
+[
+  {
+    "file": "01_tiny16_basictiles.png",
+    "original_path": "tiles/tiny16-basictiles.png",
+    "description": "Tiny 16 basic tileset - 16x16 RPG tiles",
+    "resource_id": "60c66348-3203-4ebf-ba08-d51239c526bd",
+    "storage_key": "resources/images/raw/60c66348-3203-4ebf-ba08-d51239c526bd/01_tiny16_basictiles.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/60c66348-3203-4ebf-ba08-d51239c526bd/01_tiny16_basictiles.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=9a5ec89e7b7788d54918f8c683d66cc7a6313def5a632ffb414d23f35ef086b0",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "02_tiny16_characters.png",
+    "original_path": "tiles/tiny16-characters.png",
+    "description": "Tiny 16 characters - 16x16 character sprites",
+    "resource_id": "1e0fc809-8640-4ed5-a55d-3459360fbd01",
+    "storage_key": "resources/images/raw/1e0fc809-8640-4ed5-a55d-3459360fbd01/02_tiny16_characters.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/1e0fc809-8640-4ed5-a55d-3459360fbd01/02_tiny16_characters.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=ec979274a049f981430cac0ee022422b44c13a6263bf78f92972ebff1c4790d4",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "03_gameboy_tileset.png",
+    "original_path": "tiles/gameboy-tileset-1.png",
+    "description": "Game Boy platformer tileset - 4 color authentic GB palette",
+    "resource_id": "e5c3b8bb-b106-4ae1-b799-c57321c70ad3",
+    "storage_key": "resources/images/raw/e5c3b8bb-b106-4ae1-b799-c57321c70ad3/03_gameboy_tileset.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/e5c3b8bb-b106-4ae1-b799-c57321c70ad3/03_gameboy_tileset.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=d3baba640a15a31f686e08baa9073169d91c93ee40185a4ee82838b721f1abac",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "side-view",
+        "desaturated"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "04_heart_full.png",
+    "original_path": "sprites/hud/hud_heartFull.png",
+    "description": "Full heart HUD element",
+    "resource_id": "c54ad695-79b4-4265-a2eb-8b4a71d6ab95",
+    "storage_key": "resources/images/raw/c54ad695-79b4-4265-a2eb-8b4a71d6ab95/04_heart_full.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/c54ad695-79b4-4265-a2eb-8b4a71d6ab95/04_heart_full.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=5f59a51021e649ff9d2c220bf89572eade14a614c79eae495f729f43408da39a",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "05_gem_red.png",
+    "original_path": "sprites/hud/hud_gem_red.png",
+    "description": "Red gem collectible HUD icon",
+    "resource_id": "442430db-6502-47dd-873f-5ebcf429b6d1",
+    "storage_key": "resources/images/raw/442430db-6502-47dd-873f-5ebcf429b6d1/05_gem_red.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/442430db-6502-47dd-873f-5ebcf429b6d1/05_gem_red.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=6f47aded54e2e9b114acb37a15ffcece69cc6b6d4c055380ce131de3dd54ffa1",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "06_dungeon_floor.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/tile_0000.png",
+    "description": "Micro roguelike dungeon floor tile (8x8)",
+    "resource_id": "675fd7ae-f821-4842-ba12-dc8f8422445e",
+    "storage_key": "resources/images/raw/675fd7ae-f821-4842-ba12-dc8f8422445e/06_dungeon_floor.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/675fd7ae-f821-4842-ba12-dc8f8422445e/06_dungeon_floor.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=8adbafedc7987bc7c7cf69334f7c98f2c1d06623282355476cc6d144694a0e56",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "07_dungeon_wall.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/tile_0015.png",
+    "description": "Micro roguelike dungeon wall tile (8x8)",
+    "resource_id": "0c7e66dd-a0c9-4089-bece-a1d8371a1166",
+    "storage_key": "resources/images/raw/0c7e66dd-a0c9-4089-bece-a1d8371a1166/07_dungeon_wall.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/0c7e66dd-a0c9-4089-bece-a1d8371a1166/07_dungeon_wall.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=00a3d79e0b69d45a237b0466bf35fb674ee2754095fde894ab90b3ad9ee40b32",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "08_dungeon_door.png",
+    "original_path": "sprites/kenney_micro-roguelike/tiles/tile_0024.png",
+    "description": "Micro roguelike dungeon door tile (8x8)",
+    "resource_id": "83a5cbb0-6c04-405f-a60d-00ccadeb4dd8",
+    "storage_key": "resources/images/raw/83a5cbb0-6c04-405f-a60d-00ccadeb4dd8/08_dungeon_door.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/83a5cbb0-6c04-405f-a60d-00ccadeb4dd8/08_dungeon_door.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=31551dc7049b55cca5fe3171e7446a8f812444a3f9c0318eab0c50879bc55603",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "09_player_character.png",
+    "original_path": "sprites/platformer/player/p1_stand.png",
+    "description": "Player character standing sprite",
+    "resource_id": "f79631bc-f748-4eaf-83c9-bf1696162aff",
+    "storage_key": "resources/images/raw/f79631bc-f748-4eaf-83c9-bf1696162aff/09_player_character.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/f79631bc-f748-4eaf-83c9-bf1696162aff/09_player_character.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4b897de44f5f970f6d55bc1c1d1422fb30a26acfee9763ca0a4a3febfb89cc43",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "10_fish_blue.png",
+    "original_path": "sprites/kenney_fish-pack/fish_blue.png",
+    "description": "Blue fish sprite - underwater enemy/character",
+    "resource_id": "3fb3ed5d-7061-4e1d-a9d3-5fa3f69d331a",
+    "storage_key": "resources/images/raw/3fb3ed5d-7061-4e1d-a9d3-5fa3f69d331a/10_fish_blue.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/3fb3ed5d-7061-4e1d-a9d3-5fa3f69d331a/10_fish_blue.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=16ff90377638c78e5ea87ae4fbcfbc37675a5c922ff54f942d7692ffe63169a4",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "sprite",
+      "tags": [
+        "side-view"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "11_hyptosis_16x16_tiles.png",
+    "original_path": "tiles/hyptosis_batch5.png",
+    "description": "Hyptosis 16x16 tile sheet - large RPG tileset collection",
+    "resource_id": "148ba010-85ab-4a05-9ef5-f23eebc2af7d",
+    "storage_key": "resources/images/raw/148ba010-85ab-4a05-9ef5-f23eebc2af7d/11_hyptosis_16x16_tiles.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/148ba010-85ab-4a05-9ef5-f23eebc2af7d/11_hyptosis_16x16_tiles.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=714ceb28ebf6e71333fd91c65eccbc835b27ff34f948e62effd0b44eea573472",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead",
+        "hi-color"
+      ],
+      "source_url": null,
+      "license": "CC-BY 3.0",
+      "processed": false
+    }
+  },
+  {
+    "file": "12_puny_dungeon.png",
+    "original_path": "tiles/puny-dungeon-tileset.png",
+    "description": "Puny dungeon tileset - 16x16 dungeon tiles (2025)",
+    "resource_id": "13d111f9-52e0-4abd-b46c-c4414ba019e4",
+    "storage_key": "resources/images/raw/13d111f9-52e0-4abd-b46c-c4414ba019e4/12_puny_dungeon.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/13d111f9-52e0-4abd-b46c-c4414ba019e4/12_puny_dungeon.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=4591f284a5bea7cd55e42c40b0051ebb86e9b848e4cd5465f9559bb72e0e2b82",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "map",
+      "tags": [
+        "overhead"
+      ],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "13_font_good_neighbors.png",
+    "original_path": "fonts/good_neighbors.png",
+    "description": "Good Neighbors pixel font bitmap",
+    "resource_id": "76ea7d95-3206-4cc9-9f3f-3a1b07b16c31",
+    "storage_key": "resources/images/raw/76ea7d95-3206-4cc9-9f3f-3a1b07b16c31/13_font_good_neighbors.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/76ea7d95-3206-4cc9-9f3f-3a1b07b16c31/13_font_good_neighbors.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=40f3202262378c8cb05a2b93717e4129e0dca713932905274e317059b6d76f5f",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "Unknown",
+      "processed": false
+    }
+  },
+  {
+    "file": "14_font_tiny16_large.png",
+    "original_path": "tiles/tiny16-fontlarge.png",
+    "description": "Tiny 16 large font - pixel font for text",
+    "resource_id": "f5572012-7e81-4d81-b33a-ca99f38d9b5a",
+    "storage_key": "resources/images/raw/f5572012-7e81-4d81-b33a-ca99f38d9b5a/14_font_tiny16_large.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/f5572012-7e81-4d81-b33a-ca99f38d9b5a/14_font_tiny16_large.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=424475fdc11ab8c2da7ac0be226eaf4bcc5a775da728c674a1f30010b3d215fd",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  },
+  {
+    "file": "15_parallax_layer3.png",
+    "original_path": "unclassified/parallax-bg-3.png",
+    "description": "Parallax background layer 3",
+    "resource_id": "d56d9e22-fbc2-49d8-a173-9c53ba20bd02",
+    "storage_key": "resources/images/raw/d56d9e22-fbc2-49d8-a173-9c53ba20bd02/15_parallax_layer3.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/d56d9e22-fbc2-49d8-a173-9c53ba20bd02/15_parallax_layer3.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=f9a0896a6c43f1ed47bd2f448c98d039d4ba413985325f1edec2d3b37172bfdc",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "background",
+      "tags": [],
+      "source_url": null,
+      "license": "CC-BY 4.0",
+      "processed": false
+    }
+  },
+  {
+    "file": "16_key_blue.png",
+    "original_path": "sprites/hud/hud_keyBlue.png",
+    "description": "Blue key collectible HUD icon",
+    "resource_id": "62c4ec2b-e684-42c8-a417-e709271142ad",
+    "storage_key": "resources/images/raw/62c4ec2b-e684-42c8-a417-e709271142ad/16_key_blue.png",
+    "download_url": "http://localhost:9000/assets/resources/images/raw/62c4ec2b-e684-42c8-a417-e709271142ad/16_key_blue.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20251029%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251029T041031Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=1eafa63b100a22c0c1ef801fae7da1e7feb8812c66660e15ffd2937ac9b538c4",
+    "metadata": {
+      "type": "image",
+      "state": "raw",
+      "image_type": "ui",
+      "tags": [],
+      "source_url": null,
+      "license": "CC0",
+      "processed": false
+    }
+  }
+]

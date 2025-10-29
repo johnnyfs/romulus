@@ -73,7 +73,7 @@ export default function ResourceDetailPage() {
 
   return (
     <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
-      <div style={{ marginBottom: "20px" }}>
+      <div style={{ marginBottom: "20px", display: "flex", justifyContent: "space-between" }}>
         <Link
           to="/resources/images/raw"
           style={{
@@ -83,6 +83,16 @@ export default function ResourceDetailPage() {
           }}
         >
           ← Back to Resources
+        </Link>
+        <Link
+          to="/resources/images/grouped"
+          style={{
+            color: "#007bff",
+            textDecoration: "none",
+            fontSize: "14px",
+          }}
+        >
+          Forward to Grouped →
         </Link>
       </div>
 

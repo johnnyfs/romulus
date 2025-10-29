@@ -5,6 +5,8 @@ import CreateGame from "./pages/CreateGame";
 import GameDetail from "./pages/GameDetail";
 import RawResourcesPage from "./pages/RawResourcesPage";
 import ResourceDetailPage from "./pages/ResourceDetailPage";
+import GroupedResourcesPage from "./pages/GroupedResourcesPage";
+import GroupedResourceDetailPage from "./pages/GroupedResourceDetailPage";
 import { GamesService } from "./client/services/GamesService";
 import type { GameListItem_Output } from "./client/models/GameListItem_Output";
 
@@ -130,6 +132,8 @@ function App() {
           <Route path="/games/create" element={<CreateGame />} />
           <Route path="/games/:id" element={<GameDetail />} />
           <Route path="/resources/images/raw" element={<RawResourcesPage />} />
+          <Route path="/resources/images/grouped" element={<GroupedResourcesPage />} />
+          <Route path="/resources/images/grouped/:id" element={<GroupedResourceDetailPage />} />
           <Route path="/resources/images/:id" element={<ResourceDetailPage />} />
         </Routes>
       </div>

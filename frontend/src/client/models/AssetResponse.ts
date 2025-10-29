@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AssetType } from './AssetType';
 import type { NESPaletteAssetData_Output } from './NESPaletteAssetData_Output';
+import type { NESSpriteSetAssetData } from './NESSpriteSetAssetData';
 /**
  * Response for an asset.
  */
@@ -12,6 +13,6 @@ export type AssetResponse = {
     game_id: string;
     name: string;
     type: AssetType;
-    data: NESPaletteAssetData_Output;
+    data: (NESPaletteAssetData_Output | NESSpriteSetAssetData);
 };
 

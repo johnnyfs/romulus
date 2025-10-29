@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from api.games.assets.models import Asset
 from api.games.assets.schemas import AssetResponse
 from api.games.entities.models import Entity
 from api.games.entities.schemas import EntityResponse
@@ -24,7 +25,13 @@ from api.games.schemas import (
 from core.rom.builder import RomBuilder
 from core.rom.registry import CodeBlockRegistry
 from core.rom.rom import Rom
-from core.schemas import NESColor, NESScene
+from core.schemas import (
+    AssetType,
+    NESColor,
+    NESSpriteSetAssetData,
+    NESScene,
+    SpriteSetType,
+)
 from dependencies import get_db
 
 router = APIRouter()
@@ -57,6 +64,19 @@ async def create_game(
         scene_data = NESScene(background_color=NESColor(index=0x02))
         scene = Scene(name="main", game_id=game.id, scene_data=scene_data)
         game.scenes.append(scene)
+
+        # Add a dummy static spriteset for testing
+        spriteset_data = NESSpriteSetAssetData(
+            type=AssetType.SPRITE_SET,
+            sprite_set_type=SpriteSetType.STATIC,
+        )
+        spriteset = Asset(
+            name="Test Sprite",
+            game_id=game.id,
+            type=AssetType.SPRITE_SET,
+            data=spriteset_data,
+        )
+        game.assets.append(spriteset)
 
     db.add(game)
     await db.flush()  # Flush to generate the UUID
