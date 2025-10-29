@@ -186,34 +186,42 @@ function EntityEditor({
       }
     }
 
-    // Convert Blob to Uint8Array
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(data.chr_data);
+    // Convert chr_data (base64 string or bytes) to Uint8Array
+    let chrData: Uint8Array;
+    if (typeof data.chr_data === 'string') {
+      // If it's a string, decode from base64 or latin1
+      // FastAPI returns bytes as a string with \u escape sequences
+      const bytes: number[] = [];
+      for (let i = 0; i < data.chr_data.length; i++) {
+        bytes.push(data.chr_data.charCodeAt(i));
+      }
+      chrData = new Uint8Array(bytes);
+    } else {
+      // If it's already a Uint8Array or ArrayBuffer
+      chrData = new Uint8Array(data.chr_data);
+    }
+
+    const pixels = decompileCHR(chrData);
 
     return (
       <canvas
         ref={(canvas) => {
           if (!canvas) return;
-          reader.onload = () => {
-            const arrayBuffer = reader.result as ArrayBuffer;
-            const chrData = new Uint8Array(arrayBuffer);
-            const pixels = decompileCHR(chrData);
 
-            const ctx = canvas.getContext('2d');
-            if (!ctx) return;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
 
-            // Clear canvas
-            ctx.clearRect(0, 0, 16, 16);
+          // Clear canvas
+          ctx.clearRect(0, 0, 16, 16);
 
-            // Draw pixels (2x scale)
-            for (let y = 0; y < 8; y++) {
-              for (let x = 0; x < 8; x++) {
-                const colorIndex = pixels[y][x];
-                ctx.fillStyle = getNESColor(colors[colorIndex]);
-                ctx.fillRect(x * 2, y * 2, 2, 2);
-              }
+          // Draw pixels (2x scale)
+          for (let y = 0; y < 8; y++) {
+            for (let x = 0; x < 8; x++) {
+              const colorIndex = pixels[y][x];
+              ctx.fillStyle = getNESColor(colors[colorIndex]);
+              ctx.fillRect(x * 2, y * 2, 2, 2);
             }
-          };
+          }
         }}
         width={16}
         height={16}
