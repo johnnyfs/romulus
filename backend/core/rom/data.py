@@ -238,13 +238,11 @@ class SpriteSetCHRData(CodeBlock):
 
     @property
     def size(self) -> int:
-        # TODO: Calculate size based on sprite set type and actual CHR data
-        # For now, return 0 (placeholder until Claude 2 implements the asset pipeline)
-        return 0
+        # Return the size of the CHR data in bytes
+        return len(self._sprite_set_data.chr_data)
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        # TODO: Render actual CHR data based on sprite set type
-        # For now, return empty bytes (placeholder until Claude 2 implements the asset pipeline)
-        # The exported name will be the CHR index (start_offset in CHR-ROM space)
-        code = bytes()
+        # Render the actual CHR data
+        # The exported name references the CHR index (start_offset in CHR-ROM space)
+        code = self._sprite_set_data.chr_data
         return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})

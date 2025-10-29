@@ -32,7 +32,59 @@ from core.schemas import (
     NESScene,
     SpriteSetType,
 )
-from dependencies import get_db
+
+
+def generate_test_face_chr() -> bytes:
+    """Generate CHR data for a test face sprite (8x8).
+
+    Pattern (1 pixel padding transparent, outline color 1, face color 2, eyes color 3):
+    . . . . . . . .
+    . # # # # # # .
+    . # @ @ @ @ # .
+    . # @ % . @ # .
+    . # @ @ @ @ # .
+    . # @ . . @ # .
+    . # # # # # # .
+    . . . . . . . .
+
+    Legend: . = transparent (color 0)
+            # = outline (color 1)
+            @ = face (color 2)
+            % = eyes (color 3)
+    """
+    # NES CHR format: 2 bitplanes, 8 bytes each
+    # Bitplane 0 = low bit, Bitplane 1 = high bit
+    # Color 0 = 00, Color 1 = 01, Color 2 = 10, Color 3 = 11
+
+    # Define the pattern (0=transparent, 1=outline, 2=face, 3=eyes)
+    pattern = [
+        [0, 0, 0, 0, 0, 0, 0, 0],  # Row 0
+        [0, 1, 1, 1, 1, 1, 1, 0],  # Row 1
+        [0, 1, 2, 2, 2, 2, 1, 0],  # Row 2
+        [0, 1, 2, 3, 0, 2, 1, 0],  # Row 3
+        [0, 1, 2, 2, 2, 2, 1, 0],  # Row 4
+        [0, 1, 2, 0, 0, 2, 1, 0],  # Row 5
+        [0, 1, 1, 1, 1, 1, 1, 0],  # Row 6
+        [0, 0, 0, 0, 0, 0, 0, 0],  # Row 7
+    ]
+
+    bitplane0 = []
+    bitplane1 = []
+
+    for row in pattern:
+        byte0 = 0
+        byte1 = 0
+        for col_idx, pixel in enumerate(row):
+            bit_pos = 7 - col_idx  # MSB first
+            if pixel & 1:  # Low bit
+                byte0 |= (1 << bit_pos)
+            if pixel & 2:  # High bit
+                byte1 |= (1 << bit_pos)
+        bitplane0.append(byte0)
+        bitplane1.append(byte1)
+
+    return bytes(bitplane0 + bitplane1)
+
 
 router = APIRouter()
 
@@ -65,10 +117,12 @@ async def create_game(
         scene = Scene(name="main", game_id=game.id, scene_data=scene_data)
         game.scenes.append(scene)
 
-        # Add a dummy static spriteset for testing
+        # Add a static spriteset with test face CHR data
+        chr_data = generate_test_face_chr()
         spriteset_data = NESSpriteSetAssetData(
             type=AssetType.SPRITE_SET,
             sprite_set_type=SpriteSetType.STATIC,
+            chr_data=chr_data,
         )
         spriteset = Asset(
             name="Test Sprite",

@@ -170,11 +170,16 @@ class NESSpriteSetAssetData(BaseModel):
 
     A sprite set is a collection of CHR tiles that form animation frames.
     The type determines the animation pattern and tile layout requirements.
+
+    CHR data format:
+    - Each 8x8 tile is 16 bytes (2 bitplanes of 8 bytes each)
+    - For STATIC type: exactly 16 bytes (one 8x8 tile)
+    - Future animation types will require multiple tiles
     """
 
     type: Literal[AssetType.SPRITE_SET] = AssetType.SPRITE_SET
     sprite_set_type: SpriteSetType  # Animation pattern type
-    # Future: Add CHR data, dimensions, etc.
+    chr_data: bytes  # Raw CHR-ROM tile data (16 bytes per 8x8 tile)
 
 
 # Discriminated union of all asset data types

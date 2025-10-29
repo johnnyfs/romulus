@@ -9,6 +9,7 @@ interface Group {
   width: number;
   height: number;
   imageType: ImageType;
+  tags: string[];
 }
 
 interface ImageGroupingToolProps {
@@ -302,6 +303,7 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
         name: `Group ${groups.length + 1}`,
         ...currentDraw,
         imageType: ImageType.SPRITE, // Default to sprite
+        tags: [],
       };
       setGroups([...groups, newGroup]);
       setSelectedGroupId(newGroup.id);
@@ -326,6 +328,25 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
       width: snapToPixel(size),
       height: snapToPixel(size),
       imageType: ImageType.SPRITE, // Default to sprite
+      tags: [],
+    };
+
+    setGroups([...groups, newGroup]);
+    setSelectedGroupId(newGroup.id);
+  };
+
+  const handleSelectAll = () => {
+    if (!imageDimensions) return;
+
+    const newGroup: Group = {
+      id: `group-${Date.now()}`,
+      name: 'Full Image',
+      x: 0,
+      y: 0,
+      width: imageDimensions.width,
+      height: imageDimensions.height,
+      imageType: ImageType.SPRITE,
+      tags: [],
     };
 
     setGroups([...groups, newGroup]);
@@ -453,6 +474,22 @@ export const ImageGroupingTool: React.FC<ImageGroupingToolProps> = ({
           }
         });
       }
+
+      // Mark the original resource as processed
+      setUploadProgress({
+        current: groupsToProcess.length,
+        total: groupsToProcess.length,
+        status: 'Marking original as processed...'
+      });
+
+      await ResourcesService.updateResourceResourcesResourceIdPut(resourceId, {
+        resource_data: {
+          type: 'image',
+          state: ImageState.RAW,
+          image_type: ImageType.SPRITE, // Keep original type
+          processed: true,
+        }
+      });
 
       setUploadProgress({
         current: groupsToProcess.length,
