@@ -16,16 +16,9 @@ class PreambleCodeBlock(CodeBlock):
     7. Call load_scene subroutine
     8. Loop forever (main game loop will be in NMI handler)
     """
-
-    _main_scene_name: str = "main"
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.PREAMBLE
-
-    @property
-    def name(self) -> str:
-        return "preamble"
+    label: str = "preamble"
+    type: CodeBlockType = CodeBlockType.PREAMBLE
+    main_scene_name: str = "main"
 
     @property
     def size(self) -> int:
@@ -35,7 +28,7 @@ class PreambleCodeBlock(CodeBlock):
             start_offset=0x8000,
             names={
                 "zp__src1": 0x00,
-                f"scene_data__{self._main_scene_name}": 0x8000,
+                f"scene_data__{self.main_scene_name}": 0x8000,
                 "load_scene": 0x8000,
             },
         )
@@ -43,7 +36,7 @@ class PreambleCodeBlock(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        return ["zp__src1", f"scene_data__{self._main_scene_name}", "load_scene"]
+        return ["zp__src1", f"scene_data__{self.main_scene_name}", "load_scene"]
 
     def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
         """Build the preamble assembly code."""
@@ -73,7 +66,7 @@ class PreambleCodeBlock(CodeBlock):
 
         # === Load Initial Scene ===
         # Load the address of the initial scene data into zero page variable zp__src1
-        scene_data_addr = names[f"scene_data__{self._main_scene_name}"]
+        scene_data_addr = names[f"scene_data__{self.main_scene_name}"]
         zp_src_addr = names["zp__src1"]
 
         # Load low byte of scene data address
@@ -128,4 +121,4 @@ class PreambleCodeBlock(CodeBlock):
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = self._build_code(start_offset, names)
-        return RenderedCodeBlock(code=code, exported_names={})
+        return RenderedCodeBlock(code=code, exported_labels={})

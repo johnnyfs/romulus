@@ -28,7 +28,7 @@ class TestPaletteData:
             ),
         )
 
-        assert palette_data.name == f"component__{component_id}"
+        assert palette_data.label == f"component__{component_id}"
 
     def test_palette_data_has_no_dependencies(self):
         """Verify palette data has no dependencies."""
@@ -85,7 +85,7 @@ class TestPaletteData:
 
         # Should be 6 bytes: 01 02 03 14 25 36
         assert rendered.code == bytes([0x01, 0x02, 0x03, 0x14, 0x25, 0x36])
-        assert rendered.exported_names == {f"component__{component_id}": 0x8000}
+        assert rendered.exported_labels == {f"component__{component_id}": 0x8000}
 
 
 class TestAddressData:
@@ -94,7 +94,7 @@ class TestAddressData:
     def test_address_data_name(self):
         """Verify address data name is prefixed correctly."""
         addr_data = AddressData(_name="initial_scene", _referenced_value_name="scene_data__main")
-        assert addr_data.name == "data__initial_scene"
+        assert addr_data.label == "data__initial_scene"
 
     def test_address_data_has_dependency(self):
         """Verify address data depends on referenced value."""
@@ -115,7 +115,7 @@ class TestAddressData:
 
         # Little endian: BC 9A
         assert rendered.code == bytes([0xBC, 0x9A])
-        assert rendered.exported_names == {"data__ptr": 0x8000}
+        assert rendered.exported_labels == {"data__ptr": 0x8000}
 
     def test_address_data_raises_if_referenced_value_missing(self):
         """Verify error if referenced value not in names dict."""
@@ -137,7 +137,7 @@ class TestSceneData:
         )
         scene_data = SceneData(_name="main", _scene=scene)
 
-        assert scene_data.name == "scene_data__main"
+        assert scene_data.label == "scene_data__main"
 
     def test_scene_data_with_no_palettes_has_no_dependencies(self):
         """Verify scene with no palettes has no dependencies."""
@@ -188,7 +188,7 @@ class TestSceneData:
 
         # 0F (bg color) + 00 00 (null bg pal) + 00 00 (null sprite pal)
         assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00])
-        assert rendered.exported_names == {"scene_data__main": 0x9000}
+        assert rendered.exported_labels == {"scene_data__main": 0x9000}
 
     def test_scene_data_renders_with_palette_references(self):
         """Verify scene renders with palette pointer addresses using correct component__ prefix."""
@@ -211,7 +211,7 @@ class TestSceneData:
 
         # 21 (bg color) + 00 91 (bg pal @ 0x9100) + 00 92 (sprite pal @ 0x9200)
         assert rendered.code == bytes([0x21, 0x00, 0x91, 0x00, 0x92])
-        assert rendered.exported_names == {"scene_data__main": 0x9000}
+        assert rendered.exported_labels == {"scene_data__main": 0x9000}
 
     def test_scene_data_with_missing_palette_uses_null(self):
         """Verify scene uses null pointer if palette ref not in names."""
@@ -263,8 +263,8 @@ class TestSceneData:
         palette_rendered = classic_mario_palette.render(start_offset=0x8100, names={})
 
         # Verify palette exports the correct name
-        assert f"component__{palette_component_id}" in palette_rendered.exported_names
-        assert palette_rendered.exported_names[f"component__{palette_component_id}"] == 0x8100
+        assert f"component__{palette_component_id}" in palette_rendered.exported_labels
+        assert palette_rendered.exported_labels[f"component__{palette_component_id}"] == 0x8100
 
         # Verify palette data is correct (4 palettes × 3 colors = 12 bytes)
         assert palette_rendered.code == bytes([
@@ -277,9 +277,9 @@ class TestSceneData:
         # Now render the scene with the palette in the names dict
         scene_rendered = scene_data.render(
             start_offset=0x9000,
-            names=palette_rendered.exported_names,
+            names=palette_rendered.exported_labels,
         )
 
         # Scene should be: 02 (bg color) + 00 81 (palette @ 0x8100) + 00 00 (null sprite pal)
         assert scene_rendered.code == bytes([0x02, 0x00, 0x81, 0x00, 0x00])
-        assert scene_rendered.exported_names == {"scene_data__main": 0x9000}
+        assert scene_rendered.exported_labels == {"scene_data__main": 0x9000}

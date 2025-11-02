@@ -1,6 +1,7 @@
 import enum
 from abc import abstractmethod
 from dataclasses import dataclass
+import uuid
 
 from pydantic import BaseModel
 
@@ -32,19 +33,12 @@ class RenderedCodeBlock:
     """
 
     code: bytes
-    exported_names: dict[str, int]
+    exported_labels: dict[str, int]
 
 
 class CodeBlock(BaseModel):
-    @property
-    @abstractmethod
-    def type(self) -> CodeBlockType:
-        pass
-
-    @property
-    @abstractmethod
-    def name(self) -> str:
-        pass
+    label: str
+    type: CodeBlockType
 
     @property
     @abstractmethod

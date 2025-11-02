@@ -24,7 +24,7 @@ from api.games.schemas import (
     GameUpdateResponse,
 )
 from core.rom.builder import RomBuilder
-from core.rom.registry import CodeBlockRegistry
+from core.rom.code_block_registry import CodeBlockRegistry
 from core.rom.rom import Rom
 from core.schemas import (
     AssetType,
@@ -247,7 +247,7 @@ async def render_game(
     # Build and render the ROM
     rom = Rom()
     registry = CodeBlockRegistry()
-    builder = RomBuilder(db=db, rom=rom, registry=registry)
+    builder = RomBuilder(db=db, rom=rom, code_block_registry=registry)
 
     try:
         rom_bytes = await builder.build(game_id=game_id, initial_scene_name="main")

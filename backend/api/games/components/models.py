@@ -14,8 +14,10 @@ class Component(UUIDMixin, Base):
     __table_args__ = (UniqueConstraint("game_id", "name", "type", name="uq_component_game_name_type"),)
 
     game_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("games.id"), nullable=False)
+    entity_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("entities.id"), nullable=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     type: Mapped[ComponentType] = mapped_column(nullable=False)
     component_data: Mapped[ComponentData] = mapped_column(PydanticType(ComponentData), nullable=False)
 
     game: Mapped["Game"] = relationship("Game", back_populates="components", lazy="raise")  # type: ignore
+    entity: Mapped["Entity"] = relationship("Entity", back_populates="components", lazy="raise")  # type: ignore

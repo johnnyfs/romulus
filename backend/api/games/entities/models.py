@@ -17,5 +17,6 @@ class Entity(UUIDMixin, Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     entity_data: Mapped[NESEntity] = mapped_column(PydanticType(NESEntity), nullable=False)
 
-    # Relationship to Game
+    # Relationships
     game: Mapped["Game"] = relationship("Game", back_populates="entities")  # type: ignore
+    components: Mapped[list["Component"]] = relationship("Component", back_populates="entity", lazy="raise")  # type: ignore

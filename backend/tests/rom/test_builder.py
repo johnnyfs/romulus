@@ -5,7 +5,7 @@ import pytest
 from core.rom.builder import RomBuilder
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
 from core.rom.preamble import PreambleCodeBlock
-from core.rom.registry import CodeBlockRegistry
+from core.rom.code_block_registry import CodeBlockRegistry
 from core.rom.rom import Rom, RomCodeArea
 from core.rom.subroutines import LoadSceneSubroutine
 
@@ -25,8 +25,8 @@ class TrackingRom(Rom):
         object.__setattr__(self, "add_count", {})
 
     def add(self, code_block: CodeBlock) -> None:
-        self.add_order.append(code_block.name)
-        self.add_count[code_block.name] = self.add_count.get(code_block.name, 0) + 1
+        self.add_order.append(code_block.label)
+        self.add_count[code_block.label] = self.add_count.get(code_block.label, 0) + 1
         super().add(code_block)
 
 
@@ -43,7 +43,7 @@ class MockCodeBlock(CodeBlock):
         return self._type
 
     @property
-    def name(self) -> str:
+    def label(self) -> str:
         return self._name
 
     @property
@@ -55,7 +55,7 @@ class MockCodeBlock(CodeBlock):
         return self._dependencies
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        return RenderedCodeBlock(code=b"\x00" * 10, exported_names={})
+        return RenderedCodeBlock(code=b"\x00" * 10, exported_labels={})
 
 
 class TestRomBuilder:
@@ -65,7 +65,7 @@ class TestRomBuilder:
         """Verify that a code block with no dependencies is added directly."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         block = MockCodeBlock("simple_block", dependencies=[])
         builder._add(rom, block)
@@ -81,7 +81,7 @@ class TestRomBuilder:
         """Verify that dependencies are added before the code block itself."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Add a block that depends on zp__src1 (which is in DEFAULT_REGISTRY)
         block = MockCodeBlock("dependent_block", dependencies=["zp__src1"])
@@ -94,7 +94,7 @@ class TestRomBuilder:
         """Verify that transitive dependencies are resolved depth-first."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Create a chain: block_c -> block_b -> block_a
         block_a = MockCodeBlock("block_a", dependencies=[])
@@ -115,7 +115,7 @@ class TestRomBuilder:
         """Verify that multiple dependencies are added in the order listed."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Add a block that depends on both zp__src1 and zp__src2
         block = MockCodeBlock("multi_dep_block", dependencies=["zp__src1", "zp__src2"])
@@ -128,7 +128,7 @@ class TestRomBuilder:
         """Verify that unknown dependencies raise a KeyError."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Create a block with an unknown dependency
         block = MockCodeBlock("bad_block", dependencies=["unknown_dep"])
@@ -148,7 +148,7 @@ class TestRomBuilder:
         # Should be able to look up by name
         assert "test_block" in registry
         retrieved_block = registry["test_block"]
-        assert retrieved_block.name == "test_block"
+        assert retrieved_block.label == "test_block"
         assert retrieved_block is block
 
     def test_registry_has_default_blocks(self):
@@ -164,7 +164,7 @@ class TestRomBuilder:
 
         # Can retrieve them
         zp_src1 = registry["zp__src1"]
-        assert zp_src1.name == "zp__src1"
+        assert zp_src1.label == "zp__src1"
 
     def test_scene_with_palette_reference_added_before_palette(self):
         """
@@ -176,7 +176,7 @@ class TestRomBuilder:
         """
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Create a palette code block and add to registry directly
         # (simulating what would happen when registry.add_components() is called)
@@ -206,7 +206,7 @@ class TestRomBuilder:
         """Integration test: verify preamble adds zp__src1, scene_data, and load_scene."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Add mock scene data to registry (preamble depends on it)
         scene_data = MockCodeBlock("scene_data__main", dependencies=[], block_type=CodeBlockType.DATA)
@@ -214,7 +214,7 @@ class TestRomBuilder:
 
         # Add preamble
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
         builder._add(rom, preamble)
 
         # Should add dependencies first (in depth-first order)
@@ -232,7 +232,7 @@ class TestRomBuilder:
         """Verify load_scene subroutine adds its zero page dependencies first."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Add load_scene
         load_scene = LoadSceneSubroutine()
@@ -246,7 +246,7 @@ class TestRomBuilder:
         """Verify complex dependency trees are traversed depth-first."""
         rom = TrackingRom()
         registry = CodeBlockRegistry()
-        builder = RomBuilder(db=Mock(), rom=rom, registry=registry)
+        builder = RomBuilder(db=Mock(), rom=rom, code_block_registry=registry)
 
         # Create tree:
         #       root

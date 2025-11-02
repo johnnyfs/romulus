@@ -115,11 +115,10 @@ ComponentData = Annotated[NESPaletteData | NESSpriteData, Field(discriminator="t
 
 
 class NESEntity(BaseModel):
-    """An entity with position data and attached components."""
+    """An entity with position data."""
 
     x: int  # X position (byte: 0-255)
     y: int  # Y position (byte: 0-255)
-    components: list[ComponentData] = []  # Components attached to this entity
 
 
 class NESScene(BaseModel):

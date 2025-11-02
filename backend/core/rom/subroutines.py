@@ -17,14 +17,8 @@ class LoadSceneSubroutine(CodeBlock):
       Offset 1-2: Background palette data pointer (2 bytes, little-endian, 0 = null)
       Offset 3-4: Sprite palette data pointer (2 bytes, little-endian, 0 = null)
     """
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.SUBROUTINE
-
-    @property
-    def name(self) -> str:
-        return "load_scene"
+    label: str = "load_scene"
+    type: CodeBlockType = CodeBlockType.SUBROUTINE
 
     @property
     def size(self) -> int:
@@ -199,4 +193,4 @@ class LoadSceneSubroutine(CodeBlock):
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = self._build_code(start_offset, names)
-        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})

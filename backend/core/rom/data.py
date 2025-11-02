@@ -1,11 +1,11 @@
-from typing import TYPE_CHECKING
-from pydantic import PrivateAttr
+from typing import Self
+import uuid
+from api.games.entities.models import Entity
+from api.games.scenes.models import Scene
+from core.rom.label_registry import LabelRegistry
 
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import NESEntity, NESSpriteSetAssetData, NESPaletteData, NESScene
-
-if TYPE_CHECKING:
-    from core.rom.registry import CodeBlockRegistry
+from core.schemas import NESColor, NESEntity, NESPaletteAssetData, NESSpriteSetAssetData, NESPaletteData
 
 
 class AddressData(CodeBlock):
@@ -14,37 +14,30 @@ class AddressData(CodeBlock):
 
     - used to store 2-byte values
     """
+    referenced_value_name: str
 
-    _name: str = PrivateAttr()
-    _referenced_value_name: str = PrivateAttr()
-
-    def __init__(self, _name: str, _referenced_value_name: str):
-        super().__init__()
-        self._name = _name
-        self._referenced_value_name = _referenced_value_name
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.DATA
-
-    @property
-    def name(self) -> str:
-        return f"data__{self._name}"
+    @classmethod
+    def from_name(cls, name: str, referenced_value_name: str, registry: LabelRegistry) -> Self:
+        return cls(
+            label=f"data__{name}",
+            type=CodeBlockType.DATA,
+            referenced_value_name=referenced_value_name
+        )
 
     @property
     def dependencies(self) -> list[str]:
-        return [self._referenced_value_name]
+        return [self.referenced_value_name]
 
     @property
     def size(self) -> int:
         return 2
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        if self._referenced_value_name not in names:
-            raise ValueError(f"Referenced value name '{self._referenced_value_name}' not found in names.")
-        value = names[self._referenced_value_name]
+        if self.referenced_value_name not in names:
+            raise ValueError(f"Referenced value name '{self.referenced_value_name}' not found in names.")
+        value = names[self.referenced_value_name]
         code = value.to_bytes(2, "little")
-        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
 
 
 class PaletteData(CodeBlock):
@@ -54,29 +47,15 @@ class PaletteData(CodeBlock):
     - contains NES palette data
     - can be from a component (legacy) or an asset
     """
+    palette_data: NESPaletteAssetData
 
-    _id: str = PrivateAttr()  # UUID as string
-    _palette_data: NESPaletteData = PrivateAttr()
-    _is_asset: bool = PrivateAttr()  # True if this is an asset, False if component
-
-    def __init__(self, _component_id: str, _palette_data: NESPaletteData, _is_asset: bool = False):
-        super().__init__()
-        self._id = _component_id  # Keep param name for backward compatibility
-        self._palette_data = _palette_data
-        self._is_asset = _is_asset
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.DATA
-
-    @property
-    def name(self) -> str:
-        # TODO: Standardize all names to {component|asset}__{type}__{id} format
-        # for better type safety and clearer error messages
-        if self._is_asset:
-            return f"asset__palette__{self._id}"
-        else:
-            return f"component__{self._id}"
+    @classmethod
+    def from_model(cls, id: uuid.UUID, palette_data: NESPaletteAssetData, registry: LabelRegistry) -> Self:
+        return cls(
+            label=registry.get_asset_label(id),
+            type=CodeBlockType.DATA,
+            palette_data=palette_data
+        )
 
     @property
     def dependencies(self) -> list[str]:
@@ -85,15 +64,15 @@ class PaletteData(CodeBlock):
     @property
     def size(self) -> int:
         # Each palette has 3 colors, each color is 1 byte
-        return len(self._palette_data.palettes) * 3
+        return len(self.palette_data.palettes) * 3
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = bytearray()
-        for palette in self._palette_data.palettes:
+        for palette in self.palette_data.palettes:
             for color in palette.colors:
                 code.append(color.index)
 
-        return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
 
 
 class SceneData(CodeBlock):
@@ -102,34 +81,27 @@ class SceneData(CodeBlock):
 
     - contains the data for a scene
     """
+    background_color: NESColor
+    background_palette: str | None
+    sprite_palette: str | None
 
-    _name: str = PrivateAttr()
-    _scene: NESScene = PrivateAttr()
-
-    def __init__(self, _name: str, _scene: NESScene):
-        super().__init__()
-        self._name = _name
-        self._scene = _scene
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.DATA
-
-    @property
-    def name(self) -> str:
-        return f"scene_data__{self._name}"
+    @classmethod
+    def from_model(cls, scene: Scene, registry: LabelRegistry) -> Self:
+        return cls(
+            label=registry.get_scene_label(scene.id),
+            type=CodeBlockType.DATA,
+            background_color=scene.scene_data.background_color,
+            background_palette=registry.get_asset_label(id) if (id := scene.scene_data.background_palettes) else None,
+            sprite_palette=registry.get_asset_label(id) if (id := scene.scene_data.sprite_palettes) else None
+        )
 
     @property
     def dependencies(self) -> list[str]:
-        # TODO: Once we fully migrate to assets, we should add type info to NESScene
-        # to distinguish between component and asset references. For now, we try both
-        # naming conventions: asset__palette__{id} first (new), then component__{id} (legacy)
         dependencies = []
-        if (bp := self._scene.background_palettes) is not None:
-            # Try asset naming first, will fall back to component if not found
-            dependencies.append(f"asset__palette__{bp}")
-        if (sp := self._scene.sprite_palettes) is not None:
-            dependencies.append(f"asset__palette__{sp}")
+        if (self.background_palette is not None):
+            dependencies.append(self.background_palette)
+        if (self.sprite_palette is not None):
+            dependencies.append(self.sprite_palette)
         return dependencies
 
     @property
@@ -138,31 +110,26 @@ class SceneData(CodeBlock):
         return 1 + 2 + 2
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        scene_data = self._scene
         code = bytearray()
 
         # Background color
-        code.append(scene_data.background_color.index)
+        code.append(self.background_color.index)
 
         # Background palettes address
         # Try asset naming first, fall back to component naming (legacy)
         bg_pal_addr = 0
-        if scene_data.background_palettes:
-            asset_name = f"asset__palette__{scene_data.background_palettes}"
-            component_name = f"component__{scene_data.background_palettes}"
-            bg_pal_addr = names.get(asset_name, names.get(component_name, 0))
+        if self.background_palette:
+            bg_pal_addr = names.get(self.background_palette, 0)
         code.extend(bg_pal_addr.to_bytes(2, "little"))
 
         # Sprite palettes address
         # Try asset naming first, fall back to component naming (legacy)
         sprite_pal_addr = 0
-        if scene_data.sprite_palettes:
-            asset_name = f"asset__palette__{scene_data.sprite_palettes}"
-            component_name = f"component__{scene_data.sprite_palettes}"
-            sprite_pal_addr = names.get(asset_name, names.get(component_name, 0))
+        if self.sprite_palette:
+            sprite_pal_addr = names.get(self.sprite_palette, 0)
         code.extend(sprite_pal_addr.to_bytes(2, "little"))
 
-        return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
 
 
 class EntityData(CodeBlock):
@@ -171,41 +138,27 @@ class EntityData(CodeBlock):
 
     - contains entity position data (x, y)
     """
+    entity_data: NESEntity
+    component_labels: list[str]
 
-    _name: str = PrivateAttr()
-    _entity: NESEntity = PrivateAttr()
-    _registry: "CodeBlockRegistry | None" = PrivateAttr()
+    @classmethod
+    def from_model(cls, entity: Entity, registry: LabelRegistry) -> Self:
+        """Entity depends on components attached to it."""
+        component_labels = []
+        for component in entity.components:
+            component_label = registry.get_component_label(component.id)
+            component_labels.append(component_label)
 
-    def __init__(self, _name: str, _entity: NESEntity, _registry: "CodeBlockRegistry | None" = None):
-        super().__init__()
-        self._name = _name
-        self._entity = _entity
-        self._registry = _registry
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.DATA
-
-    @property
-    def name(self) -> str:
-        return f"entity_data__{self._name}"
+        return cls(
+            label=registry.get_entity_label(entity.id),
+            type=CodeBlockType.DATA,
+            entity_data=entity.entity_data,
+            component_labels=component_labels
+        )
 
     @property
     def dependencies(self) -> list[str]:
-        """Entity depends on sprite sets referenced by its sprite components."""
-        deps = []
-        if not self._registry:
-            return deps
-
-        for component in self._entity.components:
-            if component.type == 'sprite' and component.sprite_set:
-                # Sprite component references a sprite set asset
-                # Look up the code block names for this asset ID
-                import uuid
-                asset_id = uuid.UUID(component.sprite_set) if isinstance(component.sprite_set, str) else component.sprite_set
-                code_block_names = self._registry.get_asset_code_block_names(asset_id)
-                deps.extend(code_block_names)
-        return deps
+        return self.component_labels
 
     @property
     def size(self) -> int:
@@ -213,16 +166,15 @@ class EntityData(CodeBlock):
         return 2
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        entity_data = self._entity
         code = bytearray()
 
         # X position (byte)
-        code.append(entity_data.x & 0xFF)
+        code.append(self.entity_data.x & 0xFF)
 
         # Y position (byte)
-        code.append(entity_data.y & 0xFF)
+        code.append(self.entity_data.y & 0xFF)
 
-        return RenderedCodeBlock(code=bytes(code), exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
 
 
 class SpriteSetCHRData(CodeBlock):
@@ -232,24 +184,15 @@ class SpriteSetCHRData(CodeBlock):
     - contains CHR tile data for sprites
     - exports a name that references the starting CHR index
     """
+    sprite_set_data: NESSpriteSetAssetData
 
-    _id: str = PrivateAttr()  # UUID as string
-    _name: str = PrivateAttr()  # Asset name
-    _sprite_set_data: NESSpriteSetAssetData = PrivateAttr()
-
-    def __init__(self, _asset_id: str, _name: str, _sprite_set_data: NESSpriteSetAssetData):
-        super().__init__()
-        self._id = _asset_id
-        self._name = _name
-        self._sprite_set_data = _sprite_set_data
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.CHR
-
-    @property
-    def name(self) -> str:
-        return f"spriteset_chr__{self._name}"
+    @classmethod
+    def from_model(cls, asset_id: uuid.UUID, sprite_set_data: NESSpriteSetAssetData, registry: LabelRegistry) -> Self:
+        return cls(
+            label=registry.get_asset_label(asset_id),
+            type=CodeBlockType.CHR,
+            sprite_set_data=sprite_set_data
+        )
 
     @property
     def dependencies(self) -> list[str]:
@@ -258,10 +201,10 @@ class SpriteSetCHRData(CodeBlock):
     @property
     def size(self) -> int:
         # Return the size of the CHR data in bytes
-        return len(self._sprite_set_data.chr_data)
+        return len(self.sprite_set_data.chr_data)
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         # Render the actual CHR data
         # The exported name references the CHR index (start_offset in CHR-ROM space)
-        code = self._sprite_set_data.chr_data
-        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
+        code = self.sprite_set_data.chr_data
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})

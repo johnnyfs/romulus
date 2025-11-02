@@ -48,7 +48,7 @@ class Rom(BaseModel):
     code_blocks: dict[RomCodeArea, dict[str, CodeBlock]] = Field(default_factory=_empty_code_blocks_factory)
 
     def add(self, code_block: CodeBlock) -> None:
-        self.code_blocks[RomCodeArea.from_code_block_type(code_block.type)][code_block.name] = code_block
+        self.code_blocks[RomCodeArea.from_code_block_type(code_block.type)][code_block.label] = code_block
 
     def render(self) -> bytes:
         """

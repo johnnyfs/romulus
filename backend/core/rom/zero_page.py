@@ -7,10 +7,7 @@ class ZeroPageVariable(CodeBlock):
 
     - allocates a zero page variable for use by the ROM
     """
-
-    @property
-    def type(self) -> CodeBlockType:
-        return CodeBlockType.ZEROPAGE
+    type: CodeBlockType = CodeBlockType.ZEROPAGE
 
     @property
     def dependencies(self) -> list[str]:
@@ -18,7 +15,7 @@ class ZeroPageVariable(CodeBlock):
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = b""  # Zero page variables do not generate code
-        return RenderedCodeBlock(code=code, exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
 
 
 class ZeroPageWord(ZeroPageVariable):
@@ -35,17 +32,11 @@ class ZeroPageSource1(ZeroPageWord):
     """
     A generic source vector for indirect loading via the zero page.
     """
-
-    @property
-    def name(self) -> str:
-        return "zp__src1"
+    label: str = "zp__src1"
 
 
 class ZeroPageSource2(ZeroPageWord):
     """
     A generic source vector for indirect loading via the zero page.
     """
-
-    @property
-    def name(self) -> str:
-        return "zp__src2"
+    label: str = "zp__src2"

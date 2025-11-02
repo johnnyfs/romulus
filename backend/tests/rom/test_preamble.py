@@ -11,7 +11,7 @@ class TestPreambleCodeBlock:
     def test_disables_interrupts_and_decimal_mode(self):
         """Verify that SEI and CLD are executed at the start."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         code = preamble.render(
             start_offset=0x8000,
@@ -34,7 +34,7 @@ class TestPreambleCodeBlock:
     def test_disables_nmi_via_ppuctrl(self):
         """Verify that NMI is disabled by writing 0x00 to PPUCTRL."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         code = preamble.render(
             start_offset=0x8000,
@@ -60,7 +60,7 @@ class TestPreambleCodeBlock:
     def test_initializes_stack_pointer(self):
         """Verify that stack pointer is set to 0xFF."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         code = preamble.render(
             start_offset=0x8000,
@@ -86,7 +86,7 @@ class TestPreambleCodeBlock:
     def test_zeros_cpu_registers(self):
         """Verify that A, X, Y registers are zeroed."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         code = preamble.render(
             start_offset=0x8000,
@@ -116,7 +116,7 @@ class TestPreambleCodeBlock:
     def test_loads_scene_address_to_zero_page(self):
         """Verify that scene data address is loaded into zp__src1."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         scene_data_addr = 0x9000
         zp_src_addr = 0x10
@@ -147,7 +147,7 @@ class TestPreambleCodeBlock:
     def test_calls_load_scene_subroutine(self):
         """Verify that JSR to load_scene is executed."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         load_scene_addr = 0xA000
 
@@ -178,7 +178,7 @@ class TestPreambleCodeBlock:
     def test_enters_infinite_loop_after_load_scene(self):
         """Verify that code enters an infinite JMP loop after load_scene returns."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         load_scene_addr = 0xA000
 
@@ -213,7 +213,7 @@ class TestPreambleCodeBlock:
     def test_full_initialization_sequence(self):
         """Integration test: verify the full initialization sequence."""
         preamble = PreambleCodeBlock()
-        preamble._main_scene_name = "main"
+        preamble.main_scene_name = "main"
 
         scene_data_addr = 0x9000
         load_scene_addr = 0xA000

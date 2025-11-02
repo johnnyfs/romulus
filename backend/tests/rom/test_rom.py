@@ -25,7 +25,7 @@ class MockCodeBlock(CodeBlock):
         return self._type
 
     @property
-    def name(self) -> str:
+    def label(self) -> str:
         return self._name
 
     @property
@@ -37,7 +37,7 @@ class MockCodeBlock(CodeBlock):
         return []
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        return RenderedCodeBlock(code=self._code, exported_names={self.name: start_offset})
+        return RenderedCodeBlock(code=self._code, exported_labels={self.label: start_offset})
 
 
 class TestRomRender:
