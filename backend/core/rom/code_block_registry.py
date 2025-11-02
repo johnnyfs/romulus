@@ -46,9 +46,6 @@ class CodeBlockRegistry:
         for entity in entities:
             code_block = self._entity_to_code_block(entity)
             self.add_code_block(code_block)
-            for component in entity.components:
-                # TODO: Add component code blocks if needed
-                pass
 
     def add_game(self, game: Game):
         """Add all code blocks for a game's assets and entities."""

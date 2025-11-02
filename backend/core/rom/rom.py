@@ -177,35 +177,40 @@ class Rom:
         # CHR ROM (8KB of pattern tables)
         # Build from CHR code blocks
         chr_rom = bytearray(8192)
+
+        # Reserve first tile (16 bytes) for background test pattern
+        # This ensures entity sprites don't overwrite the background
         chr_offset = 0
+
+        # Add test pattern for first tile (4 quadrants) at index 0
+        # Low bit plane (bit 0 of color)
+        chr_rom[0] = 0b00001111  # Row 0: color 0 left half, color 1 right half
+        chr_rom[1] = 0b00001111  # Row 1
+        chr_rom[2] = 0b00001111  # Row 2
+        chr_rom[3] = 0b00001111  # Row 3
+        chr_rom[4] = 0b00001111  # Row 4: color 2 left half, color 3 right half
+        chr_rom[5] = 0b00001111  # Row 5
+        chr_rom[6] = 0b00001111  # Row 6
+        chr_rom[7] = 0b00001111  # Row 7
+
+        # High bit plane (bit 1 of color)
+        chr_rom[8] = 0b00000000   # Row 0: color 0 left half, color 1 right half
+        chr_rom[9] = 0b00000000   # Row 1
+        chr_rom[10] = 0b00000000  # Row 2
+        chr_rom[11] = 0b00000000  # Row 3
+        chr_rom[12] = 0b11111111  # Row 4: color 2 left half, color 3 right half
+        chr_rom[13] = 0b11111111  # Row 5
+        chr_rom[14] = 0b11111111  # Row 6
+        chr_rom[15] = 0b11111111  # Row 7
+
+        # Start placing sprite sets after the background tile
+        chr_offset = 16  # One tile = 16 bytes
 
         for block in self.code_blocks[RomCodeArea.CHR_ROM].values():
             rendered = block.render(start_offset=chr_offset, names=names)
             chr_rom[chr_offset:chr_offset + len(rendered.code)] = rendered.code
             names.update(rendered.exported_labels)
             chr_offset += block.size
-
-        # If no CHR blocks, add test pattern for first tile (4 quadrants)
-        if chr_offset == 0:
-            # Low bit plane (bit 0 of color)
-            chr_rom[0] = 0b00001111  # Row 0: color 0 left half, color 1 right half
-            chr_rom[1] = 0b00001111  # Row 1
-            chr_rom[2] = 0b00001111  # Row 2
-            chr_rom[3] = 0b00001111  # Row 3
-            chr_rom[4] = 0b00001111  # Row 4: color 2 left half, color 3 right half
-            chr_rom[5] = 0b00001111  # Row 5
-            chr_rom[6] = 0b00001111  # Row 6
-            chr_rom[7] = 0b00001111  # Row 7
-
-            # High bit plane (bit 1 of color)
-            chr_rom[8] = 0b00000000   # Row 0: color 0 left half, color 1 right half
-            chr_rom[9] = 0b00000000   # Row 1
-            chr_rom[10] = 0b00000000  # Row 2
-            chr_rom[11] = 0b00000000  # Row 3
-            chr_rom[12] = 0b11111111  # Row 4: color 2 left half, color 3 right half
-            chr_rom[13] = 0b11111111  # Row 5
-            chr_rom[14] = 0b11111111  # Row 6
-            chr_rom[15] = 0b11111111  # Row 7
 
         chr_rom = bytes(chr_rom)
 

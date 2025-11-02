@@ -119,6 +119,8 @@ class NESEntity(BaseModel):
 
     x: int  # X position (byte: 0-255)
     y: int  # Y position (byte: 0-255)
+    spriteset: NESRef | None = None  # Reference to a sprite set asset (optional)
+    palette_index: int = 0  # Palette index (0-3) for color
 
 
 class NESScene(BaseModel):

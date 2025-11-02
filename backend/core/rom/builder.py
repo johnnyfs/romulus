@@ -3,6 +3,7 @@ import uuid
 from dataclasses import dataclass
 
 from api.games.assets.models import Asset
+from api.games.entities.models import Entity
 from core.rom.label_registry import LabelRegistry
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -49,6 +50,7 @@ class RomBuilder:
                 selectinload(Game.scenes),
                 selectinload(Game.assets),
                 selectinload(Game.entities),
+                selectinload(Game.entities).selectinload(Entity.components),
             ],
         )
 

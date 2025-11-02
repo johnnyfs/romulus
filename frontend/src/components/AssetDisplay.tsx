@@ -87,7 +87,8 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
             name: entity.name,
             x: entity.entity_data.x,
             y: entity.entity_data.y,
-            components: entity.components || [],
+            spriteset: entity.entity_data.spriteset || null,
+            palette_index: entity.entity_data.palette_index || 0,
             isDirty: false,
           };
           sceneEntityMap.set(entity.id, entityData);
@@ -361,7 +362,8 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
       name: `Entity ${entityNumber}`,
       x: 0,
       y: 0,
-      components: [],
+      spriteset: null,
+      palette_index: 0,
       isDirty: true, // New entity, not saved yet
     };
 
@@ -373,7 +375,7 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
     setSceneEntities(newSceneEntities);
   };
 
-  const handleEntityUpdate = (sceneId: string, entityId: string, x: number, y: number) => {
+  const handleEntityUpdate = (sceneId: string, entityId: string, data: { x?: number; y?: number; spriteset?: string | null; palette_index?: number }) => {
     const currentSceneEntities = sceneEntities.get(sceneId);
     if (!currentSceneEntities) return;
 
@@ -382,8 +384,7 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
 
     const updatedEntity: EntityData = {
       ...entity,
-      x,
-      y,
+      ...data,
       isDirty: true,
     };
 
@@ -412,24 +413,6 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
     setSceneEntities(newSceneEntities);
   };
 
-  const handleEntityComponentsChange = (sceneId: string, entityId: string, components: any[]) => {
-    const currentSceneEntities = sceneEntities.get(sceneId);
-    if (!currentSceneEntities) return;
-
-    const entity = currentSceneEntities.get(entityId);
-    if (!entity) return;
-
-    const updatedEntity: EntityData = {
-      ...entity,
-      components,
-      isDirty: true,
-    };
-
-    currentSceneEntities.set(entityId, updatedEntity);
-    const newSceneEntities = new Map(sceneEntities);
-    newSceneEntities.set(sceneId, new Map(currentSceneEntities));
-    setSceneEntities(newSceneEntities);
-  };
 
   const handleEntitySave = async (sceneId: string, entityId: string) => {
     if (!game) return;
@@ -449,7 +432,8 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
         entity_data: {
           x: entity.x,
           y: entity.y,
-          components: entity.components || [],
+          spriteset: entity.spriteset,
+          palette_index: entity.palette_index,
         },
       };
 
@@ -673,9 +657,8 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
                             <EntityEditor
                               key={entityId}
                               entity={entity}
-                              onUpdate={(x, y) => handleEntityUpdate(scene.id, entityId, x, y)}
+                              onUpdate={(data) => handleEntityUpdate(scene.id, entityId, data)}
                               onNameChange={(name) => handleEntityNameChange(scene.id, entityId, name)}
-                              onComponentsChange={(components) => handleEntityComponentsChange(scene.id, entityId, components)}
                               onSave={() => handleEntitySave(scene.id, entityId)}
                               spriteSize={game?.game_data.sprite_size || '8x8'}
                               spriteSets={game?.assets?.filter(a => a.type === 'sprite_set') || []}

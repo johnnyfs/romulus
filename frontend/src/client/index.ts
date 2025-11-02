@@ -10,6 +10,10 @@ export type { OpenAPIConfig } from './core/OpenAPI';
 export type { AssetCreateRequest } from './models/AssetCreateRequest';
 export type { AssetResponse } from './models/AssetResponse';
 export { AssetType } from './models/AssetType';
+export type { ComponentCreateRequest } from './models/ComponentCreateRequest';
+export type { ComponentCreateResponse } from './models/ComponentCreateResponse';
+export type { ComponentUpdateRequest } from './models/ComponentUpdateRequest';
+export type { ComponentUpdateResponse } from './models/ComponentUpdateResponse';
 export type { EntityCreateRequest } from './models/EntityCreateRequest';
 export type { EntityCreateResponse } from './models/EntityCreateResponse';
 export type { EntityResponse_Input } from './models/EntityResponse_Input';
@@ -57,6 +61,7 @@ export type { UploadTicketResponse } from './models/UploadTicketResponse';
 export type { ValidationError } from './models/ValidationError';
 
 export { AssetsService } from './services/AssetsService';
+export { ComponentsService } from './services/ComponentsService';
 export { EntitiesService } from './services/EntitiesService';
 export { GamesService } from './services/GamesService';
 export { ResourcesService } from './services/ResourcesService';

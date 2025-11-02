@@ -1,26 +1,23 @@
 import { useState } from 'react';
-import { Save, Plus, X } from 'lucide-react';
+import { Save } from 'lucide-react';
 import styles from './EntityEditor.module.css';
-import type { NESSpriteData } from '../client/models/NESSpriteData';
-import type { NESPaletteData_Output } from '../client/models/NESPaletteData_Output';
 import type { AssetResponse } from '../client/models/AssetResponse';
-
-type ComponentData = NESSpriteData | NESPaletteData_Output;
+import type { NESRef } from '../client/models/NESRef';
 
 export interface EntityData {
   id?: string;
   name: string;
   x: number;
   y: number;
-  components?: ComponentData[];
+  spriteset: NESRef | null;
+  palette_index: number;
   isDirty: boolean;
 }
 
 interface EntityEditorProps {
   entity: EntityData;
-  onUpdate: (x: number, y: number) => void;
+  onUpdate: (data: { x?: number; y?: number; spriteset?: NESRef | null; palette_index?: number }) => void;
   onNameChange: (name: string) => void;
-  onComponentsChange: (components: ComponentData[]) => void;
   onSave: () => void;
   spriteSize: '8x8' | '8x16';  // Game's sprite size setting
   spriteSets: AssetResponse[];  // Available sprite set assets
@@ -32,9 +29,7 @@ function EntityEditor({
   entity,
   onUpdate,
   onNameChange,
-  onComponentsChange,
   onSave,
-  spriteSize,
   spriteSets,
   palettes,
   backgroundColor
@@ -46,7 +41,7 @@ function EntityEditor({
     setXInput(value);
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 0 && numValue <= 255) {
-      onUpdate(numValue, entity.y);
+      onUpdate({ x: numValue });
     }
   };
 
@@ -54,72 +49,16 @@ function EntityEditor({
     setYInput(value);
     const numValue = parseInt(value, 10);
     if (!isNaN(numValue) && numValue >= 0 && numValue <= 255) {
-      onUpdate(entity.x, numValue);
+      onUpdate({ y: numValue });
     }
   };
 
-  const handleAddSprite = () => {
-    const components = entity.components || [];
-    const hasSprite = components.some(c => c.type === 'sprite');
-
-    if (hasSprite) {
-      alert('Entity already has a sprite component');
-      return;
-    }
-
-    const newSprite: NESSpriteData = {
-      type: 'sprite',
-      width: 1,
-      height: 1,
-      sprite_set: null,
-      palette_index: 0,
-    };
-
-    onComponentsChange([...components, newSprite]);
+  const handleSpriteSetChange = (spriteSetId: string) => {
+    onUpdate({ spriteset: spriteSetId || null });
   };
 
-  const handleSpriteChange = (index: number, width: number, height: number) => {
-    const components = entity.components || [];
-    const updated = [...components];
-    updated[index] = {
-      ...updated[index],
-      width,
-      height,
-    } as NESSpriteData;
-    onComponentsChange(updated);
-  };
-
-  const handleSpriteSetChange = (index: number, spriteSetId: string | null) => {
-    const components = entity.components || [];
-    const updated = [...components];
-    updated[index] = {
-      ...updated[index],
-      sprite_set: spriteSetId,
-    } as NESSpriteData;
-    onComponentsChange(updated);
-  };
-
-  const handlePaletteIndexChange = (index: number, paletteIndex: number) => {
-    const components = entity.components || [];
-    const updated = [...components];
-    updated[index] = {
-      ...updated[index],
-      palette_index: paletteIndex,
-    } as NESSpriteData;
-    onComponentsChange(updated);
-  };
-
-  const handleRemoveComponent = (index: number) => {
-    const components = entity.components || [];
-    onComponentsChange(components.filter((_, i) => i !== index));
-  };
-
-  const getPixelDimensions = (width: number, height: number) => {
-    if (spriteSize === '8x8') {
-      return { w: width * 8, h: height * 8 };
-    } else {
-      return { w: width * 8, h: height * 16 };
-    }
+  const handlePaletteIndexChange = (paletteIndex: number) => {
+    onUpdate({ palette_index: paletteIndex });
   };
 
   // Decompile CHR data to pixel array (returns color indices 0-3)
@@ -144,7 +83,7 @@ function EntityEditor({
 
   // Get NES color by index
   const getNESColor = (index: number): string => {
-    // Import the NES color palette (simplified for now - should match backend)
+    // NES color palette (should match backend)
     const NES_COLORS = [
       '#7C7C7C', '#0000FC', '#0000BC', '#4428BC', '#940084', '#A80020', '#A81000', '#881400',
       '#503000', '#007800', '#006800', '#005800', '#004058', '#000000', '#000000', '#000000',
@@ -159,10 +98,10 @@ function EntityEditor({
   };
 
   // Render sprite preview as canvas
-  const renderSpritePreview = (spriteSetId: string | null, paletteIndex: number): React.ReactNode => {
-    if (!spriteSetId) return null;
+  const renderSpritePreview = (): React.ReactNode => {
+    if (!entity.spriteset) return null;
 
-    const spriteSet = spriteSets.find(s => s.id === spriteSetId);
+    const spriteSet = spriteSets.find(s => s.id === entity.spriteset);
     if (!spriteSet || spriteSet.type !== 'sprite_set') return null;
 
     // Get CHR data from sprite set
@@ -175,8 +114,8 @@ function EntityEditor({
 
     if (palette && palette.data) {
       const paletteData = palette.data as any;
-      if (paletteData.palettes && paletteData.palettes[paletteIndex]) {
-        const subPalette = paletteData.palettes[paletteIndex];
+      if (paletteData.palettes && paletteData.palettes[entity.palette_index]) {
+        const subPalette = paletteData.palettes[entity.palette_index];
         colors = [
           backgroundColor, // Color 0 is always background
           subPalette.colors[0]?.index || 0x16,
@@ -273,108 +212,51 @@ function EntityEditor({
         </div>
       </div>
 
-      {/* Components section */}
-      <div className={styles.componentsSection}>
-        <div className={styles.componentsHeader}>
-          <span className={styles.componentsTitle}>Components</span>
-          <button
-            className={styles.addComponentButton}
-            onClick={handleAddSprite}
-            title="Add sprite component"
-          >
-            <Plus size={12} /> Sprite
-          </button>
+      {/* Sprite section */}
+      <div className={styles.spriteSection}>
+        <div className={styles.spriteHeader}>
+          <span className={styles.spriteTitle}>Sprite</span>
         </div>
 
-        {entity.components && entity.components.length > 0 && (
-          <div className={styles.componentsList}>
-            {entity.components.map((component, index) => {
-              if (component.type === 'sprite') {
-                const sprite = component as NESSpriteData;
-                const pixels = getPixelDimensions(sprite.width, sprite.height);
-                return (
-                  <div key={index} className={styles.componentItem}>
-                    <div className={styles.componentHeader}>
-                      <span className={styles.componentType}>Sprite</span>
-                      <button
-                        className={styles.removeComponentButton}
-                        onClick={() => handleRemoveComponent(index)}
-                        title="Remove component"
-                      >
-                        <X size={12} />
-                      </button>
-                    </div>
-                    <div className={styles.componentContent}>
-                      {sprite.sprite_set && renderSpritePreview(sprite.sprite_set, sprite.palette_index || 0)}
-                      <div className={styles.componentFields}>
-                        <div className={styles.componentField}>
-                          <label>Sprite Set:</label>
-                          <select
-                            value={sprite.sprite_set || ''}
-                            onChange={(e) => handleSpriteSetChange(index, e.target.value || null)}
-                          >
-                            <option value="">None</option>
-                            {spriteSets.map((ss) => (
-                              <option key={ss.id} value={ss.id}>
-                                {ss.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+        <div className={styles.spriteContent}>
+          {entity.spriteset && renderSpritePreview()}
+          <div className={styles.spriteFields}>
+            <div className={styles.spriteField}>
+              <label>Sprite Set:</label>
+              <select
+                value={entity.spriteset || ''}
+                onChange={(e) => handleSpriteSetChange(e.target.value)}
+              >
+                <option value="">None</option>
+                {spriteSets.map((ss) => (
+                  <option key={ss.id} value={ss.id}>
+                    {ss.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-                        {sprite.sprite_set && (
-                          <>
-                            <div className={styles.componentField}>
-                              <label>Palette:</label>
-                              <div className={styles.paletteSelector}>
-                                {[0, 1, 2, 3].map((idx) => (
-                                  <label key={idx} className={styles.paletteOption}>
-                                    <input
-                                      type="radio"
-                                      name={`palette-${index}`}
-                                      value={idx}
-                                      checked={(sprite.palette_index || 0) === idx}
-                                      onChange={() => handlePaletteIndexChange(index, idx)}
-                                    />
-                                    <span>{idx}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            </div>
-
-                            <div className={styles.componentField}>
-                              <label>Width:</label>
-                              <input
-                                type="number"
-                                value={sprite.width}
-                                onChange={(e) => handleSpriteChange(index, parseInt(e.target.value) || 1, sprite.height)}
-                                min="1"
-                                max="16"
-                              />
-                              <span className={styles.pixelSize}>({pixels.w}px)</span>
-                            </div>
-                            <div className={styles.componentField}>
-                              <label>Height:</label>
-                              <input
-                                type="number"
-                                value={sprite.height}
-                                onChange={(e) => handleSpriteChange(index, sprite.width, parseInt(e.target.value) || 1)}
-                                min="1"
-                                max="16"
-                              />
-                              <span className={styles.pixelSize}>({pixels.h}px)</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                );
-              }
-              return null;
-            })}
+            {entity.spriteset && (
+              <div className={styles.spriteField}>
+                <label>Palette:</label>
+                <div className={styles.paletteSelector}>
+                  {[0, 1, 2, 3].map((idx) => (
+                    <label key={idx} className={styles.paletteOption}>
+                      <input
+                        type="radio"
+                        name="palette"
+                        value={idx}
+                        checked={entity.palette_index === idx}
+                        onChange={() => handlePaletteIndexChange(idx)}
+                      />
+                      <span>{idx}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -3,9 +3,9 @@ from unittest.mock import Mock
 
 import pytest
 
-from core.rom.data import AddressData, PaletteData, SceneData
+from core.rom.data import AddressData, PaletteData, SceneData, EntityData
 from core.rom.label_registry import LabelRegistry
-from core.schemas import NESColor, NESPalette, NESPaletteAssetData, NESScene
+from core.schemas import NESColor, NESPalette, NESPaletteAssetData, NESScene, NESEntity
 
 
 class TestPaletteData:
@@ -243,8 +243,8 @@ class TestSceneData:
         assert "asset__palette__bg_palette" in scene_data.dependencies
         assert "asset__palette__sprite_palette" in scene_data.dependencies
 
-    def test_scene_data_size_is_5_bytes(self):
-        """Verify scene is 1 byte (bg color) + 2 bytes (bg pal ptr) + 2 bytes (sprite pal ptr)."""
+    def test_scene_data_size_with_no_entities(self):
+        """Verify scene with no entities is 1 byte (bg color) + 2 bytes (bg pal) + 2 bytes (sprite pal) + 2 bytes (null terminator)."""
         scene_id = uuid.uuid4()
         registry = LabelRegistry()
 
@@ -255,15 +255,49 @@ class TestSceneData:
             background_color=NESColor(index=0x0F),
             background_palettes=None,
             sprite_palettes=None,
+            entities=[],
         )
         registry._add_scenes([mock_scene])
 
         scene_data = SceneData.from_model(scene=mock_scene, registry=registry)
 
-        assert scene_data.size == 5
+        # 1 (bg color) + 2 (bg pal) + 2 (sprite pal) + 2 (null terminator) = 7 bytes
+        assert scene_data.size == 7
+
+    def test_scene_data_size_with_entities(self):
+        """Verify scene size includes 2 bytes per entity plus null terminator."""
+        scene_id = uuid.uuid4()
+        entity1_id = uuid.uuid4()
+        entity2_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Add entities to registry
+        mock_entity1 = Mock()
+        mock_entity1.id = entity1_id
+        mock_entity1.name = "player"
+        mock_entity2 = Mock()
+        mock_entity2.id = entity2_id
+        mock_entity2.name = "enemy"
+        registry._add_entities([mock_entity1, mock_entity2])
+
+        mock_scene = Mock()
+        mock_scene.id = scene_id
+        mock_scene.name = "main"
+        mock_scene.scene_data = NESScene(
+            background_color=NESColor(index=0x0F),
+            background_palettes=None,
+            sprite_palettes=None,
+            entities=[entity1_id, entity2_id],
+        )
+        registry._add_scenes([mock_scene])
+
+        scene_data = SceneData.from_model(scene=mock_scene, registry=registry)
+
+        # 1 (bg color) + 2 (bg pal) + 2 (sprite pal) + 2 (entity1) + 2 (entity2) + 2 (null) = 11 bytes
+        assert scene_data.size == 11
 
     def test_scene_data_renders_with_null_palettes(self):
-        """Verify scene renders with null (0x0000) palette pointers."""
+        """Verify scene renders with null (0x0000) palette pointers and null-terminated entity list."""
         scene_id = uuid.uuid4()
         registry = LabelRegistry()
 
@@ -274,14 +308,15 @@ class TestSceneData:
             background_color=NESColor(index=0x0F),
             background_palettes=None,
             sprite_palettes=None,
+            entities=[],
         )
         registry._add_scenes([mock_scene])
 
         scene_data = SceneData.from_model(scene=mock_scene, registry=registry)
         rendered = scene_data.render(start_offset=0x9000, names={})
 
-        # 0F (bg color) + 00 00 (null bg pal) + 00 00 (null sprite pal)
-        assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00])
+        # 0F (bg color) + 00 00 (null bg pal) + 00 00 (null sprite pal) + 00 00 (null terminator)
+        assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
         assert rendered.exported_labels == {"scene__main": 0x9000}
 
     def test_scene_data_renders_with_palette_references(self):
@@ -311,6 +346,7 @@ class TestSceneData:
             background_color=NESColor(index=0x21),
             background_palettes=bg_palette_id,
             sprite_palettes=sprite_palette_id,
+            entities=[],
         )
         registry._add_scenes([mock_scene])
 
@@ -324,8 +360,8 @@ class TestSceneData:
             },
         )
 
-        # 21 (bg color) + 00 91 (bg pal @ 0x9100) + 00 92 (sprite pal @ 0x9200)
-        assert rendered.code == bytes([0x21, 0x00, 0x91, 0x00, 0x92])
+        # 21 (bg color) + 00 91 (bg pal @ 0x9100) + 00 92 (sprite pal @ 0x9200) + 00 00 (null terminator)
+        assert rendered.code == bytes([0x21, 0x00, 0x91, 0x00, 0x92, 0x00, 0x00])
         assert rendered.exported_labels == {"scene__main": 0x9000}
 
     def test_scene_data_with_missing_palette_uses_null(self):
@@ -348,6 +384,7 @@ class TestSceneData:
             background_color=NESColor(index=0x0F),
             background_palettes=missing_palette_id,
             sprite_palettes=None,
+            entities=[],
         )
         registry._add_scenes([mock_scene])
 
@@ -356,5 +393,206 @@ class TestSceneData:
         # Missing palette should result in 0x0000
         rendered = scene_data.render(start_offset=0x9000, names={})
 
-        # 0F (bg color) + 00 00 (missing -> null) + 00 00 (null sprite pal)
-        assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00])
+        # 0F (bg color) + 00 00 (missing -> null) + 00 00 (null sprite pal) + 00 00 (null terminator)
+        assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+
+    def test_scene_data_renders_with_entity_addresses(self):
+        """Verify scene renders entity addresses correctly with null terminator."""
+        scene_id = uuid.uuid4()
+        entity1_id = uuid.uuid4()
+        entity2_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Add entities to registry
+        mock_entity1 = Mock()
+        mock_entity1.id = entity1_id
+        mock_entity1.name = "player"
+        mock_entity2 = Mock()
+        mock_entity2.id = entity2_id
+        mock_entity2.name = "enemy"
+        registry._add_entities([mock_entity1, mock_entity2])
+
+        mock_scene = Mock()
+        mock_scene.id = scene_id
+        mock_scene.name = "main"
+        mock_scene.scene_data = NESScene(
+            background_color=NESColor(index=0x0F),
+            background_palettes=None,
+            sprite_palettes=None,
+            entities=[entity1_id, entity2_id],
+        )
+        registry._add_scenes([mock_scene])
+
+        scene_data = SceneData.from_model(scene=mock_scene, registry=registry)
+
+        rendered = scene_data.render(
+            start_offset=0x9000,
+            names={
+                "entity__player": 0x9100,
+                "entity__enemy": 0x9150,
+            },
+        )
+
+        # 0F (bg color) + 00 00 (null bg pal) + 00 00 (null sprite pal) + 00 91 (player @ 0x9100) + 50 91 (enemy @ 0x9150) + 00 00 (null terminator)
+        assert rendered.code == bytes([0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x91, 0x50, 0x91, 0x00, 0x00])
+        assert rendered.exported_labels == {"scene__main": 0x9000}
+
+    def test_scene_data_depends_on_entities(self):
+        """Verify scene depends on its entity labels."""
+        scene_id = uuid.uuid4()
+        entity1_id = uuid.uuid4()
+        entity2_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Add entities to registry
+        mock_entity1 = Mock()
+        mock_entity1.id = entity1_id
+        mock_entity1.name = "player"
+        mock_entity2 = Mock()
+        mock_entity2.id = entity2_id
+        mock_entity2.name = "enemy"
+        registry._add_entities([mock_entity1, mock_entity2])
+
+        mock_scene = Mock()
+        mock_scene.id = scene_id
+        mock_scene.name = "main"
+        mock_scene.scene_data = NESScene(
+            background_color=NESColor(index=0x0F),
+            background_palettes=None,
+            sprite_palettes=None,
+            entities=[entity1_id, entity2_id],
+        )
+        registry._add_scenes([mock_scene])
+
+        scene_data = SceneData.from_model(scene=mock_scene, registry=registry)
+
+        assert "entity__player" in scene_data.dependencies
+        assert "entity__enemy" in scene_data.dependencies
+
+
+class TestEntityData:
+    """Tests for EntityData code block."""
+
+    def test_entity_data_from_model_uses_registry_label(self):
+        """Verify entity data uses label from registry."""
+        entity_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "player"
+        mock_entity.entity_data = NESEntity(x=10, y=20, spriteset=None, palette_index=0)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        assert entity_data.label == "entity__player"
+
+    def test_entity_data_without_spriteset_has_no_dependencies(self):
+        """Verify entity without spriteset has no dependencies."""
+        entity_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "player"
+        mock_entity.entity_data = NESEntity(x=10, y=20, spriteset=None, palette_index=0)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        assert entity_data.dependencies == []
+
+    def test_entity_data_with_spriteset_depends_on_asset(self):
+        """Verify entity with spriteset depends on the sprite set asset."""
+        entity_id = uuid.uuid4()
+        spriteset_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Add sprite set asset to registry
+        mock_spriteset = Mock()
+        mock_spriteset.id = spriteset_id
+        mock_spriteset.type = "sprite_set"
+        mock_spriteset.name = "hero_sprites"
+        registry._add_assets([mock_spriteset])
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "player"
+        mock_entity.entity_data = NESEntity(x=10, y=20, spriteset=spriteset_id, palette_index=2)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        assert "asset__sprite_set__hero_sprites" in entity_data.dependencies
+
+    def test_entity_data_size_is_4_bytes(self):
+        """Verify entity data is always 4 bytes (x, y, spriteset_idx, palette_idx)."""
+        entity_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "player"
+        mock_entity.entity_data = NESEntity(x=10, y=20, spriteset=None, palette_index=0)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        assert entity_data.size == 4
+
+    def test_entity_data_renders_position_and_sprite_info(self):
+        """Verify entity renders x, y, spriteset index, and palette index."""
+        entity_id = uuid.uuid4()
+        spriteset_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Add sprite set asset
+        mock_spriteset = Mock()
+        mock_spriteset.id = spriteset_id
+        mock_spriteset.type = "sprite_set"
+        mock_spriteset.name = "hero_sprites"
+        registry._add_assets([mock_spriteset])
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "player"
+        mock_entity.entity_data = NESEntity(x=100, y=150, spriteset=spriteset_id, palette_index=2)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        # Spriteset at CHR tile index 5 (background is at 0, so entity sprites start at 1+)
+        rendered = entity_data.render(
+            start_offset=0x8000,
+            names={"asset__sprite_set__hero_sprites": 5}
+        )
+
+        # 64 (x=100) + 96 (y=150) + 05 (spriteset tile idx=5) + 02 (palette idx=2)
+        assert rendered.code == bytes([100, 150, 5, 2])
+        assert rendered.exported_labels == {"entity__player": 0x8000}
+
+    def test_entity_data_renders_without_spriteset(self):
+        """Verify entity without spriteset renders with 0 for spriteset index."""
+        entity_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        mock_entity = Mock()
+        mock_entity.id = entity_id
+        mock_entity.name = "invisible"
+        mock_entity.entity_data = NESEntity(x=50, y=60, spriteset=None, palette_index=1)
+        mock_entity.components = []
+        registry._add_entities([mock_entity])
+
+        entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
+
+        rendered = entity_data.render(start_offset=0x8000, names={})
+
+        # 32 (x=50) + 3C (y=60) + 00 (no spriteset) + 01 (palette idx=1)
+        assert rendered.code == bytes([50, 60, 0, 1])
+        assert rendered.exported_labels == {"entity__invisible": 0x8000}

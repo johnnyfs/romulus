@@ -84,15 +84,18 @@ class SceneData(CodeBlock):
     background_color: NESColor
     background_palette: str | None
     sprite_palette: str | None
+    entity_labels: list[str] = []
 
     @classmethod
     def from_model(cls, scene: Scene, registry: LabelRegistry) -> Self:
+        entity_labels = [registry.get_entity_label(entity_id) for entity_id in scene.scene_data.entities]
         return cls(
             label=registry.get_scene_label(scene.id),
             type=CodeBlockType.DATA,
             background_color=scene.scene_data.background_color,
             background_palette=registry.get_asset_label(id) if (id := scene.scene_data.background_palettes) else None,
-            sprite_palette=registry.get_asset_label(id) if (id := scene.scene_data.sprite_palettes) else None
+            sprite_palette=registry.get_asset_label(id) if (id := scene.scene_data.sprite_palettes) else None,
+            entity_labels=entity_labels
         )
 
     @property
@@ -102,12 +105,20 @@ class SceneData(CodeBlock):
             dependencies.append(self.background_palette)
         if (self.sprite_palette is not None):
             dependencies.append(self.sprite_palette)
+        dependencies.extend(self.entity_labels)
         return dependencies
 
     @property
     def size(self) -> int:
-        """Scene is 1 byte for background color + 4 bytes for the palette addresses (which must still be present if null.)"""
-        return 1 + 2 + 2
+        """
+        Scene data is variable length:
+        - 1 byte for background color
+        - 2 bytes for background palette address
+        - 2 bytes for sprite palette address
+        - 2 bytes per entity address
+        - 2 bytes for null terminator (0x0000)
+        """
+        return 1 + 2 + 2 + (len(self.entity_labels) * 2) + 2
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = bytearray()
@@ -116,18 +127,24 @@ class SceneData(CodeBlock):
         code.append(self.background_color.index)
 
         # Background palettes address
-        # Try asset naming first, fall back to component naming (legacy)
         bg_pal_addr = 0
         if self.background_palette:
             bg_pal_addr = names.get(self.background_palette, 0)
         code.extend(bg_pal_addr.to_bytes(2, "little"))
 
         # Sprite palettes address
-        # Try asset naming first, fall back to component naming (legacy)
         sprite_pal_addr = 0
         if self.sprite_palette:
             sprite_pal_addr = names.get(self.sprite_palette, 0)
         code.extend(sprite_pal_addr.to_bytes(2, "little"))
+
+        # Entity addresses (null-terminated array)
+        for entity_label in self.entity_labels:
+            entity_addr = names.get(entity_label, 0)
+            code.extend(entity_addr.to_bytes(2, "little"))
+
+        # Null terminator (0x0000)
+        code.extend((0).to_bytes(2, "little"))
 
         return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
 
@@ -136,34 +153,35 @@ class EntityData(CodeBlock):
     """
     An entity data code block.
 
-    - contains entity position data (x, y)
+    - contains entity position data (x, y) and sprite information
     """
     entity_data: NESEntity
-    component_labels: list[str]
+    spriteset_label: str | None = None
+    palette_index: int = 0
 
     @classmethod
     def from_model(cls, entity: Entity, registry: LabelRegistry) -> Self:
-        """Entity depends on components attached to it."""
-        component_labels = []
-        for component in entity.components:
-            component_label = registry.get_component_label(component.id)
-            component_labels.append(component_label)
+        """Entity depends on its spriteset asset (if any)."""
+        spriteset_label = None
+        if entity.entity_data.spriteset:
+            spriteset_label = registry.get_asset_label(entity.entity_data.spriteset)
 
         return cls(
             label=registry.get_entity_label(entity.id),
             type=CodeBlockType.DATA,
             entity_data=entity.entity_data,
-            component_labels=component_labels
+            spriteset_label=spriteset_label,
+            palette_index=entity.entity_data.palette_index
         )
 
     @property
     def dependencies(self) -> list[str]:
-        return self.component_labels
+        return [self.spriteset_label] if self.spriteset_label else []
 
     @property
     def size(self) -> int:
-        """Entity is 2 bytes: x position + y position."""
-        return 2
+        """Entity is 4 bytes: x position + y position + spriteset idx + palette idx."""
+        return 4
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         code = bytearray()
@@ -174,8 +192,16 @@ class EntityData(CodeBlock):
         # Y position (byte)
         code.append(self.entity_data.y & 0xFF)
 
-        return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
+        # Sprite set index
+        # The spriteset label in names dict contains the CHR tile index
+        # (background pattern is at index 0, entity sprites start at index 1+)
+        spriteset_index = names.get(self.spriteset_label, 0) if self.spriteset_label else 0
+        code.append(spriteset_index & 0xFF)
 
+        # Palette index
+        code.append(self.palette_index & 0xFF)
+
+        return RenderedCodeBlock(code=bytes(code), exported_labels={self.label: start_offset})
 
 class SpriteSetCHRData(CodeBlock):
     """
@@ -205,6 +231,8 @@ class SpriteSetCHRData(CodeBlock):
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         # Render the actual CHR data
-        # The exported name references the CHR index (start_offset in CHR-ROM space)
+        # The exported name references the CHR tile index (start_offset / 16)
+        # Each CHR tile is 16 bytes (8 bytes per bitplane)
         code = self.sprite_set_data.chr_data
-        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
+        chr_tile_index = start_offset // 16
+        return RenderedCodeBlock(code=code, exported_labels={self.label: chr_tile_index})
