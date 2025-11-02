@@ -4,40 +4,36 @@ from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
 from core.rom.rom import Rom
 
 
-class MockCodeBlock(CodeBlock):
+class _MockCodeBlock(CodeBlock):
     """Mock code block for testing ROM assembly."""
-
-    def __init__(
-        self,
-        name: str,
-        block_type: CodeBlockType,
-        size: int,
-        code: bytes = None,
-    ):
-        super().__init__()
-        self._name = name
-        self._type = block_type
-        self._size = size
-        self._code = code or (b"\x00" * size)
-
-    @property
-    def type(self) -> CodeBlockType:
-        return self._type
-
-    @property
-    def label(self) -> str:
-        return self._name
+    mock_size: int
+    mock_code: bytes
 
     @property
     def size(self) -> int:
-        return self._size
+        return self.mock_size
 
     @property
     def dependencies(self) -> list[str]:
         return []
 
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
-        return RenderedCodeBlock(code=self._code, exported_labels={self.label: start_offset})
+        return RenderedCodeBlock(code=self.mock_code, exported_labels={self.label: start_offset})
+
+
+def MockCodeBlock(
+    name: str,
+    block_type: CodeBlockType,
+    size: int,
+    code: bytes | None = None,
+) -> CodeBlock:
+    """Factory function to create mock code blocks for ROM testing."""
+    return _MockCodeBlock(
+        label=name,
+        type=block_type,
+        mock_size=size,
+        mock_code=code or (b"\x00" * size)
+    )
 
 
 class TestRomRender:

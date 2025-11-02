@@ -1,7 +1,5 @@
 import enum
 
-from pydantic import BaseModel, Field
-
 from core.rom.code_block import CodeBlock, CodeBlockType
 
 
@@ -44,8 +42,11 @@ def _empty_code_blocks_factory() -> dict[RomCodeArea, dict[str, CodeBlock]]:
     }
 
 
-class Rom(BaseModel):
-    code_blocks: dict[RomCodeArea, dict[str, CodeBlock]] = Field(default_factory=_empty_code_blocks_factory)
+class Rom:
+    def __init__(self, code_blocks: dict[RomCodeArea, dict[str, CodeBlock]] | None = None):
+        self.code_blocks: dict[RomCodeArea, dict[str, CodeBlock]] = (
+            code_blocks if code_blocks is not None else _empty_code_blocks_factory()
+        )
 
     def add(self, code_block: CodeBlock) -> None:
         self.code_blocks[RomCodeArea.from_code_block_type(code_block.type)][code_block.label] = code_block
@@ -70,7 +71,7 @@ class Rom(BaseModel):
         for block in self.code_blocks[RomCodeArea.ZEROPAGE].values():
             rendered = block.render(start_offset=zp_offset, names=names)
             zp_code.extend(rendered.code)
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             zp_offset += block.size
 
         if zp_offset > 256:
@@ -91,7 +92,7 @@ class Rom(BaseModel):
         for block in prg_blocks:
             rendered = block.render(start_offset=prg_offset, names=names)
             prg_code.extend(rendered.code)
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             prg_offset += block.size
 
         # Step 3: NMI routine - post vblank first, then vblank
@@ -103,14 +104,14 @@ class Rom(BaseModel):
         for block in self.code_blocks[RomCodeArea.NMI_POST_VBLANK].values():
             rendered = block.render(start_offset=nmi_offset, names=names)
             nmi_code.extend(rendered.code)
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             nmi_offset += block.size
 
         # Add vblank blocks
         for block in self.code_blocks[RomCodeArea.NMI_VBLANK].values():
             rendered = block.render(start_offset=nmi_offset, names=names)
             nmi_code.extend(rendered.code)
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             nmi_offset += block.size
 
         # Add RTI to end NMI
@@ -125,7 +126,7 @@ class Rom(BaseModel):
         for block in self.code_blocks[RomCodeArea.RESET].values():
             rendered = block.render(start_offset=reset_offset, names=names)
             reset_code.extend(rendered.code)
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             reset_offset += block.size
 
         # Step 5: Final assembly
@@ -181,7 +182,7 @@ class Rom(BaseModel):
         for block in self.code_blocks[RomCodeArea.CHR_ROM].values():
             rendered = block.render(start_offset=chr_offset, names=names)
             chr_rom[chr_offset:chr_offset + len(rendered.code)] = rendered.code
-            names.update(rendered.exported_names)
+            names.update(rendered.exported_labels)
             chr_offset += block.size
 
         # If no CHR blocks, add test pattern for first tile (4 quadrants)
