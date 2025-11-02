@@ -19,5 +19,4 @@ class Component(UUIDMixin, Base):
     type: Mapped[ComponentType] = mapped_column(nullable=False)
     component_data: Mapped[ComponentData] = mapped_column(PydanticType(ComponentData), nullable=False)
 
-    game: Mapped["Game"] = relationship("Game", back_populates="components", lazy="raise")  # type: ignore
     entity: Mapped["Entity"] = relationship("Entity", back_populates="components", lazy="raise")  # type: ignore

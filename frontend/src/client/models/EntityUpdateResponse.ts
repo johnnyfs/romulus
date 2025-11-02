@@ -2,11 +2,14 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NESEntity_Output } from './NESEntity_Output';
+import type { NESEntity } from './NESEntity';
+import type { NESPaletteData_Output } from './NESPaletteData_Output';
+import type { NESSpriteData } from './NESSpriteData';
 export type EntityUpdateResponse = {
     id: string;
     game_id: string;
     name: string;
-    entity_data: NESEntity_Output;
+    entity_data: NESEntity;
+    components?: Array<(NESPaletteData_Output | NESSpriteData)>;
 };
 

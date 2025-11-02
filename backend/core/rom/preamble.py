@@ -18,7 +18,7 @@ class PreambleCodeBlock(CodeBlock):
     """
     label: str = "preamble"
     type: CodeBlockType = CodeBlockType.PREAMBLE
-    main_scene_name: str = "main"
+    main_scene_label: str
 
     @property
     def size(self) -> int:
@@ -28,7 +28,7 @@ class PreambleCodeBlock(CodeBlock):
             start_offset=0x8000,
             names={
                 "zp__src1": 0x00,
-                f"scene_data__{self.main_scene_name}": 0x8000,
+                self.main_scene_label: 0x8000,
                 "load_scene": 0x8000,
             },
         )
@@ -36,7 +36,7 @@ class PreambleCodeBlock(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        return ["zp__src1", f"scene_data__{self.main_scene_name}", "load_scene"]
+        return ["zp__src1", self.main_scene_label, "load_scene"]
 
     def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
         """Build the preamble assembly code."""
@@ -66,7 +66,7 @@ class PreambleCodeBlock(CodeBlock):
 
         # === Load Initial Scene ===
         # Load the address of the initial scene data into zero page variable zp__src1
-        scene_data_addr = names[f"scene_data__{self.main_scene_name}"]
+        scene_data_addr = names[self.main_scene_label]
         zp_src_addr = names["zp__src1"]
 
         # Load low byte of scene data address

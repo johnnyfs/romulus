@@ -19,7 +19,7 @@ DEFAULT_REGISTRY = {
 class CodeBlockRegistry:
     def __init__(self, label_registry: LabelRegistry):
         self._label_registry = label_registry
-        self._code_blocks_by_label: dict[str, CodeBlock] = {}
+        self._code_blocks_by_label: dict[str, CodeBlock] = DEFAULT_REGISTRY.copy()
 
     def _asset_to_code_block(self, asset: Asset) -> CodeBlock:
         """Convert an asset to code blocks (data blocks)."""

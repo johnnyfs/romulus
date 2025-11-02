@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NESEntity } from './NESEntity';
-export type EntityCreateRequest = {
-    name: string;
-    entity_data: NESEntity;
+/**
+ * An entity with position data.
+ */
+export type NESEntity = {
+    'x': number;
+    'y': number;
 };
 

@@ -23,7 +23,7 @@ from api.games.schemas import (
     GameUpdateRequest,
     GameUpdateResponse,
 )
-from core.rom.builder import RomBuilder
+from core.rom.builder import RomBuilder, get_rom_builder
 from core.rom.code_block_registry import CodeBlockRegistry
 from core.rom.rom import Rom
 from core.schemas import (
@@ -143,11 +143,11 @@ async def get_game(
     game_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
 ):
-    # Query game with scenes, entities, and assets eagerly loaded
+    # Query game with scenes, entities (with components), and assets eagerly loaded
     stmt = select(Game).where(Game.id == game_id).options(
         selectinload(Game.scenes),
         selectinload(Game.assets),
-        selectinload(Game.entities)
+        selectinload(Game.entities).selectinload(Entity.components)
     )
     result = await db.execute(stmt)
     game = result.scalar_one_or_none()
@@ -172,13 +172,14 @@ async def get_game(
         for asset in game.assets
     ]
 
-    # Convert entities to response format (components are embedded in entity_data)
+    # Convert entities to response format with components
     entities = [
         EntityResponse(
             id=entity.id,
             game_id=entity.game_id,
             name=entity.name,
             entity_data=entity.entity_data,
+            components=[c.component_data for c in entity.components],
         )
         for entity in game.entities
     ]
@@ -236,7 +237,7 @@ async def delete_game(
 )
 async def render_game(
     game_id: uuid.UUID,
-    db: AsyncSession = Depends(get_db),
+    rom_builder: RomBuilder = Depends(get_rom_builder),
 ):
     """
     Renders a game into a NES ROM file.
@@ -244,13 +245,9 @@ async def render_game(
     Returns the ROM data as application/octet-stream which can be
     loaded directly into a NES emulator.
     """
-    # Build and render the ROM
-    rom = Rom()
-    registry = CodeBlockRegistry()
-    builder = RomBuilder(db=db, rom=rom, code_block_registry=registry)
 
     try:
-        rom_bytes = await builder.build(game_id=game_id, initial_scene_name="main")
+        rom_bytes = await rom_builder.build(game_id=game_id, initial_scene_name="main")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:

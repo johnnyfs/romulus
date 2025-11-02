@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://romulus:romulus@localhost:5432/romulus"
+    DATABASE_URL: str = "postgresql+asyncpg://romulus:romulus@localhost:5433/romulus"
 
     # API
     API_V1_PREFIX: str = "/api/v1"

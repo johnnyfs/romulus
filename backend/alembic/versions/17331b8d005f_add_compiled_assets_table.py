@@ -15,7 +15,7 @@ from core.schemas import AssetData
 
 # revision identifiers, used by Alembic.
 revision: str = '17331b8d005f'
-down_revision: Union[str, Sequence[str], None] = 'f6d0a8cccb2b'
+down_revision: Union[str, Sequence[str], None] = '49c9b1097ca6'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

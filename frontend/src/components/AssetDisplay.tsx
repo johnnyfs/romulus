@@ -87,7 +87,7 @@ function AssetDisplay({ game, onRebuildROM, onSceneUpdated }: AssetDisplayProps)
             name: entity.name,
             x: entity.entity_data.x,
             y: entity.entity_data.y,
-            components: entity.entity_data.components || [],
+            components: entity.components || [],
             isDirty: false,
           };
           sceneEntityMap.set(entity.id, entityData);

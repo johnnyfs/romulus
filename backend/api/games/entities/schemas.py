@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import BaseModel
 
-from core.schemas import NESEntity
+from core.schemas import ComponentData, NESEntity
 
 
 class EntityCreateRequest(BaseModel):
@@ -15,6 +15,7 @@ class EntityCreateResponse(BaseModel):
     game_id: uuid.UUID
     name: str
     entity_data: NESEntity
+    components: list[ComponentData] = []
 
 
 class EntityUpdateRequest(BaseModel):
@@ -27,6 +28,7 @@ class EntityUpdateResponse(BaseModel):
     game_id: uuid.UUID
     name: str
     entity_data: NESEntity
+    components: list[ComponentData] = []
 
 
 class EntityResponse(BaseModel):
@@ -34,3 +36,4 @@ class EntityResponse(BaseModel):
     game_id: uuid.UUID
     name: str
     entity_data: NESEntity
+    components: list[ComponentData] = []

@@ -2,9 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NESEntity_Input } from './NESEntity_Input';
+import type { NESEntity } from './NESEntity';
 export type EntityUpdateRequest = {
     name?: (string | null);
-    entity_data?: (NESEntity_Input | null);
+    entity_data?: (NESEntity | null);
 };
 

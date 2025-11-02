@@ -1,7 +1,9 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from api.games.entities.models import Entity
 from api.games.entities.schemas import (
@@ -28,11 +30,13 @@ async def create_entity(
     )
     db.add(entity)
     await db.flush()
+    await db.refresh(entity, attribute_names=["components"])
     return EntityCreateResponse(
         id=entity.id,
         game_id=entity.game_id,
         name=entity.name,
         entity_data=entity.entity_data,
+        components=[c.component_data for c in entity.components],
     )
 
 
@@ -43,7 +47,10 @@ async def update_entity(
     request: EntityUpdateRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    entity = await db.get(Entity, entity_id)
+    stmt = select(Entity).where(Entity.id == entity_id).options(selectinload(Entity.components))
+    result = await db.execute(stmt)
+    entity = result.scalar_one_or_none()
+
     if entity is None or entity.game_id != game_id:
         raise HTTPException(status_code=404, detail="Entity not found")
 
@@ -58,6 +65,7 @@ async def update_entity(
         game_id=entity.game_id,
         name=entity.name,
         entity_data=entity.entity_data,
+        components=[c.component_data for c in entity.components],
     )
 
 

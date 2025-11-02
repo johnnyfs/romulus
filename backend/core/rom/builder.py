@@ -61,17 +61,20 @@ class RomBuilder:
 
         # Add all the scenes and their dependencies. (The sum of their referenced objects
         # is the sum of the game.)
-        saw_main = False
+        main_label = None
         for scene in game.scenes:
-            saw_main = saw_main or (scene.name == initial_scene_name)
             scene_label = self.label_registry.get_scene_label(scene.id)
-            scene_block = self.code_block_registry[scene_label]
-            self._add(self.rom, scene_block) 
+            print(f"Adding scene '{scene.name}' with label '{scene_label}' to ROM.")
+            if scene.name == initial_scene_name:
+                print(f"  -> This is the initial scene.")
+                main_label = scene_label
+            scene_block = SceneData.from_model(scene=scene, registry=self.label_registry)
+            self._add(self.rom, scene_block)
 
-        if not saw_main:
+        if main_label is None:
             raise ValueError(f"Game must have a scene named '{initial_scene_name}'.")
 
-        preamble = PreambleCodeBlock(main_scene_name=initial_scene_name)
+        preamble = PreambleCodeBlock(main_scene_label=main_label)
         self._add(self.rom, preamble)
 
         # Asset code blocks are added automatically via dependencies
