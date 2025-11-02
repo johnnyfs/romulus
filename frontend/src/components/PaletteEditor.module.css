@@ -60,29 +60,23 @@
   transform: scale(1.2);
 }
 
-.paletteGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--spacing-sm);
-}
-
-.subPalette {
-  border: 1px solid #d0d0d0;
-  border-radius: var(--border-radius-sm);
-  padding: var(--spacing-xs);
-  background-color: #fff;
-}
-
-.subPaletteLabel {
-  font-size: 10px;
-  color: var(--color-text-muted);
-  margin-bottom: 6px;
-  font-weight: var(--font-weight-medium);
-}
-
-.paletteColors {
+.paletteRow {
   display: flex;
-  gap: var(--spacing-md);
+  align-items: center;
+  gap: 6px;
+}
+
+.subPaletteInline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.paletteDivider {
+  width: 1px;
+  height: 20px;
+  background-color: #d0d0d0;
+  margin: 0 4px;
 }
 
 .paletteColorColumn {
@@ -99,10 +93,10 @@
 }
 
 .paletteColorSwatch {
-  width: 32px;
-  height: 32px;
-  border: 2px solid #333;
-  border-radius: var(--border-radius-sm);
+  width: 16px;
+  height: 16px;
+  border: 1px solid #333;
+  border-radius: 2px;
   cursor: pointer;
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   padding: 0;

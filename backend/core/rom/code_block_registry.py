@@ -5,13 +5,14 @@ from core.rom.code_block import CodeBlock, CodeBlockType
 from core.rom.data import EntityData, PaletteData, SpriteSetCHRData
 from core.rom.label_registry import LabelRegistry
 from core.rom.subroutines import LoadSceneSubroutine
-from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2
+from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2, ZeroPageEntityRAM
 from core.schemas import AssetType
 
 DEFAULT_REGISTRY = {
     # Zero page
     "zp__src1": ZeroPageSource1(),
     "zp__src2": ZeroPageSource2(),
+    "zp__entity_ram_page": ZeroPageEntityRAM(),
     # Subroutines
     "load_scene": LoadSceneSubroutine(),
 }

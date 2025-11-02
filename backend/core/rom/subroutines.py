@@ -1,21 +1,24 @@
 from core.rom.asm import Asm6502
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
+from core.schemas import ENTITY_SIZE_BYTES
 
 
 class LoadSceneSubroutine(CodeBlock):
     """
     The built-in load scene subroutine code block.
 
-    Loads a scene's palette data into PPU memory:
+    Loads a scene's palette data into PPU memory and entities into RAM:
     1. Load background color (byte 0) into palette index 0
     2. Load background palette data (12 bytes) if pointer is non-null
     3. Load sprite palette data (12 bytes) if pointer is non-null
-    4. Enable PPU rendering and NMI
+    4. Load entity data into RAM page $0200-$02FF (null-terminated list)
+    5. Enable PPU rendering and NMI
 
     Scene data format (pointed to by zp__src1):
       Offset 0: Background color index (1 byte)
       Offset 1-2: Background palette data pointer (2 bytes, little-endian, 0 = null)
       Offset 3-4: Sprite palette data pointer (2 bytes, little-endian, 0 = null)
+      Offset 5+: Entity address list (2 bytes each, null-terminated with 0x0000)
     """
     label: str = "load_scene"
     type: CodeBlockType = CodeBlockType.SUBROUTINE
@@ -28,13 +31,14 @@ class LoadSceneSubroutine(CodeBlock):
             names={
                 "zp__src1": 0x00,
                 "zp__src2": 0x02,
+                "zp__entity_ram_page": 0x04,
             },
         )
         return len(asm)
 
     @property
     def dependencies(self) -> list[str]:
-        return ["zp__src1", "zp__src2"]
+        return ["zp__src1", "zp__src2", "zp__entity_ram_page"]
 
     def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
         """Build the load_scene subroutine assembly code."""
@@ -176,6 +180,77 @@ class LoadSceneSubroutine(CodeBlock):
         sprite_palette_end = len(asm)
         skip_sprite_bytes = sprite_palette_end - beq_sprite_fixup_pos - 1
         asm._code[beq_sprite_fixup_pos] = skip_sprite_bytes & 0xFF
+
+        # === Load entity data into RAM ===
+        # Entity list starts at offset 5 in scene data
+        # Format: [addr_low, addr_high, addr_low, addr_high, ..., 0x00, 0x00]
+        # Each entity's data is ENTITY_SIZE_BYTES bytes that we copy to $0200+
+
+        zp_entity_ram_page = names["zp__entity_ram_page"]
+        ENTITY_RAM_PAGE = 0x02  # $0200-$02FF
+
+        # Initialize entity RAM page pointer
+        asm.lda_imm(ENTITY_RAM_PAGE)
+        asm.sta_zp(zp_entity_ram_page)
+
+        # Y = offset into scene data (starts at 5, after bg color + 2 palette ptrs)
+        asm.ldy_imm(5)
+
+        # X = offset into entity RAM page (starts at 0)
+        asm.ldx_imm(0)
+
+        # Loop through entity addresses
+        entity_loop_start = len(asm)
+
+        # Load entity address low byte
+        asm.lda_ind_y(zp_src1)
+        # Store entity address in zp__src2
+        asm.sta_zp(zp_src2)
+        asm.iny()
+
+        # Load entity address high byte
+        asm.lda_ind_y(zp_src1)
+        asm.sta_zp(zp_src2 + 1)
+
+        # Check if null (both bytes must be zero)
+        # ORA with low byte to check if either is non-zero
+        asm.ora_zp(zp_src2)
+        asm.beq(0)  # Will be patched to skip to end
+        beq_entity_end_fixup_pos = len(asm) - 1
+
+        asm.iny()
+
+        # Save Y (scene data offset) to stack
+        asm.tya()
+        asm.pha()
+
+        # Copy ENTITY_SIZE_BYTES bytes from entity data to RAM
+        asm.ldy_imm(0)
+        for byte_offset in range(ENTITY_SIZE_BYTES):
+            asm.lda_ind_y(zp_src2)
+            asm.sta_abs_x(ENTITY_RAM_PAGE * 256)  # Store to $0200 + X
+            if byte_offset < ENTITY_SIZE_BYTES - 1:
+                asm.iny()
+                asm.inx()
+
+        # Advance X to next entity slot
+        asm.inx()
+
+        # Restore Y (scene data offset) from stack
+        asm.pla()
+        asm.tay()
+
+        # Loop back to process next entity
+        # Calculate relative offset for branch
+        entity_loop_end = len(asm)
+        branch_offset = entity_loop_start - entity_loop_end - 2  # -2 for the JMP instruction size
+        # Use JMP instead of branch since the loop might be too large for a relative branch
+        asm.jmp_abs(start_offset + entity_loop_start)
+
+        # Fix up entity end BEQ
+        entity_end = len(asm)
+        skip_entity_bytes = entity_end - beq_entity_end_fixup_pos - 1
+        asm._code[beq_entity_end_fixup_pos] = skip_entity_bytes & 0xFF
 
         # === Enable PPU and NMI ===
         # PPUCTRL: Enable NMI, background pattern table at $0000, sprites at $1000

@@ -40,3 +40,21 @@ class ZeroPageSource2(ZeroPageWord):
     A generic source vector for indirect loading via the zero page.
     """
     label: str = "zp__src2"
+
+
+class ZeroPageByte(ZeroPageVariable):
+    """
+    A zero page variable that is a single byte.
+    """
+
+    @property
+    def size(self) -> int:
+        return 1
+
+
+class ZeroPageEntityRAM(ZeroPageByte):
+    """
+    Pointer to the RAM page ($0200-$02FF) where entity data is loaded.
+    This is the high byte of the address; the low byte is the entity index * ENTITY_SIZE_BYTES.
+    """
+    label: str = "zp__entity_ram_page"

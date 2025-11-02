@@ -144,6 +144,8 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .spriteField {
@@ -183,6 +185,8 @@
   font-size: 11px;
   font-family: 'Courier New', monospace;
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .spriteField select:focus {

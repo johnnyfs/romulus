@@ -2,9 +2,13 @@ import uuid
 from enum import Enum
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 type NESRef = uuid.UUID  # UUID referencing a component
+
+# Entity data size constants
+ENTITY_SIZE_BYTES = 4  # x (1) + y (1) + spriteset_idx (1) + palette_idx (1)
+MAX_N_SCENE_ENTITIES = 256 // ENTITY_SIZE_BYTES  # 64 entities max (256 bytes / 4 bytes per entity)
 
 
 class GameType(str, Enum):
@@ -129,6 +133,18 @@ class NESScene(BaseModel):
     sprite_palettes: NESRef | None = None
     components: list[NESRef] = []
     entities: list[NESRef] = []  # References to game-level entities
+
+    @field_validator("entities")
+    @classmethod
+    def validate_entity_count(cls, v: list[NESRef]) -> list[NESRef]:
+        """Validate that the number of entities doesn't exceed the maximum."""
+        if len(v) > MAX_N_SCENE_ENTITIES:
+            raise ValueError(
+                f"Scene cannot have more than {MAX_N_SCENE_ENTITIES} entities "
+                f"(got {len(v)}). This limit is based on the available RAM "
+                f"(256 bytes / {ENTITY_SIZE_BYTES} bytes per entity)."
+            )
+        return v
 
 
 # Resource data schemas (discriminated union based on type)

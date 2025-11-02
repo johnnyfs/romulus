@@ -5,7 +5,7 @@ import pytest
 
 from core.rom.data import AddressData, PaletteData, SceneData, EntityData
 from core.rom.label_registry import LabelRegistry
-from core.schemas import NESColor, NESPalette, NESPaletteAssetData, NESScene, NESEntity
+from core.schemas import NESColor, NESPalette, NESPaletteAssetData, NESScene, NESEntity, ENTITY_SIZE_BYTES
 
 
 class TestPaletteData:
@@ -275,9 +275,11 @@ class TestSceneData:
         mock_entity1 = Mock()
         mock_entity1.id = entity1_id
         mock_entity1.name = "player"
+        mock_entity1.components = []
         mock_entity2 = Mock()
         mock_entity2.id = entity2_id
         mock_entity2.name = "enemy"
+        mock_entity2.components = []
         registry._add_entities([mock_entity1, mock_entity2])
 
         mock_scene = Mock()
@@ -407,9 +409,11 @@ class TestSceneData:
         mock_entity1 = Mock()
         mock_entity1.id = entity1_id
         mock_entity1.name = "player"
+        mock_entity1.components = []
         mock_entity2 = Mock()
         mock_entity2.id = entity2_id
         mock_entity2.name = "enemy"
+        mock_entity2.components = []
         registry._add_entities([mock_entity1, mock_entity2])
 
         mock_scene = Mock()
@@ -448,9 +452,11 @@ class TestSceneData:
         mock_entity1 = Mock()
         mock_entity1.id = entity1_id
         mock_entity1.name = "player"
+        mock_entity1.components = []
         mock_entity2 = Mock()
         mock_entity2.id = entity2_id
         mock_entity2.name = "enemy"
+        mock_entity2.components = []
         registry._add_entities([mock_entity1, mock_entity2])
 
         mock_scene = Mock()
@@ -596,3 +602,39 @@ class TestEntityData:
         # 32 (x=50) + 3C (y=60) + 00 (no spriteset) + 01 (palette idx=1)
         assert rendered.code == bytes([50, 60, 0, 1])
         assert rendered.exported_labels == {"entity__invisible": 0x8000}
+
+    def test_entity_data_size_matches_constant(self):
+        """Verify that EntityData.size always equals ENTITY_SIZE_BYTES constant."""
+        entity_id = uuid.uuid4()
+        registry = LabelRegistry()
+
+        # Test with spriteset
+        mock_spriteset = Mock()
+        mock_spriteset.id = uuid.uuid4()
+        mock_spriteset.type = "sprite_set"
+        mock_spriteset.name = "test_sprite"
+        registry._add_assets([mock_spriteset])
+
+        mock_entity1 = Mock()
+        mock_entity1.id = entity_id
+        mock_entity1.name = "with_sprite"
+        mock_entity1.entity_data = NESEntity(x=10, y=20, spriteset=mock_spriteset.id, palette_index=1)
+        mock_entity1.components = []
+        registry._add_entities([mock_entity1])
+
+        entity_data1 = EntityData.from_model(entity=mock_entity1, registry=registry)
+        assert entity_data1.size == ENTITY_SIZE_BYTES
+
+        # Test without spriteset
+        mock_entity2 = Mock()
+        mock_entity2.id = uuid.uuid4()
+        mock_entity2.name = "without_sprite"
+        mock_entity2.entity_data = NESEntity(x=30, y=40, spriteset=None, palette_index=0)
+        mock_entity2.components = []
+        registry._add_entities([mock_entity2])
+
+        entity_data2 = EntityData.from_model(entity=mock_entity2, registry=registry)
+        assert entity_data2.size == ENTITY_SIZE_BYTES
+
+        # Verify constant matches actual implementation
+        assert ENTITY_SIZE_BYTES == 4

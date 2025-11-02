@@ -69,41 +69,41 @@ function PaletteEditor({
         </button>
       </div>
 
-      {/* Render all 4 sub-palettes */}
-      <div className={styles.paletteGrid}>
+      {/* Render all palettes in a single row */}
+      <div className={styles.paletteRow}>
+        {/* Background color shown once at the start */}
+        <div className={styles.paletteColorColumn}>
+          <div className={styles.paletteColorLabel}>BG</div>
+          <div
+            className={`${styles.paletteColorSwatch} ${styles.paletteColorSwatchDisabled}`}
+            style={{ backgroundColor: getNESColor(backgroundColorIndex) }}
+            title={`Background: $${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
+          />
+          <div className={styles.paletteColorIndex}>
+            ${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}
+          </div>
+        </div>
+
+        <div className={styles.paletteDivider} />
+
+        {/* All 4 sub-palettes in a row, showing only their 3 colors */}
         {palette.subPalettes.map((subPalette, subPaletteIndex) => (
-          <div key={subPaletteIndex} className={styles.subPalette}>
-            <div className={styles.subPaletteLabel}>Palette {subPaletteIndex}</div>
-            <div className={styles.paletteColors}>
-              {/* Column 0: Background color (from scene, uneditable) */}
-              <div className={styles.paletteColorColumn}>
-                <div className={styles.paletteColorLabel}>0</div>
-                <div
-                  className={`${styles.paletteColorSwatch} ${styles.paletteColorSwatchDisabled}`}
-                  style={{ backgroundColor: getNESColor(backgroundColorIndex) }}
-                  title={`Background: $${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
+          <div key={subPaletteIndex} className={styles.subPaletteInline}>
+            {subPalette.map((colorIndex, slot) => (
+              <div key={slot} className={styles.paletteColorColumn}>
+                <div className={styles.paletteColorLabel}>{subPaletteIndex}.{slot + 1}</div>
+                <button
+                  className={styles.paletteColorSwatch}
+                  style={{ backgroundColor: getNESColor(colorIndex) }}
+                  onClick={(e) => handleColorClick(subPaletteIndex, slot, e)}
+                  title={`Palette ${subPaletteIndex}, Color ${slot + 1}: $${colorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
                 />
                 <div className={styles.paletteColorIndex}>
-                  ${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}
+                  ${colorIndex.toString(16).toUpperCase().padStart(2, '0')}
                 </div>
               </div>
-
-              {/* Columns 1-3: Editable palette colors */}
-              {subPalette.map((colorIndex, slot) => (
-                <div key={slot} className={styles.paletteColorColumn}>
-                  <div className={styles.paletteColorLabel}>{slot + 1}</div>
-                  <button
-                    className={styles.paletteColorSwatch}
-                    style={{ backgroundColor: getNESColor(colorIndex) }}
-                    onClick={(e) => handleColorClick(subPaletteIndex, slot, e)}
-                    title={`Click to change: $${colorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
-                  />
-                  <div className={styles.paletteColorIndex}>
-                    ${colorIndex.toString(16).toUpperCase().padStart(2, '0')}
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
+            {subPaletteIndex < 3 && <div className={styles.paletteDivider} />}
           </div>
         ))}
       </div>

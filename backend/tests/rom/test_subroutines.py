@@ -1,4 +1,5 @@
 from core.rom.subroutines import LoadSceneSubroutine
+from core.schemas import ENTITY_SIZE_BYTES
 from tests.rom.helpers import (
     MemoryObserver,
     create_test_cpu,
@@ -13,7 +14,7 @@ class TestLoadSceneSubroutine:
         """Verify that background color (byte 0) is written to palette index 0."""
         # Create the subroutine
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         # Set up PPU register observer
         ppu_observer = MemoryObserver()
@@ -26,6 +27,8 @@ class TestLoadSceneSubroutine:
             0x00,  # BG palette pointer (null)
             0x00,
             0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -54,7 +57,7 @@ class TestLoadSceneSubroutine:
     def test_loads_background_palette_when_pointer_is_not_null(self):
         """Verify that 12 bytes of BG palette data are loaded when pointer is non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
@@ -70,6 +73,8 @@ class TestLoadSceneSubroutine:
             0x91,  # BG palette pointer -> 0x9100
             0x00,
             0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -90,7 +95,7 @@ class TestLoadSceneSubroutine:
     def test_skips_background_palette_when_pointer_is_null(self):
         """Verify that BG palette is skipped when pointer is 0x0000."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
@@ -102,6 +107,8 @@ class TestLoadSceneSubroutine:
             0x00,  # BG palette pointer (null)
             0x00,
             0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -120,7 +127,7 @@ class TestLoadSceneSubroutine:
     def test_loads_sprite_palette_when_pointer_is_not_null(self):
         """Verify that 12 bytes of sprite palette data are loaded when pointer is non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
@@ -136,6 +143,8 @@ class TestLoadSceneSubroutine:
             0x00,  # BG palette pointer (null)
             0x00,
             0x92,  # Sprite palette pointer -> 0x9200
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -153,7 +162,7 @@ class TestLoadSceneSubroutine:
     def test_loads_both_palettes_when_both_pointers_are_not_null(self):
         """Verify both BG and sprite palettes are loaded when both pointers are non-null."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
@@ -171,6 +180,8 @@ class TestLoadSceneSubroutine:
             0x91,  # BG palette pointer -> 0x9100
             0x00,
             0x92,  # Sprite palette pointer -> 0x9200
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -191,13 +202,13 @@ class TestLoadSceneSubroutine:
     def test_enables_ppu_and_nmi_at_end(self):
         """Verify that PPU and NMI are enabled at the end of the subroutine."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
 
         # Minimal scene data
-        scene_data = [0x0F, 0x00, 0x00, 0x00, 0x00]
+        scene_data = [0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # Added entity list null terminator
         memory.write(0x9000, scene_data)
 
         memory[0x10] = 0x00
@@ -216,12 +227,12 @@ class TestLoadSceneSubroutine:
     def test_returns_via_rts(self):
         """Verify that the subroutine properly returns via RTS."""
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         cpu, memory = create_test_cpu(code.code, code_address=0x8000)
 
         # Minimal scene data
-        scene_data = [0x0F, 0x00, 0x00, 0x00, 0x00]
+        scene_data = [0x0F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]  # Added entity list null terminator
         memory.write(0x9000, scene_data)
 
         memory[0x10] = 0x00
@@ -251,7 +262,7 @@ class TestLoadSceneSubroutine:
         component reference (like "Classic Mario Set").
         """
         subroutine = LoadSceneSubroutine()
-        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12})
+        code = subroutine.render(start_offset=0x8000, names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14})
 
         ppu_observer = MemoryObserver()
         cpu, memory = create_test_cpu(code.code, code_address=0x8000, observers={range(0x2000, 0x2008): ppu_observer})
@@ -263,15 +274,17 @@ class TestLoadSceneSubroutine:
             17, 33, 49,  # Palette 2
             40, 56, 22,  # Palette 3
         ]
-        memory.write(0x8100, classic_mario_palette)
+        memory.write(0x8200, classic_mario_palette)
 
         # Create scene data referencing the palette
         scene_data = [
             0x02,  # Background color (index 2)
             0x00,
-            0x81,  # BG palette pointer -> 0x8100 (little-endian)
+            0x82,  # BG palette pointer -> 0x8200 (little-endian)
             0x00,
             0x00,  # Sprite palette pointer (null)
+            0x00,
+            0x00,  # Entity list null terminator
         ]
         memory.write(0x9000, scene_data)
 
@@ -318,3 +331,90 @@ class TestLoadSceneSubroutine:
             f"Expected: {[f'{b:02X}' for b in expected_data_writes]}\n"
             f"Actual:   {[f'{b:02X}' for b in actual_data_sequence]}"
         )
+
+    def test_loads_entity_data_into_ram(self):
+        """Verify that entity data is loaded into RAM page $0200."""
+        subroutine = LoadSceneSubroutine()
+        code = subroutine.render(
+            start_offset=0x8000,
+            names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14}
+        )
+
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000)
+
+        # Create entity data at different addresses
+        # Entity 1: x=100, y=150, spriteset_idx=1, palette_idx=2
+        entity1_data = [100, 150, 1, 2]
+        memory.write(0xA000, entity1_data)
+
+        # Entity 2: x=50, y=75, spriteset_idx=3, palette_idx=1
+        entity2_data = [50, 75, 3, 1]
+        memory.write(0xA100, entity2_data)
+
+        # Create scene data with entity list (null-terminated)
+        scene_data = [
+            0x0F,  # Background color
+            0x00, 0x00,  # BG palette pointer (null)
+            0x00, 0x00,  # Sprite palette pointer (null)
+            # Entity addresses (little-endian)
+            0x00, 0xA0,  # Entity 1 @ 0xA000
+            0x00, 0xA1,  # Entity 2 @ 0xA100
+            0x00, 0x00,  # Null terminator
+        ]
+        memory.write(0x9000, scene_data)
+
+        # Set zp__src1 to point to scene data
+        memory[0x10] = 0x00
+        memory[0x11] = 0x90
+
+        # Run the subroutine
+        run_subroutine(cpu, memory, subroutine_address=0x8000)
+
+        # Verify entity data was copied to RAM page $0200
+        # Entity 1 should be at $0200-$0203
+        assert memory[0x0200] == 100, f"Entity 1 X: expected 100, got {memory[0x0200]}"
+        assert memory[0x0201] == 150, f"Entity 1 Y: expected 150, got {memory[0x0201]}"
+        assert memory[0x0202] == 1, f"Entity 1 spriteset: expected 1, got {memory[0x0202]}"
+        assert memory[0x0203] == 2, f"Entity 1 palette: expected 2, got {memory[0x0203]}"
+
+        # Entity 2 should be at $0204-$0207
+        assert memory[0x0204] == 50, f"Entity 2 X: expected 50, got {memory[0x0204]}"
+        assert memory[0x0205] == 75, f"Entity 2 Y: expected 75, got {memory[0x0205]}"
+        assert memory[0x0206] == 3, f"Entity 2 spriteset: expected 3, got {memory[0x0206]}"
+        assert memory[0x0207] == 1, f"Entity 2 palette: expected 1, got {memory[0x0207]}"
+
+        # Verify zp__entity_ram_page was set to 0x02
+        assert memory[0x14] == 0x02, f"Entity RAM page: expected 0x02, got {memory[0x14]:02X}"
+
+    def test_handles_empty_entity_list(self):
+        """Verify that empty entity list (immediate null terminator) works correctly."""
+        subroutine = LoadSceneSubroutine()
+        code = subroutine.render(
+            start_offset=0x8000,
+            names={"zp__src1": 0x10, "zp__src2": 0x12, "zp__entity_ram_page": 0x14}
+        )
+
+        cpu, memory = create_test_cpu(code.code, code_address=0x8000)
+
+        # Scene data with empty entity list
+        scene_data = [
+            0x0F,  # Background color
+            0x00, 0x00,  # BG palette pointer (null)
+            0x00, 0x00,  # Sprite palette pointer (null)
+            0x00, 0x00,  # Null terminator (empty entity list)
+        ]
+        memory.write(0x9000, scene_data)
+
+        memory[0x10] = 0x00
+        memory[0x11] = 0x90
+
+        # Run the subroutine - should not crash
+        run_subroutine(cpu, memory, subroutine_address=0x8000)
+
+        # Verify zp__entity_ram_page was still set
+        assert memory[0x14] == 0x02
+
+        # Entity RAM should be zero (no entities loaded)
+        # Just check a few bytes to confirm nothing was written
+        assert memory[0x0200] == 0
+        assert memory[0x0201] == 0

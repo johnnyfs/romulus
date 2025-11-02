@@ -133,6 +133,11 @@ class Asm6502:
         self._code.extend([0x91, zp_addr & 0xFF])
         return self
 
+    def sta_abs_x(self, addr: int):
+        """STA absolute,X (0x9D)"""
+        self._code.extend([0x9D, addr & 0xFF, (addr >> 8) & 0xFF])
+        return self
+
     def stx_zp(self, addr: int):
         """STX zero page (0x86)"""
         self._code.extend([0x86, addr & 0xFF])
@@ -328,6 +333,11 @@ class Asm6502:
     def ora_imm(self, value: int):
         """ORA #immediate (0x09)"""
         self._code.extend([0x09, value & 0xFF])
+        return self
+
+    def ora_zp(self, addr: int):
+        """ORA zero page (0x05)"""
+        self._code.extend([0x05, addr & 0xFF])
         return self
 
     def eor_imm(self, value: int):
