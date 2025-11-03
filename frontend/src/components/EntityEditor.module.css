@@ -196,14 +196,14 @@
 
 .paletteSelector {
   display: flex;
-  gap: 8px;
+  gap: 2px;
 }
 
 .paletteOption {
   display: flex;
   align-items: center;
-  gap: 4px;
-  font-size: 11px;
+  gap: 1px;
+  font-size: 10px;
   color: #999;
   cursor: pointer;
 }

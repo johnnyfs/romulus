@@ -58,3 +58,11 @@ class ZeroPageEntityRAM(ZeroPageByte):
     This is the high byte of the address; the low byte is the entity index * ENTITY_SIZE_BYTES.
     """
     label: str = "zp__entity_ram_page"
+
+
+class ZeroPageSpriteRAM(ZeroPageByte):
+    """
+    Pointer to the RAM page ($0300-$03FF) where sprite data (OAM) is assembled.
+    This is the high byte of the address used for DMA transfer to PPU OAM.
+    """
+    label: str = "zp__sprite_ram_page"

@@ -20,6 +20,7 @@ from dependencies import get_db
 
 logger = logging.getLogger(__name__)
 
+
 @dataclass
 class RomBuilder:
     """
@@ -79,6 +80,13 @@ class RomBuilder:
         preamble = PreambleCodeBlock(main_scene_label=main_label)
         self._add(self.rom, preamble)
 
+        # Always add the handlers (they will conditionally call their dependencies)
+        vblank_handler = self.code_block_registry["vblank_handler"]
+        self._add(self.rom, vblank_handler)
+
+        update_handler = self.code_block_registry["update_handler"]
+        self._add(self.rom, update_handler)
+
         # Asset code blocks are added automatically via dependencies
         # (e.g., sprite sets are added when entities reference them)
         # No need to add them unconditionally here
@@ -90,9 +98,17 @@ class RomBuilder:
         First add all dependencies, recursively depth-first. Then add the code block itself.
         Adding a code block idempotently does nothing if it is already present.
         """
+        # Add required dependencies (fail if missing)
         for dependency_name in code_block.dependencies:
             dependency = self.code_block_registry[dependency_name]
             self._add(rom, dependency)
+
+        # Add optional dependencies (skip if missing)
+        for dependency_name in code_block.optional_dependencies:
+            if dependency_name in self.code_block_registry:
+                dependency = self.code_block_registry[dependency_name]
+                self._add(rom, dependency)
+
         rom.add(code_block)
         self.code_block_registry.add_code_block(code_block)
 

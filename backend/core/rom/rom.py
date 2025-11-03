@@ -77,6 +77,15 @@ class Rom:
         if zp_offset > 256:
             raise ValueError(f"Zero page allocation exceeds 256 bytes: {zp_offset} bytes used")
 
+        # Step 1.5: Pre-calculate CHR tile indices
+        # CHR blocks need to be processed first so entity data can reference the correct tile indices
+        chr_offset = 16  # Start after background tile (tile 0)
+        for block in self.code_blocks[RomCodeArea.CHR_ROM].values():
+            # Calculate and export the CHR tile index without rendering the data yet
+            chr_tile_index = chr_offset // 16
+            names[block.label] = chr_tile_index
+            chr_offset += block.size
+
         # Step 2: PRG ROM block
         # Start at beginning of 16KB PRG ROM ($C000 in second bank)
         prg_rom_start = 0xC000
@@ -178,10 +187,6 @@ class Rom:
         # Build from CHR code blocks
         chr_rom = bytearray(8192)
 
-        # Reserve first tile (16 bytes) for background test pattern
-        # This ensures entity sprites don't overwrite the background
-        chr_offset = 0
-
         # Add test pattern for first tile (4 quadrants) at index 0
         # Low bit plane (bit 0 of color)
         chr_rom[0] = 0b00001111  # Row 0: color 0 left half, color 1 right half
@@ -194,8 +199,8 @@ class Rom:
         chr_rom[7] = 0b00001111  # Row 7
 
         # High bit plane (bit 1 of color)
-        chr_rom[8] = 0b00000000   # Row 0: color 0 left half, color 1 right half
-        chr_rom[9] = 0b00000000   # Row 1
+        chr_rom[8] = 0b00000000  # Row 0: color 0 left half, color 1 right half
+        chr_rom[9] = 0b00000000  # Row 1
         chr_rom[10] = 0b00000000  # Row 2
         chr_rom[11] = 0b00000000  # Row 3
         chr_rom[12] = 0b11111111  # Row 4: color 2 left half, color 3 right half
@@ -203,13 +208,12 @@ class Rom:
         chr_rom[14] = 0b11111111  # Row 6
         chr_rom[15] = 0b11111111  # Row 7
 
-        # Start placing sprite sets after the background tile
-        chr_offset = 16  # One tile = 16 bytes
-
+        # Render CHR data blocks (tile indices were pre-calculated in Step 1.5)
+        chr_offset = 16  # Start after background tile
         for block in self.code_blocks[RomCodeArea.CHR_ROM].values():
             rendered = block.render(start_offset=chr_offset, names=names)
-            chr_rom[chr_offset:chr_offset + len(rendered.code)] = rendered.code
-            names.update(rendered.exported_labels)
+            chr_rom[chr_offset : chr_offset + len(rendered.code)] = rendered.code
+            # Labels were already exported in Step 1.5, so don't update names again
             chr_offset += block.size
 
         chr_rom = bytes(chr_rom)

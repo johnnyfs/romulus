@@ -1,12 +1,12 @@
 @import '../styles/variables.css';
 
 .paletteEditorContainer {
-  padding: var(--spacing-sm);
+  padding: 4px;
   margin-bottom: var(--spacing-sm);
   border: var(--border-width) solid #d0d0d0;
   border-radius: var(--border-radius-sm);
   background-color: #fafafa;
-  margin-left: var(--spacing-xl);
+  margin-left: 4px;
 }
 
 .paletteHeader {
@@ -63,27 +63,27 @@
 .paletteRow {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 0;
 }
 
-.subPaletteInline {
+.paletteGroup {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+}
+
+.paletteSwatches {
+  display: flex;
+  gap: 0;
 }
 
 .paletteDivider {
   width: 1px;
-  height: 20px;
+  height: 18px;
   background-color: #d0d0d0;
-  margin: 0 4px;
-}
-
-.paletteColorColumn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
+  margin: 0 3px;
 }
 
 .paletteColorLabel {
@@ -93,8 +93,8 @@
 }
 
 .paletteColorSwatch {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border: 1px solid #333;
   border-radius: 2px;
   cursor: pointer;

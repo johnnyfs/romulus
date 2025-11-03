@@ -72,38 +72,32 @@ function PaletteEditor({
       {/* Render all palettes in a single row */}
       <div className={styles.paletteRow}>
         {/* Background color shown once at the start */}
-        <div className={styles.paletteColorColumn}>
+        <div className={styles.paletteGroup}>
           <div className={styles.paletteColorLabel}>BG</div>
-          <div
-            className={`${styles.paletteColorSwatch} ${styles.paletteColorSwatchDisabled}`}
-            style={{ backgroundColor: getNESColor(backgroundColorIndex) }}
-            title={`Background: $${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
-          />
-          <div className={styles.paletteColorIndex}>
-            ${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}
+          <div className={styles.paletteSwatches}>
+            <div
+              className={`${styles.paletteColorSwatch} ${styles.paletteColorSwatchDisabled}`}
+              style={{ backgroundColor: getNESColor(backgroundColorIndex) }}
+              title={`Background: $${backgroundColorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
+            />
           </div>
         </div>
 
-        <div className={styles.paletteDivider} />
-
         {/* All 4 sub-palettes in a row, showing only their 3 colors */}
         {palette.subPalettes.map((subPalette, subPaletteIndex) => (
-          <div key={subPaletteIndex} className={styles.subPaletteInline}>
-            {subPalette.map((colorIndex, slot) => (
-              <div key={slot} className={styles.paletteColorColumn}>
-                <div className={styles.paletteColorLabel}>{subPaletteIndex}.{slot + 1}</div>
+          <div key={subPaletteIndex} className={styles.paletteGroup}>
+            <div className={styles.paletteColorLabel}>{subPaletteIndex}</div>
+            <div className={styles.paletteSwatches}>
+              {subPalette.map((colorIndex, slot) => (
                 <button
+                  key={slot}
                   className={styles.paletteColorSwatch}
                   style={{ backgroundColor: getNESColor(colorIndex) }}
                   onClick={(e) => handleColorClick(subPaletteIndex, slot, e)}
                   title={`Palette ${subPaletteIndex}, Color ${slot + 1}: $${colorIndex.toString(16).toUpperCase().padStart(2, '0')}`}
                 />
-                <div className={styles.paletteColorIndex}>
-                  ${colorIndex.toString(16).toUpperCase().padStart(2, '0')}
-                </div>
-              </div>
-            ))}
-            {subPaletteIndex < 3 && <div className={styles.paletteDivider} />}
+              ))}
+            </div>
           </div>
         ))}
       </div>

@@ -239,20 +239,18 @@ function EntityEditor({
             {entity.spriteset && (
               <div className={styles.spriteField}>
                 <label>Palette:</label>
-                <div className={styles.paletteSelector}>
-                  {[0, 1, 2, 3].map((idx) => (
-                    <label key={idx} className={styles.paletteOption}>
-                      <input
-                        type="radio"
-                        name="palette"
-                        value={idx}
-                        checked={entity.palette_index === idx}
-                        onChange={() => handlePaletteIndexChange(idx)}
-                      />
-                      <span>{idx}</span>
-                    </label>
-                  ))}
-                </div>
+                <input
+                  type="number"
+                  value={entity.palette_index}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value, 10);
+                    if (!isNaN(val) && val >= 0 && val <= 3) {
+                      handlePaletteIndexChange(val);
+                    }
+                  }}
+                  min="0"
+                  max="3"
+                />
               </div>
             )}
           </div>

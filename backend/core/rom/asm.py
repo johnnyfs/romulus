@@ -88,6 +88,11 @@ class Asm6502:
         self._code.extend([0xB1, zp_addr & 0xFF])
         return self
 
+    def lda_abs_x(self, addr: int):
+        """LDA absolute,X (0xBD)"""
+        self._code.extend([0xBD, addr & 0xFF, (addr >> 8) & 0xFF])
+        return self
+
     def ldx_imm(self, value: int):
         """LDX #immediate (0xA2)"""
         self._code.extend([0xA2, value & 0xFF])
@@ -136,6 +141,11 @@ class Asm6502:
     def sta_abs_x(self, addr: int):
         """STA absolute,X (0x9D)"""
         self._code.extend([0x9D, addr & 0xFF, (addr >> 8) & 0xFF])
+        return self
+
+    def sta_abs_y(self, addr: int):
+        """STA absolute,Y (0x99)"""
+        self._code.extend([0x99, addr & 0xFF, (addr >> 8) & 0xFF])
         return self
 
     def stx_zp(self, addr: int):
@@ -353,6 +363,13 @@ class Asm6502:
     def bit_abs(self, addr: int):
         """BIT absolute (0x2C)"""
         self._code.extend([0x2C, addr & 0xFF, (addr >> 8) & 0xFF])
+        return self
+
+    # ===== Arithmetic =====
+
+    def adc_imm(self, value: int):
+        """ADC #immediate (0x69)"""
+        self._code.extend([0x69, value & 0xFF])
         return self
 
     # ===== Comparison =====

@@ -495,8 +495,8 @@ class TestEntityData:
 
         assert entity_data.label == "entity__player"
 
-    def test_entity_data_without_spriteset_has_no_dependencies(self):
-        """Verify entity without spriteset has no dependencies."""
+    def test_entity_data_without_spriteset_depends_on_rendering_blocks(self):
+        """Verify entity without spriteset depends on render_entities and render_sprites."""
         entity_id = uuid.uuid4()
         registry = LabelRegistry()
 
@@ -509,10 +509,12 @@ class TestEntityData:
 
         entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
 
-        assert entity_data.dependencies == []
+        assert "render_entities" in entity_data.dependencies
+        assert "render_sprites" in entity_data.dependencies
+        assert len(entity_data.dependencies) == 2
 
-    def test_entity_data_with_spriteset_depends_on_asset(self):
-        """Verify entity with spriteset depends on the sprite set asset."""
+    def test_entity_data_with_spriteset_depends_on_asset_and_rendering(self):
+        """Verify entity with spriteset depends on asset, render_entities, and render_sprites."""
         entity_id = uuid.uuid4()
         spriteset_id = uuid.uuid4()
         registry = LabelRegistry()
@@ -533,7 +535,10 @@ class TestEntityData:
 
         entity_data = EntityData.from_model(entity=mock_entity, registry=registry)
 
+        assert "render_entities" in entity_data.dependencies
+        assert "render_sprites" in entity_data.dependencies
         assert "asset__sprite_set__hero_sprites" in entity_data.dependencies
+        assert len(entity_data.dependencies) == 3
 
     def test_entity_data_size_is_4_bytes(self):
         """Verify entity data is always 4 bytes (x, y, spriteset_idx, palette_idx)."""

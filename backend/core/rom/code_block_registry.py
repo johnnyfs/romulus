@@ -4,8 +4,14 @@ from api.games.models import Game
 from core.rom.code_block import CodeBlock, CodeBlockType
 from core.rom.data import EntityData, PaletteData, SpriteSetCHRData
 from core.rom.label_registry import LabelRegistry
-from core.rom.subroutines import LoadSceneSubroutine
-from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2, ZeroPageEntityRAM
+from core.rom.subroutines import (
+    LoadSceneSubroutine,
+    RenderEntitiesSubroutine,
+    RenderSpritesBlock,
+    UpdateHandler,
+    VBlankHandler,
+)
+from core.rom.zero_page import ZeroPageSource1, ZeroPageSource2, ZeroPageEntityRAM, ZeroPageSpriteRAM
 from core.schemas import AssetType
 
 DEFAULT_REGISTRY = {
@@ -13,9 +19,17 @@ DEFAULT_REGISTRY = {
     "zp__src1": ZeroPageSource1(),
     "zp__src2": ZeroPageSource2(),
     "zp__entity_ram_page": ZeroPageEntityRAM(),
+    "zp__sprite_ram_page": ZeroPageSpriteRAM(),
     # Subroutines
     "load_scene": LoadSceneSubroutine(),
+    "render_entities": RenderEntitiesSubroutine(),
+    # VBlank code blocks
+    "render_sprites": RenderSpritesBlock(),
+    # Handlers (always included)
+    "vblank_handler": VBlankHandler(),
+    "update_handler": UpdateHandler(),
 }
+
 
 class CodeBlockRegistry:
     def __init__(self, label_registry: LabelRegistry):
@@ -30,7 +44,7 @@ class CodeBlockRegistry:
             return SpriteSetCHRData.from_model(asset.id, asset.data, self._label_registry)
         else:
             raise ValueError(f"Unsupported asset type: {asset.type}")
-        
+
     def _entity_to_code_block(self, entity: Entity) -> CodeBlock:
         """Convert an entity to code blocks."""
         # For now, entities do not yield any code blocks.
@@ -41,7 +55,7 @@ class CodeBlockRegistry:
         for asset in assets:
             code_block = self._asset_to_code_block(asset)
             self.add_code_block(code_block)
-    
+
     def add_entities(self, entities: list[Entity]):
         """Add game entities to the registry as code blocks."""
         for entity in entities:

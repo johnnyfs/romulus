@@ -1,6 +1,6 @@
 from core.rom.asm import Asm6502
 from core.rom.code_block import CodeBlock, CodeBlockType, RenderedCodeBlock
-from core.schemas import ENTITY_SIZE_BYTES
+from core.schemas import ENTITY_SIZE_BYTES, MAX_N_SCENE_ENTITIES
 
 
 class LoadSceneSubroutine(CodeBlock):
@@ -20,6 +20,7 @@ class LoadSceneSubroutine(CodeBlock):
       Offset 3-4: Sprite palette data pointer (2 bytes, little-endian, 0 = null)
       Offset 5+: Entity address list (2 bytes each, null-terminated with 0x0000)
     """
+
     label: str = "load_scene"
     type: CodeBlockType = CodeBlockType.SUBROUTINE
 
@@ -263,6 +264,259 @@ class LoadSceneSubroutine(CodeBlock):
 
         # === Return from subroutine ===
         asm.rts()
+
+        return asm.bytes()
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        code = self._build_code(start_offset, names)
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
+
+
+class RenderEntitiesSubroutine(CodeBlock):
+    """
+    The built-in render_entities subroutine code block.
+
+    Converts entity data from RAM ($0200-$02FF) to sprite data in a dedicated sprite RAM page ($0300-$03FF).
+
+    For each entity (4 bytes: x, y, spriteset_idx, palette_idx):
+    - Copy X position to sprite X
+    - Copy Y position to sprite Y
+    - Copy spriteset CHR index to sprite tile index
+    - Set sprite attributes to palette_idx (bits 0-1), no flip, foreground priority
+
+    NES sprite format (4 bytes per sprite, aka OAM entry):
+    - Byte 0: Y position
+    - Byte 1: Tile index
+    - Byte 2: Attributes (bits 0-1: palette, bit 5: priority, bits 6-7: flip)
+    - Byte 3: X position
+    """
+
+    label: str = "render_entities"
+    type: CodeBlockType = CodeBlockType.SUBROUTINE
+
+    @property
+    def size(self) -> int:
+        # Pre-calculate by building the code once
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={
+                "zp__entity_ram_page": 0x00,
+                "zp__sprite_ram_page": 0x01,
+            },
+        )
+        return len(asm)
+
+    @property
+    def dependencies(self) -> list[str]:
+        return ["zp__entity_ram_page", "zp__sprite_ram_page"]
+
+    def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
+        """Build the render_entities subroutine assembly code."""
+        asm = Asm6502()
+
+        zp_entity_ram_page = names["zp__entity_ram_page"]
+        zp_sprite_ram_page = names["zp__sprite_ram_page"]
+
+        SPRITE_RAM_PAGE = 0x03  # $0300-$03FF
+
+        # Initialize sprite RAM page pointer
+        asm.lda_imm(SPRITE_RAM_PAGE)
+        asm.sta_zp(zp_sprite_ram_page)
+
+        # X = offset into entity RAM (source)
+        # Y = offset into sprite RAM (destination)
+        asm.ldx_imm(0)
+        asm.ldy_imm(0)
+
+        # Loop through all MAX_N_SCENE_ENTITIES entities
+        entity_loop_start = len(asm)
+
+        # Load entity data from $0200 + X
+        # Entity format: x(0), y(1), spriteset_idx(2), palette_idx(3)
+
+        # Load Y position (entity byte 1)
+        asm.lda_abs_x(0x0200 + 1)
+        # Store to sprite byte 0 (Y position)
+        asm.sta_abs_y(SPRITE_RAM_PAGE * 256)
+        asm.iny()
+
+        # Load spriteset index (entity byte 2)
+        asm.lda_abs_x(0x0200 + 2)
+        # Store to sprite byte 1 (tile index)
+        asm.sta_abs_y(SPRITE_RAM_PAGE * 256)
+        asm.iny()
+
+        # Load palette index (entity byte 3)
+        asm.lda_abs_x(0x0200 + 3)
+        # Store to sprite byte 2 (attributes = palette index, no flip, foreground)
+        asm.sta_abs_y(SPRITE_RAM_PAGE * 256)
+        asm.iny()
+
+        # Load X position (entity byte 0)
+        asm.lda_abs_x(0x0200)
+        # Store to sprite byte 3 (X position)
+        asm.sta_abs_y(SPRITE_RAM_PAGE * 256)
+        asm.iny()
+
+        # Advance to next entity (4 bytes)
+        asm.txa()
+        asm.clc()
+        asm.adc_imm(ENTITY_SIZE_BYTES)
+        asm.tax()
+
+        # Check if Y has reached 256 (wrapped to 0)
+        # Since we write 4 bytes per entity, after 64 entities Y = 256 = 0
+        # BNE branches if Z flag is clear (Y != 0)
+        asm.cpy_imm(0)
+        asm.bne(0)  # Will be patched
+        bne_fixup_pos = len(asm) - 1
+
+        # Calculate branch offset (backwards)
+        entity_loop_end = len(asm)
+        # BNE offset is relative to PC after the BNE instruction
+        branch_offset = entity_loop_start - entity_loop_end
+        # Convert to signed byte
+        branch_offset_byte = branch_offset & 0xFF
+        asm._code[bne_fixup_pos] = branch_offset_byte
+
+        # Return from subroutine
+        asm.rts()
+
+        return asm.bytes()
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        code = self._build_code(start_offset, names)
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
+
+
+class RenderSpritesBlock(CodeBlock):
+    """
+    The built-in render_sprites code block (runs during VBlank).
+
+    Copies sprite data from RAM ($0300-$03FF) to PPU OAM via DMA.
+    Uses the OAMDMA register ($4014) to efficiently transfer 256 bytes.
+
+    This must run during VBlank when PPU is safe to access.
+    """
+
+    label: str = "render_sprites"
+    type: CodeBlockType = CodeBlockType.VBLANK
+
+    @property
+    def size(self) -> int:
+        # Pre-calculate by building the code once
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={"zp__sprite_ram_page": 0x00},
+        )
+        return len(asm)
+
+    @property
+    def dependencies(self) -> list[str]:
+        return ["zp__sprite_ram_page"]
+
+    def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
+        """Build the render_sprites VBlank code."""
+        asm = Asm6502()
+
+        zp_sprite_ram_page = names["zp__sprite_ram_page"]
+
+        OAMDMA = 0x4014  # OAM DMA register
+
+        # Load the high byte of sprite RAM address into OAMDMA
+        # This triggers a DMA transfer of 256 bytes from $XX00-$XXFF to OAM
+        asm.lda_zp(zp_sprite_ram_page)
+        asm.sta_abs(OAMDMA)
+
+        return asm.bytes()
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        code = self._build_code(start_offset, names)
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
+
+
+class VBlankHandler(CodeBlock):
+    """
+    The VBlank handler code block that runs during vertical blanking.
+
+    Conditionally calls render_sprites if it exists in the ROM.
+    This is always included in the ROM, but only calls subroutines that are present.
+    """
+
+    label: str = "vblank_handler"
+    type: CodeBlockType = CodeBlockType.VBLANK
+
+    @property
+    def size(self) -> int:
+        # Pre-calculate by building the code once with worst case (all subroutines present)
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={"render_sprites": 0x9000},
+        )
+        return len(asm)
+
+    @property
+    def dependencies(self) -> list[str]:
+        return []
+
+    @property
+    def optional_dependencies(self) -> list[str]:
+        return ["render_sprites"]
+
+    def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
+        """Build the VBlank handler code."""
+        asm = Asm6502()
+
+        # Call render_sprites if it exists
+        if "render_sprites" in names:
+            # render_sprites is a code block (not a subroutine), so we just need to
+            # execute its code inline. However, since it's in the VBLANK area,
+            # the ROM builder will handle placing all VBLANK blocks together.
+            # For now, we don't need to call it - it will be assembled inline.
+            pass
+
+        return asm.bytes()
+
+    def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
+        code = self._build_code(start_offset, names)
+        return RenderedCodeBlock(code=code, exported_labels={self.label: start_offset})
+
+
+class UpdateHandler(CodeBlock):
+    """
+    The Update handler code block that runs every frame after VBlank.
+
+    Conditionally calls render_entities if it exists in the ROM.
+    This is always included in the ROM, but only calls subroutines that are present.
+    """
+
+    label: str = "update_handler"
+    type: CodeBlockType = CodeBlockType.UPDATE
+
+    @property
+    def size(self) -> int:
+        # Pre-calculate by building the code once with worst case (all subroutines present)
+        asm = self._build_code(
+            start_offset=0x8000,
+            names={"render_entities": 0x9000},
+        )
+        return len(asm)
+
+    @property
+    def dependencies(self) -> list[str]:
+        return []
+
+    @property
+    def optional_dependencies(self) -> list[str]:
+        return ["render_entities"]
+
+    def _build_code(self, start_offset: int, names: dict[str, int]) -> bytes:
+        """Build the Update handler code."""
+        asm = Asm6502()
+
+        # Call render_entities if it exists
+        if "render_entities" in names:
+            asm.jsr(names["render_entities"])
 
         return asm.bytes()
 

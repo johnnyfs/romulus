@@ -176,7 +176,14 @@ class EntityData(CodeBlock):
 
     @property
     def dependencies(self) -> list[str]:
-        return [self.spriteset_label] if self.spriteset_label else []
+        # Entities depend on:
+        # - Their spriteset asset (if any)
+        # - render_entities subroutine (to convert entity data to sprites)
+        # - render_sprites VBlank block (to DMA sprites to PPU)
+        deps = ["render_entities", "render_sprites"]
+        if self.spriteset_label:
+            deps.append(self.spriteset_label)
+        return deps
 
     @property
     def size(self) -> int:

@@ -50,6 +50,11 @@ class CodeBlock(BaseModel):
     def dependencies(self) -> list[str]:
         pass
 
+    @property
+    def optional_dependencies(self) -> list[str]:
+        """Optional dependencies that are added if available but don't cause failure if missing."""
+        return []
+
     @abstractmethod
     def render(self, start_offset: int, names: dict[str, int]) -> RenderedCodeBlock:
         pass
